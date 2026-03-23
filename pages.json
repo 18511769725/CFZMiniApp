@@ -1,0 +1,128 @@
+{
+	"easycom": {
+		"autoscan": true,
+		"custom": {
+			"^uni-(.*)": "@dcloudio/uni-ui/lib/uni-$1/uni-$1.vue"
+		}
+	},
+	"pages": [
+		{
+			"path": "pages/login/login",
+			"style": {
+				"navigationBarTitleText": "授权登录",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/homepage/homepage",
+			"style": {
+				"navigationBarTitleText": "个人中心"
+			}
+		},
+		{
+			"path": "pages/mall/mall",
+			"style": {
+				"navigationBarTitleText": "服务大厅"
+			}
+		},
+		{
+			"path": "pages/order/order",
+			"style": {
+				"navigationBarTitleText": "订单中心"
+			}
+		},
+		{
+			"path": "pages/mainpage/mainpage",
+			"style": {
+				"navigationBarTitleText": "朝阳企业服务平台"
+			}
+		},
+		{
+			"path": "pages/moreinfo/moreinfo",
+			"style": {
+				"navigationBarTitleText": "补充信息"
+			}
+		},
+		{
+			"path": "pages/product/product-detail",
+			"style": {
+				"navigationBarTitleText": ""
+			}
+		},
+		{
+			"path": "pages/cargo/cargo-list",
+			"style": {
+				"navigationBarTitleText": "购物车"
+			}
+		},
+		{
+			"path": "pages/orderDetail/orderDetail",
+			"style": {
+				"navigationBarTitleText": ""
+			}
+		},
+		{
+			"path": "pages/login/agreement",
+			"style": {
+				"navigationBarTitleText": ""
+			}
+		},
+		{
+			"path": "pages/webview/webview",
+			"style": {
+				"navigationBarTitleText": ""
+			}
+		},
+		{
+			"path": "pages/addUser/addUser",
+			"style": {
+				"navigationBarTitleText": "添加用户"
+			}
+		},
+		{
+			"path": "pages/askForTenantInfo/askForTenantInfo",
+			"style": {
+				"navigationBarTitleText": "补充承租人信息"
+			}
+		}
+	],
+	"globalStyle": {
+		"navigationBarTextStyle": "black",
+		"navigationBarTitleText": "uni-app",
+		"navigationBarBackgroundColor": "#F8F8F8",
+		"backgroundColor": "#F8F8F8"
+	},
+	"uniIdRouter": {},
+	"tabBar": {
+		"color": "#7A7E83",
+		"selectedColor": "#007AFF",
+		"borderStyle": "black",
+		"backgroundColor": "#F8F8F8",
+		"list": [
+			{
+				"pagePath": "pages/mainpage/mainpage",
+				"iconPath": "static/main.png",
+				"selectedIconPath": "static/mainHL.png",
+				"text": "首页"
+			},
+			{
+				"pagePath": "pages/mall/mall",
+				"iconPath": "static/mall.png",
+				"selectedIconPath": "static/mallHL.png",
+				"text": "服务大厅"
+			},
+			{
+				"pagePath": "pages/cargo/cargo-list",
+				"iconPath": "static/cargo.png",
+				"selectedIconPath": "static/cargoHL.png",
+				"text": "购物车"
+			},
+			{
+				"pagePath": "pages/homepage/homepage",
+				"iconPath": "static/my.png",
+				"selectedIconPath": "static/myHL.png",
+				"text": "我的"
+			}
+		]
+	}
+}
