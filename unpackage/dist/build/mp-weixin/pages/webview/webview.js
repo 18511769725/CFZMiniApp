@@ -1,0 +1,1 @@
+"use strict";const e=require("../../common/vendor.js"),t={__name:"webview",setup(t){const o=e.ref("");return e.onLoad((t=>{t.targetUrl?o.value=t.targetUrl:e.index.showToast({title:"链接地址异常",icon:"none"})})),(e,t)=>({a:decodeURIComponent(o.value)})}};wx.createPage(t);

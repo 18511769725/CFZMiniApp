@@ -1,0 +1,58 @@
+{
+  "pages": [
+    "pages/login/login",
+    "pages/homepage/homepage",
+    "pages/mall/mall",
+    "pages/order/order",
+    "pages/mainpage/mainpage",
+    "pages/moreinfo/moreinfo",
+    "pages/product/product-detail",
+    "pages/cargo/cargo-list",
+    "pages/orderDetail/orderDetail",
+    "pages/login/agreement",
+    "pages/webview/webview",
+    "pages/addUser/addUser",
+    "pages/askForTenantInfo/askForTenantInfo",
+    "pages/mall/productlist",
+    "pages/personal/personal"
+  ],
+  "window": {
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "uni-app",
+    "navigationBarBackgroundColor": "#F8F8F8",
+    "backgroundColor": "#F8F8F8"
+  },
+  "tabBar": {
+    "color": "#7A7E83",
+    "selectedColor": "#007AFF",
+    "borderStyle": "black",
+    "backgroundColor": "#F8F8F8",
+    "list": [
+      {
+        "pagePath": "pages/mainpage/mainpage",
+        "iconPath": "static/main.png",
+        "selectedIconPath": "static/mainHL.png",
+        "text": "首页"
+      },
+      {
+        "pagePath": "pages/mall/mall",
+        "iconPath": "static/mall.png",
+        "selectedIconPath": "static/mallHL.png",
+        "text": "服务大厅"
+      },
+      {
+        "pagePath": "pages/cargo/cargo-list",
+        "iconPath": "static/cargo.png",
+        "selectedIconPath": "static/cargoHL.png",
+        "text": "购物车"
+      },
+      {
+        "pagePath": "pages/homepage/homepage",
+        "iconPath": "static/my.png",
+        "selectedIconPath": "static/myHL.png",
+        "text": "我的"
+      }
+    ]
+  },
+  "usingComponents": {}
+}

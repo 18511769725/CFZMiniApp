@@ -1,0 +1,8 @@
+{
+  "component": true,
+  "usingComponents": {
+    "lunbo-card-component": "./LunboCardComponent",
+    "service-card-component": "./ServiceCardComponent",
+    "process-step-card": "./ProcessStepCard"
+  }
+}

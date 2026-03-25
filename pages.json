@@ -130,7 +130,7 @@
 				"text": "购物车"
 			},
 			{
-				"pagePath": "pages/personal/personal",
+				"pagePath": "pages/homepage/homepage",
 				"iconPath": "static/my.png",
 				"selectedIconPath": "static/myHL.png",
 				"text": "我的"

@@ -79,6 +79,56 @@
       </view>
     </view>
 
+    <!-- 支付信息（仅安居类订单展示） -->
+    <view class="info-card" v-if="state.orderInfo.categoryaid === 0">
+      <view class="card-title">付款计划详情</view>
+      <view class="info-item">
+        <text class="label">订单总额：</text>
+        <text class="value">{{ state.paymentPlan.totalprice || "-" }}积分</text>
+      </view>
+      <view class="info-item">
+        <text class="label">补贴方式：</text>
+        <text class="value">{{
+          showsubsidytype(state.paymentPlan.subsidytype)
+        }}</text>
+      </view>
+      <view
+        class="info-item"
+        v-if="state.paymentPlan.subsidytype === 'deduction'"
+      >
+        <text class="label">积分补贴：</text>
+        <text class="value">{{ state.paymentPlan.face_value || "-" }}</text>
+      </view>
+      <view
+        class="info-item"
+        v-if="state.paymentPlan.subsidytype === 'discount'"
+      >
+        <text class="label">折扣比例：</text>
+        <text class="value">{{ state.paymentPlan.face_value || "-" }}</text>
+      </view>
+      <view
+        class="info-item"
+        v-if="state.paymentPlan.subsidytype === 'discount'"
+      >
+        <text class="label">折扣限额：</text>
+        <text class="value"
+          >{{ state.paymentPlan.limitamount || "-" }}积分</text
+        >
+      </view>
+      <view class="info-item">
+        <text class="label">平台补贴：</text>
+        <text class="value"
+          >{{ state.paymentPlan.totalSubsidyAmount || "-" }}积分</text
+        >
+      </view>
+      <view class="info-item">
+        <text class="label">租户自付：</text>
+        <text class="value"
+          >{{ state.paymentPlan.userPayAmount || "-" }}积分</text
+        >
+      </view>
+    </view>
+
     <!-- 订单商品内容 -->
     <view class="info-card">
       <view class="card-title">订单商品明细</view>
@@ -181,6 +231,7 @@ const state = reactive({
     title: "",
     phone: "",
   },
+  paymentPlan: {},
 });
 
 // 页面加载时获取订单ID并请求详情
@@ -202,6 +253,14 @@ onLoad((options) => {
     },
   });
 });
+
+const showsubsidytype = (type) => {
+  const map = {
+    deduction: "积分补贴",
+    discount: "折扣补贴",
+  };
+  return map[type] || "未知";
+};
 
 // 模拟获取订单详情接口
 const getOrderDetail = (orderId) => {
@@ -236,6 +295,12 @@ const getOrderDetail = (orderId) => {
             title: "",
             phone: "",
           };
+        }
+        // 安居类订单异步查询支付计划
+        if (state.orderInfo.categoryaid === 0) {
+          getPaymentPlanByOrderId(orderId);
+        } else {
+          state.paymentPlan = {};
         }
       } else {
         uni.showToast({
@@ -309,6 +374,34 @@ const getTenantInfoByOrderId = (orderId) => {
         title: "",
         phone: "",
       };
+    },
+  });
+};
+
+// 异步获取订单的支付计划（仅针对安居类订单）
+const getPaymentPlanByOrderId = (orderid) => {
+  uni.request({
+    url: "https://mvpme82.cloud/api/getpaymentplanbyorderid",
+    method: "POST",
+    data: {
+      orderid: orderid,
+    },
+    success: (res) => {
+      console.info("支付计划接口返回：", res);
+      if (
+        res &&
+        res.data &&
+        res.data.retcode === "200" &&
+        Array.isArray(res.data.data)
+      ) {
+        state.paymentPlan = res.data.data[0];
+        console.info("state.paymentPlan：", state.paymentPlan);
+      } else {
+        state.paymentPlan = [];
+      }
+    },
+    fail: () => {
+      state.paymentPlan = [];
     },
   });
 };
