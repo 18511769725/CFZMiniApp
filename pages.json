@@ -84,6 +84,18 @@
 			"style": {
 				"navigationBarTitleText": "补充承租人信息"
 			}
+		},
+		{
+			"path": "pages/mall/productlist",
+			"style": {
+				"navigationBarTitleText": "产品列表"
+			}
+		},
+		{
+			"path": "pages/personal/personal",
+			"style": {
+				"navigationBarTitleText": "个人中心"
+			}
 		}
 	],
 	"globalStyle": {
@@ -118,7 +130,7 @@
 				"text": "购物车"
 			},
 			{
-				"pagePath": "pages/homepage/homepage",
+				"pagePath": "pages/personal/personal",
 				"iconPath": "static/my.png",
 				"selectedIconPath": "static/myHL.png",
 				"text": "我的"

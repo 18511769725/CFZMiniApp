@@ -1,6 +1,0 @@
-{
-  "navigationBarTitleText": "服务大厅",
-  "usingComponents": {
-    "product-item": "./components/product-item"
-  }
-}

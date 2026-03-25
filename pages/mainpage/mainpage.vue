@@ -22,7 +22,14 @@
         <text class="enterprise-name">{{
           state.ccompanyinfo.name || "企业配额总览"
         }}</text>
-        <text class="enterprise-tag">{{ companyLevelLabel }}</text>
+        <view class="enterprise-tag">
+          <image
+            v-if="companyLevelLabel"
+            class="enterprise-tag-icon"
+            :src="companyLevelLabel"
+            mode="aspectFit"
+          ></image>
+        </view>
       </view>
       <view
         style="
@@ -347,15 +354,15 @@ const companyLevelLabel = computed(() => {
   const grade = toNumber(state.ccompanyinfo?.grade);
   switch (grade) {
     case 1:
-      return "总部型企业";
+      return "/static/companytypes/zongbu.png";
     case 2:
-      return "领军型企业";
+      return "/static/companytypes/lingjun.png";
     case 3:
-      return "领跑型企业";
+      return "/static/companytypes/lingao.png";
     case 4:
-      return "潜力型企业";
+      return "/static/companytypes/qianli.png";
     default:
-      return "企业等级待确认";
+      return "";
   }
 });
 
@@ -728,10 +735,19 @@ onLoad(() => {
   font-weight: 500;
 }
 .enterprise-tag {
-  font-size: 24rpx;
-  padding: 6rpx 16rpx;
-  background: rgba(100, 149, 237, 0.3);
-  border-radius: 20rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 94rpx;
+  min-height: 40rpx;
+  padding: 0;
+  background: transparent;
+  border-radius: 0;
+}
+.enterprise-tag-icon {
+  width: 180rpx;
+  height: 60rpx;
+  object-fit: contain;
 }
 .enterprise-desc {
   font-size: 28rpx;

@@ -1,1 +1,0 @@
-"use strict";exports._imports_0="/static/login_bg1.jpg",exports._imports_0$1="/static/mainpage_bg0.jpg",exports._imports_0$2="/static/images/empty-cargo.png",exports._imports_1="/static/mainpage_bg1.jpg",exports._imports_2="/static/mainpage_bg2.jpg",exports._imports_3="/static/mainpage_bg3.jpg";

@@ -1,1 +1,0 @@
-<view class="container"><view class="webview-header"><text class="header-title"></text></view><web-view src="{{a}}"></web-view></view>
