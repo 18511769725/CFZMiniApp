@@ -21,10 +21,10 @@
           <view v-else class="card-icon-emoji">{{ icon }}</view>
         </view>
 
-        <!-- 标题和描述 -->
+        <!-- 标题和描述（副标题用 view 以便多行省略在小程序端生效） -->
         <view class="card-text">
-          <text class="card-title">{{ title }}</text>
-          <text class="card-subtitle">{{ subtitle }}</text>
+          <view class="card-title">{{ title }}</view>
+          <view class="card-subtitle">{{ subtitle }}</view>
         </view>
       </view>
       <!-- 序号徽章 -->
@@ -81,7 +81,7 @@ const isImgPath = (value) => {
   border-radius: 20rpx;
   height: 210rpx;
   display: flex;
-  align-items: flex-end;
+  align-items: stretch;
   margin-right: 20rpx;
   background: rgba(0, 0, 0, 0);
 
@@ -102,18 +102,21 @@ const isImgPath = (value) => {
     width: 100%;
     height: 100%;
     display: flex;
-    align-items: center;
+    align-items: stretch;
     justify-content: center;
+    box-sizing: border-box;
+    padding: 16rpx 0 12rpx;
     // 背景透明，无颜色遮罩
     background: rgba(0, 0, 0, 0);
-    margin-bottom: 10rpx;
 
     .card-content-left {
       width: 150rpx;
+      min-height: 0;
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
-
+      justify-content: flex-start;
+      align-items: center;
+      gap: 12rpx;
       text-align: center;
     }
 
@@ -131,7 +134,7 @@ const isImgPath = (value) => {
     width: 100%;
     display: flex;
     justify-content: center;
-    margin-bottom: 20rpx;
+    flex-shrink: 0;
   }
 
   // 序号
@@ -160,25 +163,38 @@ const isImgPath = (value) => {
 
   .card-text {
     width: 100%;
+    flex: 1;
+    min-height: 0;
     display: flex;
     flex-direction: column;
+    justify-content: flex-start;
     word-break: break-word;
     white-space: normal;
+    overflow: hidden;
 
     .card-title {
       font-size: 24rpx;
       font-weight: 600;
       color: #fff;
-      line-height: 1.2;
-      margin-bottom: 15rpx;
+      line-height: 1.25;
+      margin-bottom: 8rpx;
       word-break: break-word;
+      flex-shrink: 0;
+      overflow: hidden;
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 3;
     }
 
     .card-subtitle {
       font-size: 18rpx;
       color: rgba(255, 255, 255);
-      line-height: 1.3;
+      line-height: 1.35;
       word-break: break-word;
+      overflow: hidden;
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 4;
     }
   }
 }

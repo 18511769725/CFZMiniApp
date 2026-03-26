@@ -1,176 +1,253 @@
 <template>
   <view class="page-container">
-    <view class="enterprise-card module-enter enter-delay-0">
-      <view class="card-header">
-        <view class="header-info">
-          <text class="company-name">{{
-            state.ccompanyinfo.name || "企业信息"
-          }}</text>
-          <text class="credit-code"
-            >统一社会信用代码：{{ state.ccompanyinfo.creditcode || "-" }}</text
-          >
-          <text class="credit-code"
-            >企业联系人：{{ state.ccompanyinfo.approvername || "-" }}</text
-          >
-        </view>
-        <text class="enterprise-tag">企业账户</text>
-      </view>
+    <!-- 固定高度 + aspectFill，避免 widthFix 把整图拉高导致首卡距顶过远 -->
+    <view class="personal-top-hero">
+      <image
+        class="personal-top-bg"
+        src="https://mvpme82.cloud/data/9a2da926-b553-43d7-9edd-d18aa5e86962_1774526652367.png"
+        mode="aspectFill"
+      />
     </view>
-
-    <view class="news-section module-enter enter-delay-1">
-      <view class="news-header">
-        <text class="news-title">当前账户信息</text>
-      </view>
-
-      <view class="info-grid">
-        <view class="info-card" style="width: 30%">
-          <text class="info-label">姓名</text>
-          <text class="info-value">{{ state.userinfo.name || "-" }}</text>
-        </view>
-        <view class="info-card" style="width: 33%">
-          <text class="info-label">手机号码</text>
-          <text class="info-value">{{ state.userinfo.phone || "-" }}</text>
-        </view>
-        <view class="info-card" style="width: 30%">
-          <text class="info-label">职位信息</text>
-          <text class="info-value">{{ state.userinfo.title || "-" }}</text>
-        </view>
-      </view>
-    </view>
-
-    <view class="news-section module-enter enter-delay-2">
-      <view class="news-header">
-        <text class="news-title">服务清单</text>
-      </view>
-
-      <view class="order-overview">
-        <view class="overview-chip">
-          <text class="chip-label">服务中</text>
-          <text class="chip-value">{{ orderStats.serving }}</text>
-        </view>
-        <view class="overview-chip">
-          <text class="chip-label">服务完成</text>
-          <text class="chip-value">{{ orderStats.finished }}</text>
-        </view>
-        <view class="overview-chip">
-          <text class="chip-label">已终止</text>
-          <text class="chip-value">{{ orderStats.terminated }}</text>
-        </view>
-      </view>
-
-      <view class="tab-bar">
-        <view
-          class="tab-item"
-          :class="{ active: activeTab === 'serving' }"
-          @click="switchTab('serving')"
-        >
-          服务中
-        </view>
-        <view
-          class="tab-item"
-          :class="{ active: activeTab === 'finished' }"
-          @click="switchTab('finished')"
-        >
-          服务完成
-        </view>
-        <view
-          class="tab-item"
-          :class="{ active: activeTab === 'terminated' }"
-          @click="switchTab('terminated')"
-        >
-          已终止
-        </view>
-      </view>
-
-      <view class="order-table table-view">
-        <view class="table-header">
-          <view class="table-cell">序号</view>
-          <view class="table-cell">合同编号</view>
-          <view class="table-cell">合同总分</view>
-          <view class="table-cell">供应商名称</view>
-          <view class="table-cell">订单发起时间</view>
-          <view class="table-cell">订单状态</view>
-        </view>
-        <view
-          class="table-row"
-          v-for="(item, index) in filteredOrderList"
-          :key="item.id"
-          @click="goToOrderDetail(item.id)"
-        >
-          <view class="table-cell">{{ index + 1 }}</view>
-          <view class="table-cell">{{ item.contractid }}</view>
-          <view class="table-cell">{{ item.contractprice }}积分</view>
-          <view class="table-cell">{{ item.bcompanyname }}</view>
-          <view class="table-cell">{{ formatTime(item.createtime) }}</view>
-          <view class="table-cell">
-            <text :class="getStatusClass(item.status)">{{
-              getStatusText(item.status)
-            }}</text>
+    <view class="page-inner">
+      <view class="g-border g-border--company module-enter enter-delay-0">
+        <view class="company-card-inner">
+          <image
+            class="company-card-bg"
+            src="https://mvpme82.cloud/data/9b281412-91b6-4aee-80bf-dcd9d448510f_1774526679284.png"
+            mode="scaleToFill"
+          />
+          <view class="company-card-content">
+            <view class="card-header">
+              <view class="header-info">
+                <text class="company-name">{{
+                  state.ccompanyinfo.name || "企业信息"
+                }}</text>
+                <text class="credit-code"
+                  >统一社会信用代码：{{
+                    state.ccompanyinfo.creditcode || "-"
+                  }}</text
+                >
+              </view>
+              <view class="enterprise-tag-wrap">
+                <image
+                  v-if="companyLevelLabel"
+                  class="enterprise-tag-img"
+                  :src="companyLevelLabel"
+                  mode="aspectFit"
+                />
+                <text v-else class="enterprise-tag-fallback">企业账户</text>
+              </view>
+            </view>
+            <view class="divider-h" />
+            <view class="company-info-grid">
+              <view class="ci-line">
+                <view class="ci-item">
+                  <view class="ci-label-wrap">
+                    <view class="ci-label"><text>企业联系人</text></view>
+                  </view>
+                  <text class="ci-val ci-val--style1">{{
+                    state.ccompanyinfo.approvername ||
+                    state.userinfo.name ||
+                    "-"
+                  }}</text>
+                </view>
+                <view class="ci-item">
+                  <view class="ci-label-wrap">
+                    <view class="ci-label"><text>手机号码</text></view>
+                  </view>
+                  <text class="ci-val ci-val--style2">{{
+                    state.userinfo.phone || "-"
+                  }}</text>
+                </view>
+              </view>
+              <view class="ci-line">
+                <view class="ci-item ci-full">
+                  <view class="ci-label-wrap">
+                    <view class="ci-label"><text>职位信息</text></view>
+                  </view>
+                  <text class="ci-val ci-val--style1">{{
+                    state.userinfo.title || "-"
+                  }}</text>
+                </view>
+              </view>
+            </view>
           </view>
         </view>
-
-        <view class="empty-tip" v-if="filteredOrderList.length === 0"
-          >暂无相关订单数据</view
-        >
       </view>
 
-      <view class="mobile-order-list" v-if="filteredOrderList.length">
-        <view
-          class="mobile-order-card"
-          v-for="(item, index) in filteredOrderList"
-          :key="`mobile-${item.id}`"
-          @click="goToOrderDetail(item.id)"
-        >
-          <view class="mobile-order-top">
-            <text class="mobile-order-no">#{{ index + 1 }}</text>
-            <text class="mobile-order-id">{{ item.contractid }}</text>
-            <text
-              class="mobile-order-status"
-              :class="getStatusClass(item.status)"
+      <view class="section-title section-title--account module-enter enter-delay-1">
+        <view class="section-title-bar" />
+        <text>当前账户信息</text>
+      </view>
+      <view class="g-border g-border--account module-enter enter-delay-1">
+        <view class="account-card-inner">
+          <image
+            class="account-card-bg"
+            src="https://mvpme82.cloud/data/086a8443-ee49-4651-ae9e-4318856a6990_1774526700790.png"
+            mode="scaleToFill"
+          />
+          <image
+            class="account-avatar"
+            src="/static/personal/head.png"
+            mode="aspectFill"
+          />
+          <view class="account-detail">
+            <text class="account-name">{{ state.userinfo.name || "—" }}</text>
+            <text class="account-role">{{ state.userinfo.title || "—" }}</text>
+            <view class="account-contact-row">
+              <view class="account-contact-item">
+                <image
+                  class="account-contact-icon"
+                  src="/static/personal/phone.png"
+                  mode="aspectFit"
+                />
+                <text>{{ state.userinfo.phone || "—" }}</text>
+              </view>
+              <view class="account-contact-item">
+                <image
+                  class="account-contact-icon"
+                  src="/static/personal/email.png"
+                  mode="aspectFit"
+                />
+                <text>{{ state.userinfo.email || "—" }}</text>
+              </view>
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <view class="section-title module-enter enter-delay-2">
+        <view class="section-title-bar" />
+        <text>服务清单</text>
+      </view>
+
+      <view class="g-border g-border--order-panel module-enter enter-delay-2">
+        <view class="order-panel-inner">
+          <view class="order-overview">
+            <view class="overview-chip">
+              <image
+                class="overview-chip-bg"
+                src="https://mvpme82.cloud/data/fc679518-c72c-4f02-883c-72ffb22c7676_1774526729020.png"
+                mode="scaleToFill"
+              />
+              <text class="chip-label">服务中</text>
+              <view class="chip-divider" />
+              <text class="chip-value chip-serving">{{
+                orderStats.serving
+              }}</text>
+            </view>
+            <view class="overview-chip">
+              <image
+                class="overview-chip-bg"
+                src="https://mvpme82.cloud/data/fc679518-c72c-4f02-883c-72ffb22c7676_1774526729020.png"
+                mode="scaleToFill"
+              />
+              <text class="chip-label">服务完成</text>
+              <view class="chip-divider" />
+              <text class="chip-value chip-done">{{
+                orderStats.finished
+              }}</text>
+            </view>
+            <view class="overview-chip">
+              <image
+                class="overview-chip-bg"
+                src="https://mvpme82.cloud/data/fc679518-c72c-4f02-883c-72ffb22c7676_1774526729020.png"
+                mode="scaleToFill"
+              />
+              <text class="chip-label">已终止</text>
+              <view class="chip-divider" />
+              <text class="chip-value chip-end">{{
+                orderStats.terminated
+              }}</text>
+            </view>
+          </view>
+
+          <view class="tab-bar-shell">
+            <view class="tab-bar">
+              <view
+                class="tab-item"
+                :class="{ active: activeTab === 'serving' }"
+                @tap="switchTab('serving')"
+              >
+                服务中
+              </view>
+              <view
+                class="tab-item"
+                :class="{ active: activeTab === 'finished' }"
+                @tap="switchTab('finished')"
+              >
+                服务完成
+              </view>
+              <view
+                class="tab-item"
+                :class="{ active: activeTab === 'terminated' }"
+                @tap="switchTab('terminated')"
+              >
+                已终止
+              </view>
+            </view>
+          </view>
+
+          <view class="order-card-list">
+            <template v-if="filteredOrderList.length">
+              <view
+                v-for="item in filteredOrderList"
+                :key="item.id"
+                class="g-border g-border--order-row"
+              >
+                <view
+                  class="order-row-card-inner"
+                  @tap="goToOrderDetail(item.id)"
+                >
+                  <view class="order-thumb-shell">
+                    <view class="order-thumb-inner">
+                      <image
+                        class="order-thumb-img"
+                        :src="orderThumbSrc(item)"
+                        mode="aspectFill"
+                      />
+                    </view>
+                  </view>
+                  <view class="order-row-main">
+                    <view class="order-row-text">
+                      <text class="order-row-line"
+                        >订单编号：{{ item.contractid }}</text
+                      >
+                      <text class="order-row-line"
+                        >服务类型：{{ orderServiceType(item) }}</text
+                      >
+                      <text class="order-row-line order-row-line--status"
+                        >进度状态：{{ orderProgressLine(item) }}</text
+                      >
+                    </view>
+                    <view
+                      class="order-row-btn-wrap"
+                      @tap.stop="goToOrderDetail(item.id)"
+                    >
+                      <view class="order-row-btn">查看详情</view>
+                    </view>
+                  </view>
+                </view>
+              </view>
+            </template>
+            <view v-else class="empty-tip order-list-empty"
+              >暂无相关订单数据</view
             >
-              {{ getStatusText(item.status) }}
-            </text>
-          </view>
-          <view class="mobile-order-row">
-            <text class="mobile-order-label">合同总分</text>
-            <text class="mobile-order-value strong"
-              >{{ item.contractprice }}积分</text
-            >
-          </view>
-          <view class="mobile-order-row">
-            <text class="mobile-order-label">供应商</text>
-            <text class="mobile-order-value">{{ item.bcompanyname }}</text>
-          </view>
-          <view class="mobile-order-row">
-            <text class="mobile-order-label">发起时间</text>
-            <text class="mobile-order-value">{{
-              formatTime(item.createtime)
-            }}</text>
           </view>
         </view>
       </view>
-      <view class="empty-tip mobile-empty" v-else> 暂无相关订单数据 </view>
-    </view>
 
-    <view class="news-section module-enter enter-delay-3">
-      <view class="news-header">
-        <text class="news-title">我的功能</text>
-      </view>
-      <view class="menu-grid">
-        <view
-          class="menu-item"
-          v-for="(item, index) in visibleMenuList"
-          :key="index"
-          @click="handleMenuClick(item)"
-        >
-          <view class="menu-icon">
-            <image
-              class="func-icon"
-              :src="`/static/images/${item.icon}`"
-              mode="widthFix"
-            ></image>
-          </view>
-          <view class="menu-text">{{ item.text }}</view>
+      <view
+        class="g-border g-border--logout module-enter enter-delay-3"
+        @tap="handleLogout"
+      >
+        <view class="logout-inner">
+          <image
+            class="logout-icon"
+            src="/static/personal/quit.png"
+            mode="aspectFit"
+          />
+          <text>退出登录</text>
         </view>
       </view>
     </view>
@@ -247,18 +324,24 @@ const getStatusText = (status) => {
   return statusMap[status] || "未知状态";
 };
 
-// 获取状态文字样式类
-const getStatusClass = (status) => {
-  const classMap = {
-    0: "status-pending",
-    1: "status-negotiate",
-    2: "status-signed",
-    3: "status-finished",
-    "-1": "status-cancelled",
-    "-2": "status-rejected",
-    "-3": "status-terminated",
-  };
-  return classMap[status] || "";
+const orderServiceType = (item) =>
+  item?.producttitle || item?.bcompanyname || "—";
+
+const orderProgressLine = (item) => {
+  const t = getStatusText(item.status);
+  if (Number(item.status) === 0) return `${t}（预计2个工作日内完成）`;
+  return t;
+};
+
+const orderThumbSrc = (item) => {
+  const u =
+    item?.imageurl ||
+    item?.imageUrl ||
+    item?.productimg ||
+    item?.productimage ||
+    item?.coverurl;
+  if (u && String(u).trim()) return u;
+  return "/static/building.png";
 };
 
 // 双击跳转到订单详情页
@@ -276,51 +359,30 @@ const state = reactive({
   ccompanyinfo: {},
   creditinfo: {},
 });
-const menuList = ref([
-  {
-    text: "消息通知",
-    icon: "messages.png",
-    action: "mergeAsset",
-  },
-  {
-    text: "评价反馈",
-    icon: "pjfk.png",
-    action: "myCoupon",
-  },
-  {
-    text: "添加用户",
-    icon: "adduser.png",
-    action: "addUser",
-  },
-  {
-    text: "退出登录",
-    icon: "quit.png",
-    action: "quitlogin",
-  },
-]);
+const toNumber = (value) => {
+  const n = Number(value);
+  return Number.isFinite(n) ? n : 0;
+};
 
-const visibleMenuList = computed(() => {
-  const isAdmin = String(state.userinfo?.isadmin) === "1";
-  return menuList.value.filter((item) => {
-    if (item.action === "addUser") {
-      return isAdmin;
-    }
-    return true;
-  });
+const companyLevelLabel = computed(() => {
+  const grade = toNumber(state.ccompanyinfo?.grade);
+  switch (grade) {
+    case 1:
+      return "/static/companytypes/zongbu.png";
+    case 2:
+      return "/static/companytypes/lingjun.png";
+    case 3:
+      return "/static/companytypes/lingao.png";
+    case 4:
+      return "/static/companytypes/qianli.png";
+    default:
+      return "";
+  }
 });
 
-const handleMenuClick = (item) => {
-  switch (item.action) {
-    case "mergeAsset":
-      break;
-    case "addUser":
-      uni.navigateTo({ url: "/pages/addUser/addUser" });
-      break;
-    case "quitlogin":
-      uni.removeStorageSync("userSessionChaoqitong");
-      uni.navigateTo({ url: "/pages/login/login" });
-      break;
-  }
+const handleLogout = () => {
+  uni.removeStorageSync("userSessionChaoqitong");
+  uni.reLaunch({ url: "/pages/login/login" });
 };
 const getOrderList = () => {
   uni.request({
@@ -447,101 +509,95 @@ onShow(() => {
 });
 </script>
 
+<style lang="scss">
+page {
+  background-color: #061730;
+}
+</style>
+
 <style scoped lang="scss">
 .page-container {
-  --biz-bg: #dfe8f2;
-  --biz-surface: #edf3f8;
-  --biz-surface-soft: #e5edf6;
-  --biz-border: #c7d4e2;
-  --biz-border-strong: #b4c6d8;
-  --biz-title: #183b63;
-  --biz-text: #284868;
-  --biz-subtext: #647b94;
-  --biz-primary: #245a96;
-  --biz-primary-soft: #dbe7f3;
-  --quota-bg-dark: #2a587f;
-  --quota-bg-dark-2: #416f99;
-  --quota-text-light: #e8f2ff;
-  --quota-text-strong: #ffffff;
-
   min-height: 100vh;
-  padding: 16rpx 0 24rpx;
+  width: 100%;
   box-sizing: border-box;
-  background:
-    radial-gradient(
-      circle at 12% -10%,
-      rgba(65, 107, 153, 0.16) 0,
-      transparent 44%
-    ),
-    radial-gradient(
-      circle at 90% -8%,
-      rgba(100, 140, 185, 0.12) 0,
-      transparent 42%
-    ),
-    linear-gradient(180deg, #d5e0eb 0%, #dbe5ef 44%, var(--biz-bg) 100%);
+  background-color: #061730;
+  color: #fff;
+  padding: 0;
+  padding-bottom: env(safe-area-inset-bottom);
 }
 
-.enterprise-card,
-.news-section {
-  margin: 0 16rpx 16rpx;
-}
-
-.enterprise-card {
-  position: relative;
-  isolation: isolate;
+/* 导航栏下沿到首卡顶部 ≈ hero高度 + page-inner 的 margin-top（负值） */
+.personal-top-hero {
+  width: 100%;
+  height: 106rpx;
   overflow: hidden;
-  background: linear-gradient(
-    145deg,
-    var(--quota-bg-dark) 0%,
-    #35648e 42%,
-    var(--quota-bg-dark-2) 100%
-  );
-  border: 1rpx solid rgba(199, 218, 238, 0.34);
-  border-radius: 22rpx;
-  padding: 28rpx 24rpx;
-  box-shadow:
-    0 12rpx 26rpx rgba(26, 54, 89, 0.18),
-    0 1rpx 0 rgba(255, 255, 255, 0.08) inset;
+  line-height: 0;
+}
+
+.personal-top-bg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.page-inner {
+  position: relative;
+  z-index: 2;
+  padding: 0 31rpx;
+  padding-bottom: calc(28rpx + env(safe-area-inset-bottom));
+  max-width: 750rpx;
+  margin: 0 auto;
+  /* 106 - 40 = 66rpx，对齐设计稿；仍嫌高可把 height 降到 96 或 margin 调到 -44 */
+  margin-top: -40rpx;
+}
+
+.g-border {
   box-sizing: border-box;
 }
 
-.enterprise-card::after {
-  content: "";
-  position: absolute;
-  width: 240rpx;
-  height: 240rpx;
-  left: -120rpx;
-  bottom: -130rpx;
-  border-radius: 9999rpx;
-  background: radial-gradient(
-    circle,
-    rgba(121, 159, 201, 0.2) 0,
-    transparent 70%
+.g-border--company {
+  margin-top: 0;
+  width: 688rpx;
+  max-width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 2rpx;
+  border-radius: 41rpx;
+  background: linear-gradient(
+    171deg,
+    #80c3f6 0%,
+    #244368 48%,
+    #9ccdf0 100%
   );
-  pointer-events: none;
-  z-index: 0;
 }
 
-.enterprise-card::before {
-  content: "";
+.company-card-inner {
+  position: relative;
+  border-radius: 39rpx;
+  overflow: hidden;
+  box-sizing: border-box;
+  background: transparent;
+}
+
+.company-card-bg {
   position: absolute;
-  width: 300rpx;
-  height: 300rpx;
-  right: -120rpx;
-  top: -120rpx;
-  border-radius: 9999rpx;
-  background: radial-gradient(
-    circle,
-    rgba(146, 186, 228, 0.22) 0,
-    transparent 68%
-  );
-  pointer-events: none;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
   z-index: 0;
+  display: block;
+  pointer-events: none;
+}
+
+.company-card-content {
+  position: relative;
+  z-index: 1;
+  padding: 26rpx 24rpx 22rpx;
+  box-sizing: border-box;
 }
 
 .card-header {
-  position: relative;
-  z-index: 2;
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
@@ -553,365 +609,561 @@ onShow(() => {
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 6rpx;
+  gap: 10rpx;
 }
 
 .company-name {
-  font-size: 34rpx;
-  line-height: 1.3;
-  font-weight: 700;
-  color: var(--quota-text-strong);
-  text-shadow: 0 2rpx 4rpx rgba(6, 20, 46, 0.42);
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #ffffff;
+  line-height: 1.35;
 }
 
 .credit-code {
   font-size: 24rpx;
-  color: rgba(224, 239, 255, 0.88);
+  color: rgba(255, 255, 255, 0.65);
   line-height: 1.45;
-  font-weight: 500;
   word-break: break-all;
 }
 
-.enterprise-tag {
+.enterprise-tag-wrap {
   flex-shrink: 0;
-  padding: 8rpx 14rpx;
+  display: flex;
+  align-items: center;
+}
+
+.enterprise-tag-img {
+  width: 150rpx;
+  height: 50rpx;
+}
+
+.enterprise-tag-fallback {
+  padding: 8rpx 18rpx;
   border-radius: 999rpx;
   font-size: 22rpx;
   font-weight: 600;
-  color: #234d7d;
-  background: linear-gradient(180deg, #edf3f9 0%, #dfe8f2 100%);
-  border: 1rpx solid rgba(255, 255, 255, 0.42);
+  color: #e8f2ff;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1rpx solid rgba(255, 255, 255, 0.25);
 }
 
-.news-section {
-  position: relative;
-  overflow: hidden;
-  padding: 24rpx;
-  background: linear-gradient(
-    180deg,
-    var(--biz-surface) 0%,
-    var(--biz-surface-soft) 100%
-  );
-  border-radius: 20rpx;
-  border: 1rpx solid var(--biz-border);
-  box-shadow: 0 8rpx 22rpx rgba(24, 45, 74, 0.06);
+.divider-h {
+  height: 2rpx;
+  background: rgba(255, 255, 255, 0.18);
+  margin: 18rpx 0 16rpx;
 }
 
-.news-header {
-  position: relative;
+.company-info-grid {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 22rpx;
+  flex-direction: column;
 }
 
-.news-title {
-  position: relative;
-  font-size: 32rpx;
-  font-weight: 800;
-  letter-spacing: 0.4rpx;
-  color: var(--biz-title);
-  padding-left: 16rpx;
-}
-
-.news-title:before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 6rpx;
-  bottom: 6rpx;
-  width: 6rpx;
-  border-radius: 6rpx;
-  background: linear-gradient(180deg, #2d68b2 0%, #70a2df 100%);
-}
-
-.info-grid {
-  position: relative;
-  display: grid;
-  grid-template-columns: 30% 33% 30%;
-  gap: 14rpx;
+.ci-line {
   display: flex;
   flex-direction: row;
+  width: 100%;
+}
+
+.ci-item {
+  width: 50%;
+  margin-bottom: 12rpx;
+  display: flex;
+  align-items: center;
+}
+
+.ci-full {
+  width: 100%;
+}
+
+.ci-label-wrap {
+  width: 115rpx;
+  height: 31rpx;
+  padding: 1rpx;
+  box-sizing: border-box;
+  flex-shrink: 0;
+  border-radius: 8rpx;
+  overflow: hidden;
+  background: linear-gradient(-33deg, #4268a0 0%, #ffffff 100%);
+}
+
+.ci-label {
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
   justify-content: center;
+  background: rgba(36, 55, 90, 0.47);
+  border-radius: 7rpx;
+  font-size: 20rpx;
+  color: #ffffff;
+  line-height: 1;
+  padding: 0 4rpx;
 }
 
-.info-card {
-  background: linear-gradient(180deg, #ecf2f7 0%, #e4ecf4 100%);
-  border: 1rpx solid #ccd8e4;
-  border-radius: 16rpx;
-  padding: 20rpx 10rpx;
-  text-align: center;
+.ci-val {
+  max-width: 569rpx;
+  min-height: 23rpx;
+  margin-left: 12rpx;
+  flex: 1;
+  min-width: 0;
+  font-family: PingFang SC, PingFangSC-Light, sans-serif;
+  font-size: 21rpx;
+  font-weight: normal;
+  letter-spacing: 0;
+  color: #ffffff;
 }
 
-.info-label {
-  display: block;
+.ci-val.ci-val--style1 {
+  font-family: PingFang SC, PingFangSC-Medium, sans-serif;
   font-size: 24rpx;
-  color: var(--biz-subtext);
-  margin-bottom: 8rpx;
-  font-weight: 500;
 }
 
-.info-value {
-  font-size: 31rpx;
-  font-weight: 800;
-  line-height: 1.25;
-  color: var(--biz-title);
+.ci-val.ci-val--style2 {
+  font-family: PingFang SC, PingFangSC-Light, sans-serif;
+  font-size: 21rpx;
+  letter-spacing: 1rpx;
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  font-size: 34rpx;
+  font-weight: 600;
+  color: #ffffff;
+  margin: 32rpx 0 18rpx;
+}
+
+.section-title-bar {
+  width: 6rpx;
+  height: 28rpx;
+  border-radius: 3rpx;
+  background: linear-gradient(180deg, #80c3f6 0%, #4a8cc4 100%);
+}
+
+.section-title--account {
+  margin-top: 28rpx;
+  margin-bottom: 14rpx;
+}
+
+.g-border--account {
+  width: 692rpx;
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 2rpx;
+  border-radius: 35rpx;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.38) 0%,
+    rgba(255, 255, 255, 0.1) 100%
+  );
+}
+
+.account-card-inner {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: 165rpx;
+  padding: 28rpx 32rpx;
+  border-radius: 33rpx;
+  overflow: hidden;
+  box-sizing: border-box;
+  background: transparent;
+}
+
+.account-card-bg {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  display: block;
+  pointer-events: none;
+}
+
+.account-avatar {
+  position: relative;
+  z-index: 1;
+  width: 108rpx;
+  height: 108rpx;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: rgba(0, 0, 0, 0.2);
+  border: 2rpx solid rgba(255, 255, 255, 0.2);
+}
+
+.account-detail {
+  margin-left: 28rpx;
+  flex: 1;
+  min-width: 0;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.account-name {
+  font-family: PingFang SC, PingFangSC-Medium, sans-serif;
+  font-size: 34rpx;
+  font-weight: normal;
+  line-height: 51rpx;
+  letter-spacing: 0;
+  color: #ffffff;
+}
+
+.account-role {
+  font-family: PingFang SC, PingFangSC-Regular, sans-serif;
+  font-size: 22rpx;
+  font-weight: normal;
+  line-height: 32rpx;
+  letter-spacing: 0;
+  color: #ffffff;
+}
+
+.account-contact-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10rpx 32rpx;
+  margin-top: 6rpx;
+}
+
+.account-contact-item {
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+  font-size: 22rpx;
+  color: rgba(255, 255, 255, 0.92);
+  max-width: 100%;
+}
+
+.account-contact-item text {
+  flex: 1;
+  min-width: 0;
   word-break: break-all;
 }
 
-.tab-bar {
-  position: relative;
-  display: flex;
-  gap: 10rpx;
-  margin-bottom: 20rpx;
+.account-contact-icon {
+  width: 28rpx;
+  height: 28rpx;
+  flex-shrink: 0;
+  opacity: 0.92;
+}
+
+.g-border--order-panel {
+  width: 690rpx;
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 1rpx;
+  border-radius: 24rpx;
+  background: linear-gradient(
+    -8deg,
+    #4683d3 1%,
+    #2c62bb 26%,
+    #1141a2 51%,
+    #558dd8 100%
+  );
+}
+
+.order-panel-inner {
+  border-radius: 23rpx;
+  padding: 22rpx 18rpx 24rpx;
+  box-sizing: border-box;
+  background: rgba(6, 20, 40, 0.94);
 }
 
 .order-overview {
-  position: relative;
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: stretch;
   gap: 12rpx;
-  margin-bottom: 18rpx;
+  margin-bottom: 16rpx;
 }
 
+/* 设计稿 .10 尺寸 + 24.png 底图（替代 CSS 渐变） */
 .overview-chip {
-  background: linear-gradient(180deg, #ecf2f7 0%, #e4ecf4 100%);
-  border: 1rpx solid #ccd8e4;
-  border-radius: 14rpx;
-  padding: 14rpx 10rpx;
-  text-align: center;
+  position: relative;
+  flex: 1 1 0;
+  max-width: 193rpx;
+  min-width: 0;
+  height: 124rpx;
+  box-sizing: border-box;
+  border-radius: 22rpx;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.overview-chip-bg {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  display: block;
+  pointer-events: none;
+}
+
+.overview-chip .chip-label,
+.overview-chip .chip-divider,
+.overview-chip .chip-value {
+  position: relative;
+  z-index: 1;
 }
 
 .chip-label {
-  display: block;
   font-size: 22rpx;
-  color: var(--biz-subtext);
-  margin-bottom: 6rpx;
-  font-weight: 500;
+  color: #b7ab93;
+}
+
+.chip-divider {
+  width: 72%;
+  height: 2rpx;
+  background: rgba(183, 171, 147, 0.55);
+  margin: 8rpx 0 4rpx;
 }
 
 .chip-value {
-  display: block;
-  font-size: 34rpx;
-  font-weight: 800;
-  color: var(--biz-title);
-  line-height: 1.08;
+  font-size: 38rpx;
+  font-weight: 700;
+}
+
+.chip-serving {
+  color: #fdcf82;
+}
+
+.chip-done {
+  color: #74bea0;
+}
+
+.chip-end {
+  color: #d27374;
+}
+
+/* 设计稿 .23：椭圆外框金色描边（去掉中间深蓝，小程序不用 border-image） */
+.tab-bar-shell {
+  width: 650rpx;
+  max-width: 100%;
+  margin: 0 auto 18rpx;
+  padding: 1rpx;
+  box-sizing: border-box;
+  border-radius: 35rpx;
+  overflow: hidden;
+  background: linear-gradient(
+    180deg,
+    rgba(250, 235, 204, 0.83) 0%,
+    rgba(221, 184, 119, 0.9) 45%,
+    rgba(240, 214, 160, 0.83) 100%
+  );
+}
+
+.tab-bar {
+  display: flex;
+  align-items: stretch;
+  gap: 10rpx;
+  padding: 6rpx 8rpx;
+  box-sizing: border-box;
+  min-height: 68rpx;
+  height: 68rpx;
+  border-radius: 34rpx;
+  background: rgba(10, 24, 48, 0.94);
 }
 
 .tab-item {
   flex: 1;
-  text-align: center;
-  padding: 14rpx 0;
-  font-size: 26rpx;
-  font-weight: 600;
-  color: var(--biz-subtext);
-  border-radius: 999rpx;
-  background: #dde7f1;
-  border: 1rpx solid #c8d5e2;
-  transition: all 0.2s ease;
-
-  &.active {
-    color: var(--biz-primary);
-    font-weight: 700;
-    background: var(--biz-primary-soft);
-    border-color: #bccbdd;
-  }
-}
-
-.order-table {
-  position: relative;
-  width: 100%;
-  overflow-x: auto;
-  border-radius: 14rpx;
-  border: 1rpx solid #ccd8e4;
-}
-
-.mobile-order-list {
-  position: relative;
-  display: none;
-  flex-direction: column;
-  gap: 12rpx;
-}
-
-.mobile-order-card {
-  border: 1rpx solid #ccd8e4;
-  border-radius: 14rpx;
-  background: linear-gradient(180deg, #ecf2f7 0%, #e4ecf4 100%);
-  padding: 14rpx 14rpx 12rpx;
-}
-
-.mobile-order-top {
   display: flex;
   align-items: center;
-  gap: 10rpx;
-  margin-bottom: 10rpx;
-}
-
-.mobile-order-no {
-  font-size: 22rpx;
-  color: #5a7392;
-  font-weight: 700;
-}
-
-.mobile-order-id {
-  flex: 1;
-  min-width: 0;
-  font-size: 25rpx;
-  color: var(--biz-title);
-  font-weight: 800;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.mobile-order-status {
-  font-size: 22rpx;
-  font-weight: 600;
-}
-
-.mobile-order-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 12rpx;
-  padding: 5rpx 0;
-}
-
-.mobile-order-label {
-  font-size: 23rpx;
-  color: var(--biz-subtext);
+  justify-content: center;
+  text-align: center;
+  padding: 0 8rpx;
+  border-radius: 27rpx;
+  font-size: 26rpx;
+  color: rgba(255, 255, 255, 0.9);
   font-weight: 500;
 }
 
-.mobile-order-value {
-  flex: 1;
-  min-width: 0;
-  text-align: right;
-  font-size: 24rpx;
-  line-height: 1.35;
-  color: var(--biz-text);
-  word-break: break-all;
+.tab-item.active {
+  background: linear-gradient(0deg, #dab26b 0%, #fcefd4 100%);
+  color: #1a2a3d;
+  font-weight: 600;
 }
 
-.mobile-order-value.strong {
-  font-weight: 700;
-  color: var(--biz-title);
-}
-
-.mobile-empty {
-  display: none;
-}
-
-.table-header,
-.table-row {
-  display: grid;
-  grid-template-columns: 90rpx 220rpx 180rpx 220rpx 280rpx 160rpx;
-  align-items: center;
-  min-width: 1150rpx;
-}
-
-.table-header {
-  background: #d6e1ec;
-}
-
-.table-cell {
-  width: 100%;
-  padding: 16rpx 12rpx;
-  text-align: center;
-  font-size: 25rpx;
-  line-height: 1.35;
-  color: var(--biz-text);
-  white-space: normal;
-  word-break: break-all;
-}
-
-.table-header .table-cell {
-  font-weight: 700;
-  color: #2e4f74;
-}
-
-.table-row {
-  border-top: 1rpx solid #cdd8e3;
-  background-color: #e3ecf4;
-}
-
-.table-row:active {
-  background-color: #d8e3ee;
-}
-
-.status-pending {
-  color: #ff9800;
-}
-
-.status-negotiate {
-  color: #4299e1;
-}
-
-.status-signed {
-  color: #38b2ac;
-}
-
-.status-finished {
-  color: #48bb78;
-}
-
-.status-cancelled,
-.status-rejected,
-.status-terminated {
-  color: #e53e3e;
-}
-
-.empty-tip {
-  position: relative;
-  text-align: center;
-  padding: 36rpx 0;
-  font-size: 26rpx;
-  color: var(--biz-subtext);
-}
-
-.menu-grid {
-  position: relative;
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 12rpx;
-}
-
-.menu-item {
+.order-card-list {
   display: flex;
   flex-direction: column;
+  gap: 20rpx;
+}
+
+.g-border--order-row {
+  padding: 2rpx;
+  border-radius: 22rpx;
+  box-sizing: border-box;
+  background: linear-gradient(
+    171deg,
+    #80c3f6 0%,
+    #244368 48%,
+    #9ccdf0 100%
+  );
+}
+
+.order-row-card-inner {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  gap: 22rpx;
+  padding: 22rpx;
+  border-radius: 20rpx;
+  box-sizing: border-box;
+  background: linear-gradient(
+    135deg,
+    rgba(48, 72, 118, 0.88) 0%,
+    rgba(18, 32, 58, 0.94) 100%
+  );
+  border: 1rpx solid rgba(100, 150, 210, 0.35);
+}
+
+/* 设计稿 .24：137×137，3rpx 渐变描边 + 内区竖向渐变底（小程序模拟 border-image） */
+.order-thumb-shell {
+  width: 137rpx;
+  height: 137rpx;
+  padding: 3rpx;
+  box-sizing: border-box;
+  border-radius: 18rpx;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: linear-gradient(
+    178deg,
+    #5e97d2 0%,
+    #2c5f8f 49%,
+    #6a9ccf 100%
+  );
+}
+
+.order-thumb-inner {
+  width: 100%;
+  height: 100%;
+  border-radius: 15rpx;
+  overflow: hidden;
+  background: linear-gradient(180deg, #1b4163 0%, #76aadf 100%);
+}
+
+.order-thumb-img {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.order-row-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 137rpx;
+}
+
+.order-row-text {
+  display: flex;
+  flex-direction: column;
+  gap: 10rpx;
+}
+
+/* 设计稿订单信息块：全文 #ffffff，19rpx / 35rpx */
+.order-row-line {
+  display: block;
+  font-size: 19rpx;
+  line-height: 35rpx;
+  font-weight: normal;
+  color: #ffffff;
+  letter-spacing: 0;
+  word-break: break-all;
+}
+
+.order-row-line--status {
+  color: #ffffff;
+}
+
+/* 设计稿 .8：查看详情；圆角 15rpx，小程序用渐变外层模拟 border-image */
+.order-row-btn-wrap {
+  align-self: flex-end;
+  margin-top: 12rpx;
+  width: 127rpx;
+  height: 41rpx;
+  padding: 1rpx;
+  box-sizing: border-box;
+  border-radius: 15rpx;
+  overflow: hidden;
+  background: linear-gradient(
+    159deg,
+    #afcde9 0%,
+    #3763b3 50%,
+    #2453ab 58%,
+    #afcef2 100%
+  );
+}
+
+.order-row-btn {
+  width: 100%;
+  height: 100%;
+  display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 162rpx;
-  padding: 12rpx 8rpx;
   border-radius: 14rpx;
-  border: 1rpx solid #ccd8e4;
-  background: linear-gradient(180deg, #ecf2f7 0%, #e4ecf4 100%);
+  font-size: 20rpx;
+  color: #ffffff;
+  line-height: 1;
+  background: transparent;
   box-sizing: border-box;
 }
 
-.menu-item:active {
-  background-color: #d8e3ee;
+.order-list-empty {
+  padding: 36rpx 0 8rpx;
 }
 
-.menu-icon {
-  width: 64rpx;
-  height: 64rpx;
+.empty-tip {
+  text-align: center;
+  padding: 32rpx 0;
+  font-size: 26rpx;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.g-border--logout {
+  margin-top: 36rpx;
+  padding: 1rpx;
+  border-radius: 27rpx;
+  background: linear-gradient(
+    178deg,
+    #5e97d2 0%,
+    #2c5f8f 49%,
+    #6a9ccf 100%
+  );
+}
+
+.logout-inner {
+  height: 78rpx;
+  border-radius: 26rpx;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 10rpx;
+  gap: 16rpx;
+  font-size: 28rpx;
+  color: #ffffff;
+  background: linear-gradient(
+    180deg,
+    rgba(32, 58, 95, 0.96) 0%,
+    rgba(12, 28, 52, 0.98) 100%
+  );
 }
 
-.func-icon {
-  width: 64rpx;
-}
-
-.menu-text {
-  font-size: 25rpx;
-  font-weight: 600;
-  color: var(--biz-title);
-  line-height: 1.3;
-  text-align: center;
+.logout-icon {
+  width: 36rpx;
+  height: 36rpx;
 }
 
 .module-enter {
@@ -946,40 +1198,8 @@ onShow(() => {
 }
 
 @media screen and (max-width: 380px) {
-  .enterprise-card,
-  .news-section {
-    margin-left: 12rpx;
-    margin-right: 12rpx;
-  }
-
-  .enterprise-card,
-  .news-section {
-    padding-left: 20rpx;
-    padding-right: 20rpx;
-  }
-
-  .info-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .menu-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-
   .order-overview {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .table-view {
-    display: none;
-  }
-
-  .mobile-order-list {
-    display: flex;
-  }
-
-  .mobile-empty {
-    display: block;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 </style>

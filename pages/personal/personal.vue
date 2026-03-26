@@ -1,133 +1,239 @@
 <template>
   <view class="container">
-    <view class="card company-card">
-      <view class="company-header">
-        <text class="company-name">{{ data.company.name }}</text>
-        <view class="enterprise-tag">
+    <image
+      class="personal-top-bg"
+      src="https://mvpme82.cloud/data/9a2da926-b553-43d7-9edd-d18aa5e86962_1774526652367.png"
+      mode="widthFix"
+    />
+    <view class="personal-main">
+      <!-- 企业卡片：171° 渐变描边 + 半透明底（设计 688×254 / 圆角 41） -->
+      <view class="g-border g-border--company">
+        <view class="company-card-inner">
           <image
-            v-if="companyLevelLabel"
-            class="enterprise-tag-icon"
-            :src="companyLevelLabel"
+            class="company-card-bg"
+            src="https://mvpme82.cloud/data/9b281412-91b6-4aee-80bf-dcd9d448510f_1774526679284.png"
+            mode="scaleToFill"
+          />
+          <view class="company-card-content">
+            <view class="company-header">
+              <text class="company-name">{{ companyDisplay.name }}</text>
+              <view class="enterprise-tag">
+                <image
+                  v-if="companyLevelLabel"
+                  class="enterprise-tag-icon"
+                  :src="companyLevelLabel"
+                  mode="aspectFit"
+                />
+              </view>
+            </view>
+            <view class="code"
+              >统一社会信用代码：{{ companyDisplay.code }}</view
+            >
+            <view class="divider" />
+            <view class="info-grid">
+              <view class="info-line">
+                <view class="info-item">
+                  <view class="label-wrap">
+                    <view class="label"><text>企业联系人</text></view>
+                  </view>
+                  <text class="val val--style1">{{
+                    companyDisplay.contact
+                  }}</text>
+                </view>
+                <view class="info-item">
+                  <view class="label-wrap">
+                    <view class="label"><text>手机号码</text></view>
+                  </view>
+                  <text class="val val--style2">{{
+                    companyDisplay.phone
+                  }}</text>
+                </view>
+              </view>
+              <view class="info-line">
+                <view class="info-item info-item-full">
+                  <view class="label-wrap">
+                    <view class="label"><text>职位信息</text></view>
+                  </view>
+                  <text class="val val--style1">{{
+                    companyDisplay.position
+                  }}</text>
+                </view>
+              </view>
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <view class="section-title">
+        <view class="section-title-bar" />
+        <text>当前账户信息</text>
+      </view>
+      <view class="g-border g-border--account">
+        <view class="account-card-inner">
+          <image
+            class="account-card-bg"
+            src="https://mvpme82.cloud/data/086a8443-ee49-4651-ae9e-4318856a6990_1774526700790.png"
+            mode="scaleToFill"
+          />
+          <image
+            class="avatar"
+            :src="accountDisplay.avatar"
+            mode="aspectFill"
+          />
+          <view class="account-detail">
+            <view class="name-row">
+              <text class="name">{{ accountDisplay.name }}</text>
+              <text class="role">{{ accountDisplay.role }}</text>
+            </view>
+            <view class="contact-row">
+              <view class="contact-item">
+                <image
+                  class="contact-icon"
+                  src="/static/personal/phone.png"
+                  mode="aspectFit"
+                />
+                <text>{{ accountDisplay.phone }}</text>
+              </view>
+              <view class="contact-item contact-item-mail">
+                <image
+                  class="contact-icon"
+                  src="/static/personal/email.png"
+                  mode="aspectFit"
+                />
+                <text>{{ accountDisplay.email }}</text>
+              </view>
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <view class="section-title">
+        <view class="section-title-bar" />
+        <text>服务清单</text>
+      </view>
+
+      <view class="g-border g-border--order-panel">
+        <view class="order-panel-inner">
+          <view class="stats-grid">
+            <view class="stat-box">
+              <image
+                class="stat-box-bg"
+                src="https://mvpme82.cloud/data/fc679518-c72c-4f02-883c-72ffb22c7676_1774526729020.png"
+                mode="scaleToFill"
+              />
+              <text class="stat-label">服务中</text>
+              <view class="stat-divider" />
+              <text class="stat-count stat-count--serving">{{
+                orderStats.serving
+              }}</text>
+            </view>
+            <view class="stat-box">
+              <image
+                class="stat-box-bg"
+                src="https://mvpme82.cloud/data/fc679518-c72c-4f02-883c-72ffb22c7676_1774526729020.png"
+                mode="scaleToFill"
+              />
+              <text class="stat-label">服务完成</text>
+              <view class="stat-divider" />
+              <text class="stat-count stat-count--done">{{
+                orderStats.finished
+              }}</text>
+            </view>
+            <view class="stat-box">
+              <image
+                class="stat-box-bg"
+                src="https://mvpme82.cloud/data/fc679518-c72c-4f02-883c-72ffb22c7676_1774526729020.png"
+                mode="scaleToFill"
+              />
+              <text class="stat-label">已终止</text>
+              <view class="stat-divider" />
+              <text class="stat-count stat-count--end">{{
+                orderStats.terminated
+              }}</text>
+            </view>
+          </view>
+
+          <scroll-view scroll-x class="tab-scroll" show-scrollbar="false">
+            <view class="tab-bar-shell">
+              <view class="tab-container">
+                <view
+                  v-for="tab in tabs"
+                  :key="tab.id"
+                  class="tab-item"
+                  :class="{ active: activeTabId === tab.id }"
+                  @tap="switchTab(tab.id)"
+                >
+                  {{ tab.label }}
+                </view>
+              </view>
+            </view>
+          </scroll-view>
+
+          <view v-if="displayOrder" class="g-border g-border--order-item">
+            <view class="order-item-inner">
+              <view class="order-thumb-shell">
+                <view class="order-thumb-inner">
+                  <image
+                    class="order-thumb-img"
+                    :src="displayOrder.image"
+                    mode="aspectFill"
+                  />
+                </view>
+              </view>
+              <view class="order-info">
+                <view class="order-row"
+                  >订单编号：{{ displayOrder.contractid }}</view
+                >
+                <view class="order-row"
+                  >服务类型：{{ displayOrder.typeLabel }}</view
+                >
+                <view class="order-row status"
+                  >进度状态：{{ displayOrder.statusText }}</view
+                >
+                <view class="detail-btn-shell">
+                  <button
+                    class="detail-btn"
+                    @tap="goToOrderDetail(displayOrder.id)"
+                  >
+                    查看详情
+                  </button>
+                </view>
+              </view>
+            </view>
+          </view>
+          <view v-else class="order-empty">暂无相关订单数据</view>
+        </view>
+      </view>
+
+      <view class="section-title">
+        <view class="section-title-bar" />
+        <text>我的功能</text>
+      </view>
+      <view class="function-panel">
+        <view
+          v-for="item in functionMenuItems"
+          :key="item.action"
+          class="function-item"
+          @tap="handleMenuClick(item)"
+        >
+          <image
+            class="function-icon"
+            :src="menuIconSrc(item)"
             mode="aspectFit"
-          ></image>
+          />
+          <text class="function-text">{{ item.text }}</text>
         </view>
       </view>
-      <view class="code">统一社会信用代码：{{ data.company.code }}</view>
-      <view class="divider"></view>
-      <view class="info-grid">
-        <view class="info-line">
-          <view class="info-item">
-            <view class="label"><text>企业联系人</text></view>
-            <text class="val">{{ data.company.contact }}</text>
-          </view>
-          <view class="info-item">
-            <view class="label"><text>手机号码</text></view>
-            <text class="val">{{ data.company.phone }}</text>
-          </view>
-        </view>
-        <view class="info-line">
-          <view class="info-item" style="width: 100%">
-            <view class="label"><text>职位信息</text></view>
-            <text class="val">{{ data.company.position }}</text>
-          </view>
-        </view>
-      </view>
-    </view>
 
-    <view class="section-title">当前账户信息</view>
-    <view class="card account-card">
-      <image
-        class="avatar"
-        :src="data.account.avatar"
-        mode="aspectFill"
-      ></image>
-      <view class="account-detail">
-        <view class="name-row">
-          <text class="name">{{ data.account.name }}</text>
-          <text class="role">{{ data.account.role }}</text>
+      <view class="g-border g-border--logout" @tap="handleLogout">
+        <view class="logout-inner">
+          <image
+            class="logout-icon"
+            src="/static/personal/quit.png"
+            mode="aspectFit"
+          />
+          <text>退出登录</text>
         </view>
-        <view class="contact-row">
-          <view class="contact-item">
-            <image
-              class="contact-icon"
-              src="/static/personal/phone.png"
-              mode="aspectFit"
-            />
-            <text>{{ data.account.phone }}</text>
-          </view>
-          <view class="contact-item" style="margin-left: 30rpx">
-            <image
-              class="contact-icon"
-              src="/static/personal/email.png"
-              mode="aspectFit"
-            />
-            <text>{{ data.account.email }}</text>
-          </view>
-        </view>
-      </view>
-    </view>
-
-    <view class="section-title">服务清单</view>
-
-    <view class="card order-card">
-      <view class="stats-grid">
-        <view class="stat-box">
-          <text class="stat-label">服务中</text>
-          <view class="stat-divider"></view>
-          <text class="stat-count" style="color: #fdcf82">{{
-            data.stats[0].count
-          }}</text>
-        </view>
-        <view class="stat-box">
-          <text class="stat-label">服务完成</text>
-          <view class="stat-divider"></view>
-          <text class="stat-count" style="color: #74bea0">{{
-            data.stats[1].count
-          }}</text>
-        </view>
-        <view class="stat-box">
-          <text class="stat-label">已终止</text>
-          <view class="stat-divider"></view>
-          <text class="stat-count" style="color: #d27374">{{
-            data.stats[2].count
-          }}</text>
-        </view>
-      </view>
-      <!-- Tab 选项卡 -->
-      <scroll-view scroll-x class="tab-scroll" show-scrollbar="false">
-        <view class="tab-container">
-          <view
-            v-for="(tab, index) in tabs"
-            :key="tab.id"
-            class="tab-item"
-            :class="{ active: activeTabId === tab.id }"
-            @click="switchTab(tab.id)"
-          >
-            {{ tab.label }}
-          </view>
-        </view>
-      </scroll-view>
-      <view class="order-content">
-        <image
-          class="order-img"
-          :src="data.order.image"
-          mode="aspectFill"
-        ></image>
-        <view class="order-info">
-          <view class="order-row">订单编号：{{ data.order.id }}</view>
-          <view class="order-row">服务类型：{{ data.order.type }}</view>
-          <view class="order-row status"
-            >进度状态：{{ data.order.status }}</view
-          >
-          <button class="detail-btn">查看详情</button>
-        </view>
-      </view>
-    </view>
-
-    <view class="section-title">我的功能</view>
-    <view class="card function-card">
-      <view v-for="fn in data.functions" :key="fn.name" class="fn-item">
-        <view class="fn-icon">📍</view> <text>{{ fn.name }}</text>
       </view>
     </view>
   </view>
@@ -137,53 +243,19 @@
 import { ref, reactive, computed } from "vue";
 import { onLoad, onShow } from "@dcloudio/uni-app";
 
-const data = reactive({
-  company: {
-    name: "北京中科智城科技有限公司",
-    code: "91110105MA00XXXXXX",
-    contact: "张 明",
-    phone: "138****1234",
-    position: "企业服务对接专员",
-    tag: "总部型企业",
-  },
-  account: {
-    name: "张 明",
-    role: "企业服务对接专员",
-    phone: "138****1234",
-    email: "38576268@qq.com",
-    avatar: "/static/personal/head.png", // 指定头像文件地址
-  },
-  stats: [
-    { label: "服务中", count: 0 },
-    { label: "服务完成", count: 0 },
-    { label: "已终止", count: 0 },
-  ],
-  order: {
-    id: "CYQY20240521001",
-    type: "益企 · 安居—昆泰公寓优惠房源申请",
-    status: "资料审核中 (预计2个工作日内完成)",
-    image: "/static/building.png",
-  },
-  functions: [
-    { name: "消息通知", icon: "notification" },
-    { name: "评价反馈", icon: "feedback" },
-    { name: "退出登录", icon: "logout" },
-  ],
-});
-
-// 标签页数据
 const tabs = ref([
   { id: 1, label: "服务中" },
   { id: 2, label: "服务完成" },
   { id: 3, label: "已终止" },
 ]);
 
-// 当前活跃的tab ID
 const activeTabId = ref(1);
+const activeTab = ref("serving");
 
-// 切换tab
 const switchTab = (tabId) => {
   activeTabId.value = tabId;
+  const m = { 1: "serving", 2: "finished", 3: "terminated" };
+  activeTab.value = m[tabId] ?? "serving";
 };
 
 const toNumber = (value) => {
@@ -207,8 +279,52 @@ const companyLevelLabel = computed(() => {
   }
 });
 
-// 激活的Tab标签
-const activeTab = ref("serving");
+const companyDisplay = computed(() => ({
+  name: state.ccompanyinfo?.name || "—",
+  code: state.ccompanyinfo?.creditcode || "—",
+  contact: state.ccompanyinfo?.approvername || state.userinfo?.name || "—",
+  phone: state.userinfo?.phone || "—",
+  position: state.userinfo?.title || "—",
+}));
+
+const accountDisplay = computed(() => ({
+  name: state.userinfo?.name || "—",
+  role: state.userinfo?.title || "—",
+  phone: state.userinfo?.phone || "—",
+  email: state.userinfo?.email || "—",
+  avatar: "/static/personal/head.png",
+}));
+
+const orderItemThumb = (item) => {
+  const u =
+    item?.imageurl ||
+    item?.imageUrl ||
+    item?.productimg ||
+    item?.productimage ||
+    item?.coverurl;
+  if (u && String(u).trim()) return u;
+  return "/static/building.png";
+};
+
+const displayOrder = computed(() => {
+  const list = filteredOrderList.value;
+  if (!list.length) return null;
+  const item = list[0];
+  return {
+    id: item.id,
+    contractid: item.contractid || String(item.id ?? ""),
+    typeLabel: item.producttitle || item.bcompanyname || "服务订单",
+    statusText: getStatusText(item.status),
+    image: orderItemThumb(item),
+  };
+});
+
+const menuIconSrc = (item) => {
+  if (item.icon === "messages.png") return "/static/personal/messages.png";
+  if (item.icon === "pjfk.png") return "/static/personal/feedback.png";
+  if (item.icon === "quit.png") return "/static/personal/quit.png";
+  return `/static/images/${item.icon}`;
+};
 
 const getuserinfo = () => {
   let payload = {
@@ -335,6 +451,15 @@ const visibleMenuList = computed(() => {
   });
 });
 
+const functionMenuItems = computed(() =>
+  visibleMenuList.value.filter((item) => item.action !== "quitlogin"),
+);
+
+const handleLogout = () => {
+  uni.removeStorageSync("userSessionChaoqitong");
+  uni.reLaunch({ url: "/pages/login/login" });
+};
+
 const handleMenuClick = (item) => {
   switch (item.action) {
     case "mergeAsset":
@@ -343,8 +468,7 @@ const handleMenuClick = (item) => {
       uni.navigateTo({ url: "/pages/addUser/addUser" });
       break;
     case "quitlogin":
-      uni.removeStorageSync("userSessionChaoqitong");
-      uni.navigateTo({ url: "/pages/login/login" });
+      handleLogout();
       break;
   }
 };
@@ -474,283 +598,658 @@ onShow(() => {
 </script>
 
 <style lang="scss">
+page {
+  background-color: #061730;
+}
+
 .container {
   min-height: 100vh;
-  background:
-    url("https://mvpme82.cloud/data/9b82d795-9982-4e39-aa73-2138868cf6b3_1774399232772.jpg")
-      no-repeat top center,
-    linear-gradient(180deg, #0a1931 0%, #162a4d 100%);
-  background-size:
-    100% auto,
-    auto;
-  padding: 20rpx 30rpx;
+  width: 100%;
+  box-sizing: border-box;
+  background-color: #061730;
+  padding: 0;
+  padding-bottom: env(safe-area-inset-bottom);
   color: #fff;
 }
 
-.header-title {
-  text-align: center;
-  font-size: 34rpx;
-  padding: 40rpx 0;
+.personal-top-bg {
+  width: 100%;
+  display: block;
+  vertical-align: top;
+}
+
+.personal-main {
+  padding: 0 31rpx;
+  padding-bottom: calc(32rpx + env(safe-area-inset-bottom));
+  max-width: 750rpx;
+  margin: 0 auto;
+}
+
+/* 渐变描边：外层 padding 模拟 border-image + 圆角（小程序兼容） */
+.g-border {
+  box-sizing: border-box;
+}
+
+.g-border--company {
+  margin-top: 20rpx;
+  width: 688rpx;
+  max-width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 2rpx;
+  border-radius: 41rpx;
+  background: linear-gradient(
+    171deg,
+    #80c3f6 0%,
+    #244368 48%,
+    #9ccdf0 100%
+  );
+}
+
+.company-card-inner {
+  position: relative;
+  border-radius: 39rpx;
+  min-height: 254rpx;
+  overflow: hidden;
+  box-sizing: border-box;
+  background: transparent;
+}
+
+.company-card-bg {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  display: block;
+  pointer-events: none;
+}
+
+.company-card-content {
+  position: relative;
+  z-index: 1;
+  padding: 28rpx 26rpx 24rpx;
+  box-sizing: border-box;
+}
+
+.company-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16rpx;
+}
+
+.company-name {
+  flex: 1;
+  font-size: 30rpx;
+  font-weight: 500;
+  color: #ffffff;
+  line-height: 1.35;
+}
+
+.enterprise-tag {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+}
+
+.enterprise-tag-icon {
+  width: 150rpx;
+  height: 50rpx;
+}
+
+.divider {
+  height: 2rpx;
+  background: rgba(255, 255, 255, 0.18);
+  margin: 20rpx 0 18rpx;
+}
+
+.code {
+  font-size: 24rpx;
+  color: rgba(255, 255, 255, 0.65);
+  margin-top: 12rpx;
+}
+
+.info-grid {
+  display: flex;
+  flex-direction: column;
+}
+
+.info-line {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+}
+
+.info-item {
+  width: 50%;
+  margin-bottom: 14rpx;
+  display: flex;
+  align-items: center;
+}
+
+.info-item-full {
+  width: 100%;
+}
+
+/* 设计稿 .24-2：小程序 border-image 弱，用渐变 1rpx 模拟描边；整体 0.47 只作用在底色，避免字被 opacity 冲淡 */
+.label-wrap {
+  width: 115rpx;
+  height: 31rpx;
+  padding: 1rpx;
+  box-sizing: border-box;
+  flex-shrink: 0;
+  border-radius: 8rpx;
+  overflow: hidden;
+  background: linear-gradient(-33deg, #4268a0 0%, #ffffff 100%);
+}
+
+.info-item .label {
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(36, 55, 90, 0.47);
+  /* 外框 8rpx、描边 1rpx，内圆角约 7rpx */
+  border-radius: 7rpx;
+  font-size: 20rpx;
+  color: #ffffff;
+  line-height: 1;
+  padding: 0 4rpx;
+}
+
+.info-item .val {
+  max-width: 569rpx;
+  min-height: 23rpx;
+  margin-left: 12rpx;
+  flex: 1;
+  min-width: 0;
+  font-family: PingFang SC, PingFangSC-Light, sans-serif;
+  font-size: 21rpx;
+  font-weight: normal;
+  letter-spacing: 0;
+  color: #ffffff;
+}
+
+.info-item .val.val--style1 {
+  font-family: PingFang SC, PingFangSC-Medium, sans-serif;
+  font-size: 24rpx;
+  font-weight: normal;
+  letter-spacing: 0;
+  color: #ffffff;
+}
+
+.info-item .val.val--style2 {
+  font-family: PingFang SC, PingFangSC-Light, sans-serif;
+  font-size: 21rpx;
+  font-weight: normal;
+  letter-spacing: 1rpx;
+  color: #ffffff;
 }
 
 .section-title {
-  font-size: 32rpx;
-  margin: 30rpx 0 20rpx;
-  font-weight: bold;
-}
-
-.card {
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 20rpx;
-  padding: 30rpx;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  margin-bottom: 20rpx;
-}
-
-.company-card {
-  margin-top: 40rpx;
-  background: rgba(49, 69, 107, 0.73); /* #31456b 73% */
-  border: 1px solid rgba(255, 255, 255, 0.2); /* 调整边框更清晰 */
-  .company-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    .company-name {
-      font-size: 32rpx;
-      font-weight: 400;
-    }
-    .enterprise-tag {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-width: 94rpx;
-      min-height: 40rpx;
-      padding: 0;
-      background: transparent;
-      border-radius: 0;
-    }
-    .enterprise-tag-icon {
-      width: 150rpx;
-      height: 50rpx;
-      object-fit: contain;
-    }
-  }
-  .divider {
-    height: 2rpx;
-    background-color: rgba(255, 255, 255, 0.2);
-    margin: 20rpx 0;
-  }
-  .code {
-    font-size: 24rpx;
-    color: #b0adad;
-    margin: 10rpx 0 30rpx;
-  }
-  .info-grid {
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    .info-line {
-      width: 100%;
-      display: flex;
-      flex-direction: row;
-      justify-content: flex-start;
-      .info-item {
-        width: 50%;
-        margin-bottom: 15rpx;
-        display: flex;
-        align-items: center;
-        .label {
-          font-size: 22rpx;
-          color: #e6e7e7;
-          background-color: #3e5b8a;
-          padding: 4rpx 10rpx;
-          border-radius: 4rpx;
-          width: 120rpx;
-          text-align: center;
-          flex-shrink: 0;
-        }
-        .val {
-          font-size: 26rpx;
-          margin-left: 12rpx;
-        }
-      }
-    }
-  }
-}
-
-.account-card {
   display: flex;
   align-items: center;
-  background-image: url("https://mvpme82.cloud/data/0230c28f-a692-40b0-b5d8-7ab5b7a824ae_1774405848969.jpg");
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  padding: 20rpx;
-  border-radius: 20rpx;
-  .avatar {
-    width: 100rpx;
-    height: 100rpx;
-    border-radius: 50%;
-    background: #eee;
-    margin-left: 20rpx;
-  }
-  .account-detail {
-    margin-left: 20rpx;
-    .name-row {
-      display: flex;
-      flex-direction: column;
-      .name {
-        font-size: 32rpx;
-        font-weight: bold;
-        margin-right: 15rpx;
-      }
-      .role {
-        font-size: 24rpx;
-        color: #ccc;
-        margin-top: 15rpx;
-      }
-    }
-    .contact-row {
-      font-size: 22rpx;
-      color: #f7f6f6;
-      margin-top: 15rpx;
-      display: flex;
-      align-items: center;
-      .contact-item {
-        display: flex;
-        align-items: center;
-        gap: 6rpx;
-      }
-      .contact-icon {
-        width: 25rpx;
-        height: 25rpx;
-      }
-    }
-  }
+  gap: 12rpx;
+  font-size: 34rpx;
+  font-weight: 600;
+  color: #ffffff;
+  margin: 36rpx 0 20rpx;
+}
+
+.section-title-bar {
+  width: 6rpx;
+  height: 28rpx;
+  border-radius: 3rpx;
+  background: linear-gradient(180deg, #80c3f6 0%, #4a8cc4 100%);
+}
+
+.g-border--account {
+  width: 692rpx;
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 2rpx;
+  border-radius: 35rpx;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.42) 0%,
+    rgba(255, 255, 255, 0.1) 100%
+  );
+}
+
+.account-card-inner {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: 165rpx;
+  padding: 24rpx 28rpx;
+  border-radius: 33rpx;
+  overflow: hidden;
+  box-sizing: border-box;
+  background: transparent;
+}
+
+.account-card-bg {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  display: block;
+  pointer-events: none;
+}
+
+.avatar {
+  position: relative;
+  z-index: 1;
+  width: 100rpx;
+  height: 100rpx;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.25);
+  flex-shrink: 0;
+  border: 2rpx solid rgba(255, 255, 255, 0.15);
+}
+
+.account-detail {
+  margin-left: 24rpx;
+  flex: 1;
+  min-width: 0;
+  z-index: 1;
+}
+
+.name-row {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0;
+}
+
+.name-row .name {
+  font-family: PingFang SC, PingFangSC-Medium, sans-serif;
+  font-size: 34rpx;
+  font-weight: normal;
+  line-height: 51rpx;
+  letter-spacing: 0;
+  color: #ffffff;
+}
+
+.name-row .role {
+  font-family: PingFang SC, PingFangSC-Regular, sans-serif;
+  font-size: 22rpx;
+  font-weight: normal;
+  line-height: 32rpx;
+  letter-spacing: 0;
+  color: #ffffff;
+}
+
+.contact-row {
+  margin-top: 14rpx;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12rpx 24rpx;
+  font-size: 22rpx;
+  color: rgba(247, 246, 246, 0.95);
+}
+
+.contact-item {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+}
+
+.contact-icon {
+  width: 28rpx;
+  height: 28rpx;
+  opacity: 0.9;
+}
+
+.g-border--order-panel {
+  width: 690rpx;
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 1rpx;
+  border-radius: 24rpx;
+  background: linear-gradient(
+    -8deg,
+    #4683d3 1%,
+    #2c62bb 26%,
+    #1141a2 51%,
+    #558dd8 100%
+  );
+}
+
+.order-panel-inner {
+  border-radius: 23rpx;
+  padding: 24rpx 20rpx 28rpx;
+  box-sizing: border-box;
+  background: rgba(6, 20, 40, 0.94);
 }
 
 .stats-grid {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 20rpx;
-  .stat-box {
-    background: rgba(255, 255, 255, 0.05);
-    width: 31%;
-    height: 140rpx;
-    border-radius: 15rpx;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    border: 2rpx solid #d4af37;
-    .stat-label {
-      font-size: 24rpx;
-      color: #b7ab93;
-    }
-    .stat-divider {
-      width: 80%;
-      height: 2rpx;
-      background-color: #b7ab93;
-      margin: 10rpx 0;
-      border-radius: 1rpx;
-    }
-    .stat-count {
-      font-size: 40rpx;
-      font-weight: bold;
-      margin-top: 10rpx;
-      color: #4dbd71;
-    }
-  }
+  gap: 12rpx;
+  margin-bottom: 8rpx;
+}
+
+.stat-box {
+  position: relative;
+  flex: 1 1 0;
+  max-width: 193rpx;
+  min-width: 0;
+  height: 124rpx;
+  box-sizing: border-box;
+  border-radius: 22rpx;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.stat-box-bg {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  display: block;
+  pointer-events: none;
+}
+
+.stat-box .stat-label,
+.stat-box .stat-divider,
+.stat-box .stat-count {
+  position: relative;
+  z-index: 1;
+}
+
+.stat-label {
+  font-size: 24rpx;
+  color: #b7ab93;
+}
+
+.stat-divider {
+  width: 72%;
+  height: 2rpx;
+  background: rgba(183, 171, 147, 0.6);
+  margin: 10rpx 0 6rpx;
+}
+
+.stat-count {
+  font-size: 40rpx;
+  font-weight: 700;
+}
+
+.stat-count--serving {
+  color: #fdcf82;
+}
+
+.stat-count--done {
+  color: #74bea0;
+}
+
+.stat-count--end {
+  color: #d27374;
 }
 
 .tab-scroll {
-  flex-shrink: 0;
-  background: rgba(0, 0, 0, 0);
   width: 100%;
-  text-align: center;
-  padding: 20rpx 0;
+  padding: 20rpx 0 8rpx;
+}
+
+.tab-bar-shell {
+  width: 650rpx;
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 1rpx;
+  box-sizing: border-box;
+  border-radius: 35rpx;
+  overflow: hidden;
+  background: linear-gradient(
+    180deg,
+    rgba(250, 235, 204, 0.83) 0%,
+    rgba(221, 184, 119, 0.9) 45%,
+    rgba(240, 214, 160, 0.83) 100%
+  );
 }
 
 .tab-container {
-  width: 90%;
   display: flex;
   flex-direction: row;
+  align-items: stretch;
   justify-content: space-between;
   gap: 10rpx;
-  padding: 10rpx 15rpx;
-  border: 3rpx solid #d4a574;
-  border-radius: 50rpx;
-  background-color: #3d597e;
-
-  .tab-item {
-    flex: 1;
-    text-align: center;
-    padding: 16rpx 0;
-    border-radius: 50rpx;
-    color: rgba(255, 255, 255, 0.959);
-    font-size: 32rpx;
-    white-space: nowrap;
-    transition: all 0.3s ease;
-
-    &.active {
-      background: linear-gradient(135deg, #f3cb9f 0%, #c9945f 100%);
-      border: 2rpx solid #e98a24;
-      color: #1a3a52;
-      font-weight: 600;
-    }
-
-    &:active {
-      opacity: 0.8;
-    }
-  }
+  padding: 6rpx 8rpx;
+  border-radius: 34rpx;
+  background: rgba(10, 24, 48, 0.94);
+  min-width: 100%;
+  box-sizing: border-box;
+  min-height: 68rpx;
+  height: 68rpx;
 }
 
-.order-content {
+.tab-item {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 0 8rpx;
+  border-radius: 27rpx;
+  font-size: 28rpx;
+  color: rgba(255, 255, 255, 0.92);
+  white-space: nowrap;
+}
+
+.tab-item.active {
+  background: linear-gradient(0deg, #dab26b 0%, #fcefd4 100%);
+  color: #1a2a3d;
+  font-weight: 600;
+  box-shadow: 0 2rpx 12rpx rgba(218, 178, 107, 0.35);
+}
+
+.g-border--order-item {
+  margin-top: 20rpx;
+  padding: 2rpx;
+  border-radius: 20rpx;
+  background: linear-gradient(
+    171deg,
+    #80c3f6 0%,
+    #244368 48%,
+    #9ccdf0 100%
+  );
+}
+
+.order-item-inner {
   display: flex;
   gap: 20rpx;
-  .order-img {
-    width: 160rpx;
-    height: 160rpx;
-    border-radius: 10rpx;
-  }
-  .order-info {
-    flex: 1;
-    font-size: 22rpx;
-    .order-row {
-      margin-bottom: 8rpx;
-      color: #ccc;
-    }
-    .status {
-      color: #88b0ff;
-    }
-    .detail-btn {
-      margin-top: 10rpx;
-      float: right;
-      font-size: 20rpx;
-      padding: 0 20rpx;
-      height: 44rpx;
-      line-height: 44rpx;
-      background: transparent;
-      border: 1px solid #556b8d;
-      color: #fff;
-      border-radius: 22rpx;
-    }
-  }
+  padding: 20rpx;
+  border-radius: 18rpx;
+  box-sizing: border-box;
+  min-height: 137rpx;
+  background: rgba(30, 50, 86, 0.72);
 }
 
-.function-card {
+/* 与首页一致：设计稿 .24 订单缩略图外框 */
+.order-thumb-shell {
+  width: 137rpx;
+  height: 137rpx;
+  padding: 3rpx;
+  box-sizing: border-box;
+  border-radius: 18rpx;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: linear-gradient(
+    178deg,
+    #5e97d2 0%,
+    #2c5f8f 49%,
+    #6a9ccf 100%
+  );
+}
+
+.order-thumb-inner {
+  width: 100%;
+  height: 100%;
+  border-radius: 15rpx;
+  overflow: hidden;
+  background: linear-gradient(180deg, #1b4163 0%, #76aadf 100%);
+}
+
+.order-thumb-img {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.order-info {
+  flex: 1;
+  min-width: 0;
+  position: relative;
+  padding-bottom: 48rpx;
+}
+
+/* 设计稿订单信息：三行均为 #ffffff，19rpx / 35rpx */
+.order-row {
+  margin-bottom: 10rpx;
+  font-size: 19rpx;
+  line-height: 35rpx;
+  font-weight: normal;
+  color: #ffffff;
+  letter-spacing: 0;
+}
+
+.order-row.status {
+  color: #ffffff;
+}
+
+.detail-btn-shell {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 127rpx;
+  height: 41rpx;
+  padding: 1rpx;
+  box-sizing: border-box;
+  border-radius: 15rpx;
+  overflow: hidden;
+  background: linear-gradient(
+    159deg,
+    #afcde9 0%,
+    #3763b3 50%,
+    #2453ab 58%,
+    #afcef2 100%
+  );
+}
+
+.detail-btn {
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  margin: 0;
   display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20rpx;
+  line-height: 1;
+  color: #ffffff;
+  background: transparent;
+  border: none;
+  border-radius: 14rpx;
+}
+
+.detail-btn::after {
+  border: none;
+}
+
+.order-empty {
+  margin-top: 28rpx;
+  padding: 40rpx 20rpx;
+  text-align: center;
+  font-size: 26rpx;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.function-panel {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
   justify-content: space-around;
-  padding: 40rpx 0;
-  .fn-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    font-size: 24rpx;
-    .fn-icon {
-      font-size: 40rpx;
-      margin-bottom: 15rpx;
-    }
-  }
+  padding: 32rpx 8rpx;
+  border-radius: 24rpx;
+  background: rgba(255, 255, 255, 0.06);
+  border: 2rpx solid rgba(128, 195, 246, 0.22);
+  margin-bottom: 8rpx;
+}
+
+.function-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14rpx;
+  position: relative;
+}
+
+.function-item:not(:first-child)::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 18%;
+  bottom: 18%;
+  width: 1rpx;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.function-icon {
+  width: 48rpx;
+  height: 48rpx;
+  opacity: 0.95;
+}
+
+.function-text {
+  font-size: 24rpx;
+  color: rgba(255, 255, 255, 0.88);
+}
+
+.g-border--logout {
+  margin-top: 28rpx;
+  margin-bottom: 8rpx;
+  padding: 1rpx;
+  border-radius: 27rpx;
+  background: linear-gradient(
+    178deg,
+    #5e97d2 0%,
+    #2c5f8f 49%,
+    #6a9ccf 100%
+  );
+}
+
+.logout-inner {
+  height: 78rpx;
+  border-radius: 26rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16rpx;
+  font-size: 28rpx;
+  color: #ffffff;
+  background: linear-gradient(
+    180deg,
+    rgba(32, 58, 95, 0.96) 0%,
+    rgba(12, 28, 52, 0.98) 100%
+  );
+}
+
+.logout-icon {
+  width: 36rpx;
+  height: 36rpx;
 }
 </style>

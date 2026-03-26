@@ -16,7 +16,10 @@
 		{
 			"path": "pages/homepage/homepage",
 			"style": {
-				"navigationBarTitleText": "个人中心"
+				"navigationBarTitleText": "个人中心",
+				"navigationBarBackgroundColor": "#F8F8F8",
+				"navigationBarTextStyle": "black",
+				"backgroundColor": "#061730"
 			}
 		},
 		{
@@ -94,7 +97,10 @@
 		{
 			"path": "pages/personal/personal",
 			"style": {
-				"navigationBarTitleText": "个人中心"
+				"navigationBarTitleText": "个人中心",
+				"navigationBarBackgroundColor": "#061730",
+				"navigationBarTextStyle": "white",
+				"backgroundColor": "#061730"
 			}
 		}
 	],

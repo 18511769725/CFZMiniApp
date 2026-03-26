@@ -1,24 +1,35 @@
 <template>
   <view class="yuexiang-container">
-    <!-- 大Banner -->
-    <swiper
-      class="lunbo-section"
-      :indicator-dots="true"
-      :indicator-color="'rgba(255, 255, 255, 0.5)'"
-      :autoplay="true"
-      :interval="3000"
-      :duration="500"
-    >
-      <swiper-item v-for="(card, index) in lunboCards" :key="index">
-        <LunboCardComponent
-          :title="card.title"
-          :subtitle="card.subtitle"
-          :backgroundImage="card.backgroundImage"
-          :categorya="card.categorya"
-          :categoryb="card.categoryb"
+    <!-- 大Banner（小程序内置指示点无法改样式，改为自定义指示点） -->
+    <view class="lunbo-wrap">
+      <swiper
+        class="lunbo-section"
+        :indicator-dots="false"
+        :current="lunboCurrent"
+        :autoplay="true"
+        :interval="3000"
+        :duration="500"
+        @change="onLunboChange"
+      >
+        <swiper-item v-for="(card, index) in lunboCards" :key="index">
+          <LunboCardComponent
+            :title="card.title"
+            :subtitle="card.subtitle"
+            :backgroundImage="card.backgroundImage"
+            :categorya="card.categorya"
+            :categoryb="card.categoryb"
+          />
+        </swiper-item>
+      </swiper>
+      <view class="lunbo-dots-custom">
+        <view
+          v-for="(_, i) in lunboCards"
+          :key="i"
+          class="lunbo-dot"
+          :class="{ 'lunbo-dot--active': lunboCurrent === i }"
         />
-      </swiper-item>
-    </swiper>
+      </view>
+    </view>
 
     <!-- 4个特色服务卡片，分两层 -->
     <view class="cards-grid">
@@ -67,27 +78,61 @@
       </scroll-view>
     </view>
 
-    <!-- 推荐服务 -->
+    <!-- 推荐服务 / 热门服务等（与益企·安居同款：Tab + tabid + .19-2 列表） -->
     <view class="services-section">
-      <view class="section-title">推荐服务</view>
-      <scroll-view scroll-x class="service-scroll">
-        <view class="service-list">
+      <view class="feed-tabs-outer">
+        <view class="feed-tabs-inner">
           <view
-            v-for="(product, index) in state.feedproductlist"
-            :key="index"
-            class="service-card"
-            @click="
-              uni.navigateTo({
-                url: `/pages/product/product-detail?id=${product.id}`,
-              })
-            "
+            v-for="tab in serviceFeedTabs"
+            :key="tab.tabid"
+            class="feed-tab-wrap"
+            @tap="onFeedTabChange(tab.tabid)"
           >
-            <image :src="product.imageurl" class="service-image"></image>
-            <text class="service-name">{{ product.producttitle }}</text>
-            <text class="service-loc">{{ product.bcompanyname }}</text>
+            <view v-if="state.feedTabId === tab.tabid" class="feed-tab-active">
+              <view class="feed-tab-active-inner">
+                <text class="feed-tab-active-text">{{ tab.label }}</text>
+              </view>
+            </view>
+            <text v-else class="feed-tab-inactive">{{ tab.label }}</text>
           </view>
         </view>
-      </scroll-view>
+      </view>
+
+      <view class="feed-list-frame-19-2">
+        <view class="feed-list-frame-inner">
+          <scroll-view
+            scroll-x
+            class="feed-service-scroll"
+            show-scrollbar="false"
+            :enable-flex="true"
+          >
+            <view class="feed-service-list">
+              <view
+                v-for="(product, index) in state.feedproductlist"
+                :key="product.id || index"
+                class="feed-service-card"
+                @tap="
+                  uni.navigateTo({
+                    url: `/pages/product/product-detail?id=${product.id}`,
+                  })
+                "
+              >
+                <view class="feed-service-img-frame">
+                  <image
+                    :src="product.imageurl"
+                    class="feed-service-image"
+                    mode="aspectFill"
+                  />
+                </view>
+                <view class="feed-service-text-col">
+                  <view class="feed-service-name">{{ product.producttitle }}</view>
+                  <view class="feed-service-loc">{{ product.bcompanyname }}</view>
+                </view>
+              </view>
+            </view>
+          </scroll-view>
+        </view>
+      </view>
     </view>
   </view>
 </template>
@@ -100,23 +145,42 @@ import ProcessStepCard from "./ProcessStepCard.vue";
 
 const state = reactive({
   feedproductlist: [],
+  feedTabId: 1,
 });
 
-// 轮播图数据
+const serviceFeedTabs = [
+  { tabid: 1, label: "推荐服务" },
+  { tabid: 2, label: "热门服务" },
+  { tabid: 3, label: "专属推荐" },
+  { tabid: 4, label: "当前可预约" },
+];
+
+const onFeedTabChange = (tabid) => {
+  if (state.feedTabId === tabid) return;
+  state.feedTabId = tabid;
+  getfeedproductlist();
+};
+
+const lunboCurrent = ref(0);
+const onLunboChange = (e) => {
+  lunboCurrent.value = e.detail.current;
+};
+
+// 轮播图（切图已含标题文案，title/subtitle 留空不叠字；点击跳转参数不变）
 const lunboCards = ref([
   {
-    title: "亮马河国际风情水上行",
-    subtitle: "感受国际风情水岸夜色",
+    title: "",
+    subtitle: "",
     backgroundImage:
-      "https://mvpme82.cloud/data/1acc887a-37f9-45c6-bf11-7872d881f77a_1774322792738.jpg",
+      "https://mvpme82.cloud/data/124f4947-491b-4dbd-bf9c-8a1145a8c858_1774526431848.jpg",
     categorya: 1,
     categoryb: 1,
   },
   {
-    title: "奥塔云端观景平台",
-    subtitle: "俯瞰中轴线奇景",
+    title: "",
+    subtitle: "",
     backgroundImage:
-      "https://mvpme82.cloud/data/8811cf25-b9b7-47a9-b627-295524c41ce2_1774322964793.jpg",
+      "https://mvpme82.cloud/data/15d51da8-c168-4d2d-9967-94c6aabc815d_1774526454645.jpg",
     categorya: 1,
     categoryb: 5,
   },
@@ -205,8 +269,8 @@ const steps = ref([
 
 const getfeedproductlist = () => {
   let payload = {
-    // 这里可以添加请求参数
     categoryaid: "1",
+    tabid: state.feedTabId,
   };
   uni.request({
     url: "https://mvpme82.cloud/api/getfeedproductlistforminiapp",
@@ -232,40 +296,57 @@ onMounted(() => {
 .yuexiang-container {
   padding: 20rpx;
 
-  .lunbo-section {
+  /* 轮播区：687×269；指示点为自定义 view（设计 .28 / .3） */
+  .lunbo-wrap {
     position: relative;
+    width: 687rpx;
+    margin: 0 auto 30rpx;
+  }
+
+  .lunbo-section {
+    width: 100%;
+    height: 269rpx;
     border-radius: 24rpx;
     overflow: hidden;
-    margin-bottom: 30rpx;
-    height: 250rpx;
 
     ::v-deep .uni-swiper-item {
       display: flex;
-      align-items: center;
+      align-items: stretch;
       justify-content: center;
     }
+  }
 
-    ::v-deep .uni-swiper-dots {
-      position: absolute;
-      bottom: 12rpx;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 10;
-    }
+  .lunbo-dots-custom {
+    position: absolute;
+    left: 50%;
+    bottom: 12rpx;
+    transform: translateX(-50%);
+    z-index: 20;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+  }
 
-    ::v-deep .uni-swiper-dot {
-      background-color: rgba(255, 255, 255, 0.5);
-      border-radius: 50%;
-      width: 8rpx;
-      height: 8rpx;
-      margin: 0 6rpx;
+  /* 未选中 .3 */
+  .lunbo-dot {
+    width: 7rpx;
+    height: 7rpx;
+    margin: 0 4rpx;
+    background-color: #f8f3ea;
+    opacity: 0.67;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
 
-      &.uni-swiper-dot-active {
-        background-color: rgba(255, 255, 255, 0.9);
-        width: 20rpx;
-        border-radius: 4rpx;
-      }
-    }
+  /* 选中 .28 */
+  .lunbo-dot--active {
+    width: 17rpx;
+    height: 8rpx;
+    background-color: #ebd1a2;
+    border-radius: 4rpx;
+    opacity: 1;
   }
 
   .features-grid {
@@ -425,52 +506,213 @@ onMounted(() => {
   }
 
   .services-section {
-    .section-title {
-      font-size: 32rpx;
-      font-weight: 600;
-      margin-bottom: 16rpx;
-      color: #fff;
-    }
+    margin-top: 8rpx;
+  }
 
-    .service-scroll {
-      display: flex;
-    }
+  .feed-tabs-outer {
+    width: 690rpx;
+    height: 86rpx;
+    margin: 0 auto 16rpx;
+    box-sizing: border-box;
+    padding: 1rpx;
+    border-radius: 43rpx;
+    background: linear-gradient(
+      -8deg,
+      #4682d4 0%,
+      #2a6ac4 25%,
+      #0d51b4 51%,
+      #3b9fdf 100%
+    );
+  }
 
-    .service-list {
-      display: flex;
-      gap: 16rpx;
-      padding-bottom: 20rpx;
+  .feed-tabs-inner {
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+    border-radius: 42rpx;
+    background: rgba(13, 24, 48, 0.92);
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 10rpx;
+    gap: 4rpx;
+  }
 
-      .service-card {
-        min-width: 200rpx;
-        border-radius: 16rpx;
-        overflow: hidden;
-        border: 2rpx solid rgba(212, 165, 116, 0.3);
+  .feed-tab-wrap {
+    flex: 0 1 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 0;
+  }
 
-        .service-image {
-          width: 100%;
-          height: 120rpx;
-          background: rgba(255, 255, 255, 0.05);
-        }
+  .feed-tab-active {
+    width: 204rpx;
+    height: 62rpx;
+    box-sizing: border-box;
+    padding: 1rpx;
+    border-radius: 31rpx;
+    flex-shrink: 0;
+    background: linear-gradient(
+      -6deg,
+      #2c94c5 0%,
+      #2070ac 30%,
+      #134b93 60%,
+      #37acd9 100%
+    );
+  }
 
-        .service-name {
-          display: block;
-          font-size: 20rpx;
-          font-weight: 500;
-          color: #fff;
-          padding: 12rpx;
-          line-height: 1.3;
-        }
+  .feed-tab-active-inner {
+    width: 100%;
+    height: 100%;
+    border-radius: 30rpx;
+    background: linear-gradient(180deg, #1a3a6e 0%, #0f2848 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+  }
 
-        .service-loc {
-          display: block;
-          font-size: 16rpx;
-          color: rgba(255, 255, 255, 0.5);
-          padding: 0 12rpx 12rpx;
-          line-height: 1.2;
-        }
-      }
-    }
+  .feed-tab-active-text {
+    font-size: 26rpx;
+    font-weight: 600;
+    color: #ffffff;
+    line-height: 1.2;
+    white-space: nowrap;
+  }
+
+  .feed-tab-inactive {
+    max-width: 150rpx;
+    min-height: 35rpx;
+    font-family: PingFang SC, PingFangSC-Regular, sans-serif;
+    font-size: 31rpx;
+    font-weight: normal;
+    line-height: 35rpx;
+    color: #ffffff;
+    text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    padding: 0 4rpx;
+    box-sizing: border-box;
+  }
+
+  .feed-list-frame-19-2 {
+    width: 690rpx;
+    margin: 0 auto;
+    box-sizing: border-box;
+    padding: 1rpx;
+    border-radius: 32rpx;
+    overflow: hidden;
+    background: linear-gradient(
+      -8deg,
+      #4683d3 1%,
+      #2c62bb 26%,
+      #1141a2 51%,
+      #558dd8 100%
+    );
+  }
+
+  .feed-list-frame-inner {
+    width: 100%;
+    box-sizing: border-box;
+    border-radius: 31rpx;
+    background: rgba(14, 15, 18, 0.78);
+    padding: 8rpx 12rpx 6rpx;
+    overflow: hidden;
+  }
+
+  .feed-service-scroll {
+    width: 100%;
+    height: 270rpx;
+    white-space: nowrap;
+    box-sizing: border-box;
+  }
+
+  .feed-service-list {
+    display: inline-flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 20rpx;
+    padding: 0 2rpx 0 0;
+    box-sizing: border-box;
+  }
+
+  .feed-service-card {
+    width: 204rpx;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: transparent;
+  }
+
+  .feed-service-img-frame {
+    width: 204rpx;
+    height: 134rpx;
+    box-sizing: border-box;
+    padding: 2rpx;
+    flex-shrink: 0;
+    border-radius: 16rpx;
+    background: linear-gradient(
+      -8deg,
+      #699fce 0%,
+      #3c73b4 30%,
+      #0e4799 61%,
+      #739cbc 100%
+    );
+    overflow: hidden;
+  }
+
+  .feed-service-image {
+    width: 200rpx;
+    height: 130rpx;
+    display: block;
+    vertical-align: top;
+    border-radius: 14rpx;
+    background: rgba(0, 0, 0, 0.15);
+    overflow: hidden;
+  }
+
+  .feed-service-text-col {
+    width: 204rpx;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 6rpx;
+    gap: 0;
+  }
+
+  .feed-service-name {
+    width: 190rpx;
+    min-height: 20rpx;
+    font-family: PingFang SC, PingFangSC-Regular, sans-serif;
+    font-size: 22rpx;
+    font-weight: normal;
+    line-height: 35rpx;
+    color: #ffffff;
+    text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    box-sizing: border-box;
+  }
+
+  .feed-service-loc {
+    width: 153rpx;
+    min-height: 15rpx;
+    font-family: PingFang SC, PingFangSC-Regular, sans-serif;
+    font-size: 16rpx;
+    font-weight: normal;
+    line-height: 28rpx;
+    color: #b4b4b4;
+    text-align: center;
+    word-break: break-all;
+    overflow-wrap: anywhere;
+    white-space: normal;
+    overflow: visible;
+    box-sizing: border-box;
   }
 }
 </style>

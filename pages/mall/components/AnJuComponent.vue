@@ -1,16 +1,20 @@
 <template>
   <view class="anju-container">
-    <!-- 两个大卡片：优惠房源和补贴房源 -->
-    <view class="cards-grid">
-      <ServiceCardComponent
-        v-for="(card, index) in serviceCards"
-        :key="index"
-        :icon="card.icon"
-        :title="card.title"
-        :subtitle="card.subtitle"
-        :backgroundImage="card.backgroundImage"
-        :categorya="card.categorya"
-        :categoryb="card.categoryb"
+    <!-- 优惠房源 / 补贴房源：整图 15.png，跳转与原先卡片同一商品列表接口参数 -->
+    <view class="anju-housing-banner" @tap="goHousingProductList">
+      <image
+        class="anju-housing-banner-img"
+        src="https://mvpme82.cloud/data/a385d669-b84d-4f61-ae1b-3e5b8fa6b040_1774526386651.png"
+        mode="widthFix"
+      />
+    </view>
+
+    <!-- 宣传横幅（一键申报 / 全域护航 / 安居无忧） -->
+    <view class="anju-promo-banner">
+      <image
+        class="anju-promo-banner-img"
+        src="https://mvpme82.cloud/data/efc34df3-0c6d-4911-bdc7-0094e104b483_1774526259483.png"
+        mode="widthFix"
       />
     </view>
 
@@ -35,39 +39,95 @@
       </scroll-view>
     </view>
 
-    <!-- 推荐服务 -->
+    <!-- 推荐服务 / 热门服务等 Tab + 列表（Tab：.19-3 / .20；列表外框：.19-2；图：.16-2） -->
     <view class="services-section">
-      <view class="section-title">推荐服务</view>
-      <scroll-view scroll-x class="service-scroll">
-        <view class="service-list">
+      <!-- 外框 .19-3：渐变描边容器 -->
+      <view class="feed-tabs-outer">
+        <view class="feed-tabs-inner">
           <view
-            v-for="(product, index) in state.feedproductlist"
-            :key="index"
-            class="service-card"
-            @click="
-              uni.navigateTo({
-                url: `/pages/product/product-detail?id=${product.id}`,
-              })
-            "
+            v-for="tab in serviceFeedTabs"
+            :key="tab.tabid"
+            class="feed-tab-wrap"
+            @tap="onFeedTabChange(tab.tabid)"
           >
-            <image :src="product.imageurl" class="service-image"></image>
-            <text class="service-name">{{ product.producttitle }}</text>
-            <text class="service-loc">{{ product.bcompanyname }}</text>
+            <view v-if="state.feedTabId === tab.tabid" class="feed-tab-active">
+              <view class="feed-tab-active-inner">
+                <text class="feed-tab-active-text">{{ tab.label }}</text>
+              </view>
+            </view>
+            <text v-else class="feed-tab-inactive">{{ tab.label }}</text>
           </view>
         </view>
-      </scroll-view>
+      </view>
+
+      <!-- 列表整体外框 .19-2：渐变描边 + 大圆角（内为横向滚动） -->
+      <view class="feed-list-frame-19-2">
+        <view class="feed-list-frame-inner">
+          <scroll-view
+            scroll-x
+            class="feed-service-scroll"
+            show-scrollbar="false"
+            :enable-flex="true"
+          >
+            <view class="feed-service-list">
+              <view
+                v-for="(product, index) in state.feedproductlist"
+                :key="product.id || index"
+                class="feed-service-card"
+                @tap="
+                  uni.navigateTo({
+                    url: `/pages/product/product-detail?id=${product.id}`,
+                  })
+                "
+              >
+                <view class="feed-service-img-frame">
+                  <image
+                    :src="product.imageurl"
+                    class="feed-service-image"
+                    mode="aspectFill"
+                  />
+                </view>
+                <view class="feed-service-text-col">
+                  <view class="feed-service-name">{{ product.producttitle }}</view>
+                  <view class="feed-service-loc">{{ product.bcompanyname }}</view>
+                </view>
+              </view>
+            </view>
+          </scroll-view>
+        </view>
+      </view>
     </view>
   </view>
 </template>
 
 <script setup>
 import { ref, reactive, onMounted } from "vue";
-import ServiceCardComponent from "./ServiceCardComponent.vue";
 import ProcessStepCard from "./ProcessStepCard.vue";
 
 const state = reactive({
   feedproductlist: [],
+  feedTabId: 1,
 });
+
+const serviceFeedTabs = [
+  { tabid: 1, label: "推荐服务" },
+  { tabid: 2, label: "热门服务" },
+  { tabid: 3, label: "专属推荐" },
+  { tabid: 4, label: "当前可预约" },
+];
+
+const onFeedTabChange = (tabid) => {
+  if (state.feedTabId === tabid) return;
+  state.feedTabId = tabid;
+  getfeedproductlist();
+};
+
+/** 与原 ServiceCardComponent 一致：安居分类下商品列表（原两卡均为 categorya=0、categoryb=0） */
+const goHousingProductList = () => {
+  uni.navigateTo({
+    url: "/pages/mall/productlist?categorya=0&categoryb=0",
+  });
+};
 // 流程步骤
 const steps = ref([
   {
@@ -114,32 +174,10 @@ const steps = ref([
   },
 ]);
 
-// 服务卡片数据
-const serviceCards = ref([
-  {
-    icon: "/static/pages/mall/anju/yhfy.png",
-    title: "优惠房源",
-    subtitle: "城芯优选 优惠房源",
-    backgroundImage:
-      "https://mvpme82.cloud/data/e023ed8d-3d34-478d-b2f4-122ded27d525_1774317254032.png",
-    categorya: 0,
-    categoryb: 0,
-  },
-  {
-    icon: "/static/pages/mall/anju/btfy.png",
-    title: "补贴房源",
-    subtitle: "城芯安居 专属补贴",
-    backgroundImage:
-      "https://mvpme82.cloud/data/cc2c869e-ab29-47d2-a8d0-f2a4bc013591_1774318625739.jpg",
-    categorya: 0,
-    categoryb: 0,
-  },
-]);
-
 const getfeedproductlist = () => {
   let payload = {
-    // 这里可以添加请求参数
     categoryaid: "0",
+    tabid: state.feedTabId,
   };
   uni.request({
     url: "https://mvpme82.cloud/api/getfeedproductlistforminiapp",
@@ -165,69 +203,29 @@ onMounted(() => {
 .anju-container {
   padding: 20rpx;
 
-  .cards-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20rpx;
+  .anju-housing-banner {
     margin-bottom: 30rpx;
+    border-radius: 24rpx;
+    overflow: hidden;
+    line-height: 0;
 
-    .card {
-      border-radius: 24rpx;
-      padding: 30rpx;
-      border: 2rpx solid rgba(212, 165, 116, 0.5);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      position: relative;
-      overflow: hidden;
+    .anju-housing-banner-img {
+      width: 100%;
+      display: block;
+      vertical-align: top;
+    }
+  }
 
-      &::before {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: linear-gradient(
-          135deg,
-          rgba(212, 165, 116, 0.1) 0%,
-          transparent 100%
-        );
-        pointer-events: none;
-      }
+  .anju-promo-banner {
+    margin-bottom: 24rpx;
+    border-radius: 24rpx;
+    overflow: hidden;
+    line-height: 0;
 
-      .card-icon {
-        font-size: 48rpx;
-        margin-bottom: 16rpx;
-      }
-
-      .card-title {
-        font-size: 28rpx;
-        font-weight: 600;
-        color: #fff;
-        margin-bottom: 8rpx;
-      }
-
-      .card-desc {
-        font-size: 20rpx;
-        color: rgba(255, 255, 255, 0.6);
-      }
-
-      &.card-discount {
-        background: linear-gradient(
-          135deg,
-          rgba(212, 165, 116, 0.15) 0%,
-          rgba(101, 84, 192, 0.1) 100%
-        );
-      }
-
-      &.card-subsidy {
-        background: linear-gradient(
-          135deg,
-          rgba(70, 130, 180, 0.15) 0%,
-          rgba(100, 150, 200, 0.1) 100%
-        );
-      }
+    .anju-promo-banner-img {
+      width: 100%;
+      display: block;
+      vertical-align: top;
     }
   }
 
@@ -282,52 +280,223 @@ onMounted(() => {
   }
 
   .services-section {
-    .section-title {
-      font-size: 32rpx;
-      font-weight: 600;
-      margin-bottom: 16rpx;
-      color: #fff;
-    }
+    margin-top: 8rpx;
+  }
 
-    .service-scroll {
-      display: flex;
-    }
+  /* .19-3 外框：690×86，渐变描边（小程序用双层模拟 border-image） */
+  .feed-tabs-outer {
+    width: 690rpx;
+    height: 86rpx;
+    margin: 0 auto 16rpx;
+    box-sizing: border-box;
+    padding: 1rpx;
+    /* 大圆角：高度一半，整条 Tab 呈胶囊外框 */
+    border-radius: 43rpx;
+    background: linear-gradient(
+      -8deg,
+      #4682d4 0%,
+      #2a6ac4 25%,
+      #0d51b4 51%,
+      #3b9fdf 100%
+    );
+  }
 
-    .service-list {
-      display: flex;
-      gap: 16rpx;
-      padding-bottom: 20rpx;
+  .feed-tabs-inner {
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+    border-radius: 42rpx;
+    background: rgba(13, 24, 48, 0.92);
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 10rpx;
+    gap: 4rpx;
+  }
 
-      .service-card {
-        min-width: 200rpx;
-        border-radius: 16rpx;
-        overflow: hidden;
-        border: 2rpx solid rgba(212, 165, 116, 0.3);
+  .feed-tab-wrap {
+    flex: 0 1 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 0;
+  }
 
-        .service-image {
-          width: 100%;
-          height: 120rpx;
-          background: rgba(255, 255, 255, 0.05);
-        }
+  /* .20 选中：204×62 渐变描边胶囊 */
+  .feed-tab-active {
+    width: 204rpx;
+    height: 62rpx;
+    box-sizing: border-box;
+    padding: 1rpx;
+    border-radius: 31rpx;
+    flex-shrink: 0;
+    background: linear-gradient(
+      -6deg,
+      #2c94c5 0%,
+      #2070ac 30%,
+      #134b93 60%,
+      #37acd9 100%
+    );
+  }
 
-        .service-name {
-          display: block;
-          font-size: 20rpx;
-          font-weight: 500;
-          color: #fff;
-          padding: 12rpx;
-          line-height: 1.3;
-        }
+  .feed-tab-active-inner {
+    width: 100%;
+    height: 100%;
+    border-radius: 30rpx;
+    background: linear-gradient(180deg, #1a3a6e 0%, #0f2848 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+  }
 
-        .service-loc {
-          display: block;
-          font-size: 16rpx;
-          color: rgba(255, 255, 255, 0.5);
-          padding: 0 12rpx 12rpx;
-          line-height: 1.2;
-        }
-      }
-    }
+  .feed-tab-active-text {
+    font-size: 26rpx;
+    font-weight: 600;
+    color: #ffffff;
+    line-height: 1.2;
+    white-space: nowrap;
+  }
+
+  /* 未选中文案（不设死宽，避免「当前可预约」截断；字号按稿 31rpx） */
+  .feed-tab-inactive {
+    max-width: 150rpx;
+    min-height: 35rpx;
+    font-family: PingFang SC, PingFangSC-Regular, sans-serif;
+    font-size: 31rpx;
+    font-weight: normal;
+    line-height: 35rpx;
+    color: #ffffff;
+    text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    padding: 0 4rpx;
+    box-sizing: border-box;
+  }
+
+  /* .19-2 列表整体外框：690 宽，渐变描边 + 大圆角（小程序用 1rpx padding 模拟 border-image） */
+  .feed-list-frame-19-2 {
+    width: 690rpx;
+    margin: 0 auto;
+    box-sizing: border-box;
+    padding: 1rpx;
+    border-radius: 32rpx;
+    overflow: hidden;
+    /* 外框渐变描边保留 */
+    background: linear-gradient(
+      -8deg,
+      #4683d3 1%,
+      #2c62bb 26%,
+      #1141a2 51%,
+      #558dd8 100%
+    );
+  }
+
+  .feed-list-frame-inner {
+    width: 100%;
+    box-sizing: border-box;
+    border-radius: 31rpx;
+    /* 内底改为偏中性暗色、略透明，减轻「整块发蓝」 */
+    background: rgba(14, 15, 18, 0.78);
+    padding: 8rpx 12rpx 6rpx;
+    overflow: hidden;
+  }
+
+  .feed-service-scroll {
+    width: 100%;
+    /* 与卡片实际高度对齐：避免 scroll-view 固定过高导致框内底部空一条 */
+    height: 270rpx;
+    white-space: nowrap;
+    box-sizing: border-box;
+  }
+
+  .feed-service-list {
+    display: inline-flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 20rpx;
+    padding: 0 2rpx 0 0;
+    box-sizing: border-box;
+  }
+
+  .feed-service-card {
+    width: 204rpx;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: transparent;
+  }
+
+  /* .16-2 图片区：204×134，2rpx 渐变描边（小程序用 padding + 渐变底模拟） */
+  .feed-service-img-frame {
+    width: 204rpx;
+    height: 134rpx;
+    box-sizing: border-box;
+    padding: 2rpx;
+    flex-shrink: 0;
+    border-radius: 16rpx;
+    background: linear-gradient(
+      -8deg,
+      #699fce 0%,
+      #3c73b4 30%,
+      #0e4799 61%,
+      #739cbc 100%
+    );
+    overflow: hidden;
+  }
+
+  .feed-service-image {
+    width: 200rpx;
+    height: 130rpx;
+    display: block;
+    vertical-align: top;
+    border-radius: 14rpx;
+    background: rgba(0, 0, 0, 0.15);
+    overflow: hidden;
+  }
+
+  .feed-service-text-col {
+    width: 204rpx;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 6rpx;
+    gap: 0;
+  }
+
+  .feed-service-name {
+    width: 190rpx;
+    min-height: 20rpx;
+    font-family: PingFang SC, PingFangSC-Regular, sans-serif;
+    font-size: 22rpx;
+    font-weight: normal;
+    line-height: 35rpx;
+    color: #ffffff;
+    text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    box-sizing: border-box;
+  }
+
+  /* 第二行：允许换行，不使用省略号；行高略紧于 35，多行时减少框底留白 */
+  .feed-service-loc {
+    width: 153rpx;
+    min-height: 15rpx;
+    font-family: PingFang SC, PingFangSC-Regular, sans-serif;
+    font-size: 16rpx;
+    font-weight: normal;
+    line-height: 28rpx;
+    color: #b4b4b4;
+    text-align: center;
+    word-break: break-all;
+    overflow-wrap: anywhere;
+    white-space: normal;
+    overflow: visible;
+    box-sizing: border-box;
   }
 }
 </style>

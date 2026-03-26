@@ -5,7 +5,7 @@
       class="card-background"
       mode="aspectFill"
     ></image>
-    <view class="card-content">
+    <view v-if="title || subtitle" class="card-content">
       <text class="card-title">{{ title }}</text>
       <text class="card-subtitle">{{ subtitle }}</text>
     </view>
@@ -59,10 +59,11 @@ const handleCardClick = () => {
 <style scoped lang="scss">
 .service-card-wrapper {
   position: relative;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
   border-radius: 24rpx;
   overflow: hidden;
-  border: 3rpx solid rgba(212, 165, 116, 0.5);
-  height: 240rpx;
   display: flex;
   //   align-items: flex-end;
 
