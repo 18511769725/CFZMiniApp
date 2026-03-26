@@ -288,7 +288,7 @@ const companyFieldLabelBgSrc =
 
 /** 服务清单「查看详情」按钮底图 */
 const orderDetailBtnBgSrc =
-  "https://mvpme82.cloud/data/2d6fa1ea-4d0f-45da-9569-97db180f3d8a_1774544328115.png";
+  "https://mvpme82.cloud/data/87edb7e3-00ac-4f48-9c2c-2589f9f802ac_1774546014161.png";
 
 /** 每个订单条目卡片底图（非整列表） */
 const orderRowCardBgSrc =
@@ -552,7 +552,7 @@ onShow(() => {
 
 <style lang="scss">
 page {
-  background-color: #061730;
+  background-color: #020713;
 }
 </style>
 
@@ -561,7 +561,7 @@ page {
   min-height: 100vh;
   width: 100%;
   box-sizing: border-box;
-  background-color: #061730;
+  background-color: #020713;
   color: #fff;
   padding: 0;
   padding-bottom: env(safe-area-inset-bottom);

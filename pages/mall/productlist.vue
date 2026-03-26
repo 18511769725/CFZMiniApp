@@ -30,7 +30,7 @@
 
 <script setup>
 import { ref, reactive, computed } from "vue";
-import { onLoad } from "@dcloudio/uni-app";
+import { onLoad, onShow } from "@dcloudio/uni-app";
 import productItem from "./components/product-item.vue";
 
 const state = reactive({
@@ -46,18 +46,12 @@ const state = reactive({
 const isAnjuList = computed(() => Number(state.categorya) === 0);
 const listVariant = computed(() => (isAnjuList.value ? "anju" : "default"));
 
+/** 与 pages.json / globalStyle 一致：默认白底导航栏、黑字标题「产品列表」 */
 const applyNavigationStyle = () => {
-  if (Number(state.categorya) === 0) {
-    uni.setNavigationBarColor({
-      frontColor: "#ffffff",
-      backgroundColor: "#020713",
-    });
-  } else {
-    uni.setNavigationBarColor({
-      frontColor: "#000000",
-      backgroundColor: "#ffffff",
-    });
-  }
+  uni.setNavigationBarColor({
+    frontColor: "#000000",
+    backgroundColor: "#F8F8F8",
+  });
 };
 
 // 商品列表数据
@@ -128,7 +122,7 @@ const findnewproduct = (news) => {
 // 处理跳转商品详情页
 const handleToDetail = (productId) => {
   uni.navigateTo({
-    url: `/pages/product/product-detail?id=${productId}`,
+    url: `/pages/product/product-detail?id=${productId}&categorya=${state.categorya ?? 0}`,
   });
 };
 
@@ -178,6 +172,10 @@ onLoad((options) => {
   state.categoryb = options.categoryb || 0; // 从页面参数获取二级分类ID，默认为0
   applyNavigationStyle();
   loadProductList();
+});
+
+onShow(() => {
+  applyNavigationStyle();
 });
 
 // onShow((options) => {

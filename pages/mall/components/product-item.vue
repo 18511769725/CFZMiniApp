@@ -5,14 +5,24 @@
     class="anju-card-outer"
     @click="toProductDetail"
   >
+    <image
+      class="anju-card-bg"
+      :src="anjuCardBgSrc"
+      mode="scaleToFill"
+    />
     <view class="anju-card-inner">
       <view class="anju-thumb-wrap">
-        <image
-          class="anju-thumb"
-          :src="getFirstProductImage()"
-          mode="aspectFill"
-          lazy-load="true"
-        />
+        <!-- 外框：模拟 border-image 渐变边（小程序不用 border-image） -->
+        <view class="anju-thumb-border">
+          <view class="anju-thumb-inner">
+            <image
+              class="anju-thumb"
+              :src="getFirstProductImage()"
+              mode="aspectFill"
+              lazy-load="true"
+            />
+          </view>
+        </view>
       </view>
       <view class="anju-main">
         <view class="anju-title">{{
@@ -46,19 +56,32 @@
         </view>
         <view class="anju-footer-row">
           <view class="anju-tags">
-            <view class="anju-tag anju-tag-discount">
-              <text class="anju-tag-text">折扣抵用</text>
+            <view class="anju-tag-discount-wrap">
+              <image
+                class="anju-tag-discount-bg"
+                :src="anjuTagDiscountBgSrc"
+                mode="scaleToFill"
+              />
+              <text class="anju-tag-discount-label">折扣抵用</text>
             </view>
-            <view class="anju-tag anju-tag-audit-shell">
-              <view class="anju-tag-audit-inner">
-                <text class="anju-tag-text">需审核</text>
-              </view>
+            <view class="anju-tag-audit-wrap">
+              <image
+                class="anju-tag-audit-bg"
+                :src="anjuTagAuditBgSrc"
+                mode="scaleToFill"
+              />
+              <text class="anju-tag-audit-label">需审核</text>
             </view>
           </view>
           <view class="anju-actions" @click.stop>
-            <view class="anju-btn anju-btn-ghost" @click="toProductDetail"
-              >查看详情</view
-            >
+            <view class="anju-btn-detail-wrap" @click="toProductDetail">
+              <image
+                class="anju-btn-detail-bg"
+                :src="anjuDetailBtnBgSrc"
+                mode="scaleToFill"
+              />
+              <view class="anju-btn-detail-label">查看详情</view>
+            </view>
             <view class="anju-btn anju-btn-primary" @click="toProductDetail"
               >立即申请</view
             >
@@ -114,6 +137,22 @@ const props = defineProps({
 });
 
 const emit = defineEmits(["toDetail", "addCart"]);
+
+/** 益企·安居列表卡片整图底（688×252，描边圆角在切图内） */
+const anjuCardBgSrc =
+  "https://mvpme82.cloud/data/012873f5-90cc-444e-a41a-64aa74767595_1774545749708.png";
+
+/** 益企·安居列表「查看详情」按钮底图 */
+const anjuDetailBtnBgSrc =
+  "https://mvpme82.cloud/data/87edb7e3-00ac-4f48-9c2c-2589f9f802ac_1774546014161.png";
+
+/** 益企·安居列表「折扣抵用」标签底图 */
+const anjuTagDiscountBgSrc =
+  "https://mvpme82.cloud/data/2bac1f23-af75-4b88-bb2a-9aec2b8e1dcf_1774546263764.png";
+
+/** 益企·安居列表「需审核」标签底图 */
+const anjuTagAuditBgSrc =
+  "https://mvpme82.cloud/data/4e754266-1c0d-4508-a174-03a2381a6241_1774546888649.png";
 
 const getFirstProductImage = () => {
   if (!props.product.imagelist) {
@@ -213,40 +252,70 @@ const toProductDetail = () => {
 </script>
 
 <style scoped lang="scss">
-/* ========== 益企·安居深色卡片（688×252、圆角 41；列表竖向间距由 product-list gap 24 统一） ========== */
+/* ========== 益企·安居：688×252 整图底 + 叠字；列表间距 product-list gap 24rpx ========== */
 .anju-card-outer {
+  position: relative;
   width: 688rpx;
-  max-width: calc(100% - 64rpx);
+  max-width: 100%;
+  height: 252rpx;
   margin: 0 auto;
-  padding: 2rpx;
-  border-radius: 41rpx;
   box-sizing: border-box;
-  background: linear-gradient(
-    171deg,
-    #80c3f6 0%,
-    #244368 48%,
-    #9ccdf0 100%
-  );
+  overflow: hidden;
+  border-radius: 40rpx;
+}
+
+.anju-card-bg {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  display: block;
+  pointer-events: none;
 }
 
 .anju-card-inner {
+  position: relative;
+  z-index: 1;
   display: flex;
   flex-direction: row;
-  align-items: stretch;
-  min-height: 248rpx;
+  align-items: flex-start;
+  height: 100%;
   padding: 20rpx 22rpx 18rpx 20rpx;
-  border-radius: 39rpx;
   box-sizing: border-box;
-  background: rgba(13, 28, 52, 0.74);
+  background: transparent;
 }
 
+/* 缩略图整体 144×145，含 3rpx 渐变外框 */
 .anju-thumb-wrap {
-  width: 148rpx;
-  height: 196rpx;
+  width: 144rpx;
+  height: 145rpx;
   flex-shrink: 0;
-  border-radius: 16rpx;
+  box-sizing: border-box;
+}
+
+.anju-thumb-border {
+  width: 144rpx;
+  height: 145rpx;
+  box-sizing: border-box;
+  padding: 3rpx;
+  border-radius: 18rpx;
   overflow: hidden;
-  background: rgba(0, 0, 0, 0.25);
+  background: linear-gradient(
+    178deg,
+    #5e97d2 0%,
+    #2c5f8f 49%,
+    #6a9ccf 100%
+  );
+}
+
+.anju-thumb-inner {
+  width: 100%;
+  height: 100%;
+  border-radius: 15rpx;
+  overflow: hidden;
+  background: linear-gradient(0deg, #1b4163 0%, #76aadf 100%);
 }
 
 .anju-thumb {
@@ -258,16 +327,22 @@ const toProductDetail = () => {
 .anju-main {
   flex: 1;
   min-width: 0;
+  min-height: 0;
   margin-left: 20rpx;
+  align-self: stretch;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 }
 
+/* 设计稿：标题 34rpx PingFangSC-Semibold #fff */
 .anju-title {
-  font-size: 28rpx;
+  font-family: "PingFang SC", -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 34rpx;
   font-weight: 600;
   color: #ffffff;
-  line-height: 1.35;
+  line-height: 1.2;
+  letter-spacing: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   display: -webkit-box;
@@ -275,20 +350,25 @@ const toProductDetail = () => {
   -webkit-box-orient: vertical;
 }
 
+/* 设计稿：地址/副标题 22rpx PingFangSC-Regular #b8dced */
 .anju-sub {
   margin-top: 6rpx;
+  font-family: "PingFang SC", -apple-system, BlinkMacSystemFont, sans-serif;
   font-size: 22rpx;
-  color: rgba(255, 255, 255, 0.55);
-  line-height: 1.3;
+  font-weight: 400;
+  color: #b8dced;
+  line-height: 1.2;
+  letter-spacing: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .anju-grid {
-  margin-top: 12rpx;
+  margin-top: 8rpx;
   flex: 1;
   min-height: 0;
+  overflow: hidden;
 }
 
 .anju-grid-row {
@@ -296,18 +376,22 @@ const toProductDetail = () => {
   flex-direction: row;
   justify-content: space-between;
   gap: 12rpx;
-  margin-bottom: 6rpx;
+  margin-bottom: 4rpx;
 }
 
 .anju-grid-row-full .anju-grid-cell {
   flex: 1;
 }
 
+/* 设计稿：详情区 17rpx / 行高 23rpx PingFangSC-Regular #fff */
 .anju-grid-cell {
   flex: 1;
-  font-size: 20rpx;
-  color: rgba(255, 255, 255, 0.82);
-  line-height: 1.4;
+  font-family: "PingFang SC", -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 17rpx;
+  font-weight: 400;
+  color: #ffffff;
+  line-height: 23rpx;
+  letter-spacing: 0;
 }
 
 .anju-grid-cell-nowrap {
@@ -322,7 +406,8 @@ const toProductDetail = () => {
   align-items: center;
   justify-content: space-between;
   margin-top: auto;
-  padding-top: 10rpx;
+  padding-top: 6rpx;
+  flex-shrink: 0;
 }
 
 .anju-tags {
@@ -333,28 +418,67 @@ const toProductDetail = () => {
   flex-shrink: 0;
 }
 
-/* 折扣抵用：描边 #f6a47f */
-.anju-tag-discount {
-  padding: 2rpx 10rpx;
+.anju-tag-discount-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 28rpx;
+  min-width: 100rpx;
+  padding: 0 10rpx;
+  box-sizing: border-box;
+  overflow: hidden;
   border-radius: 6rpx;
-  border: 1rpx solid #f6a47f;
-  background: rgba(246, 164, 127, 0.18);
+  flex-shrink: 0;
 }
 
-/* 需审核：渐变描边壳 + 内底（小程序不用 border-image） */
-.anju-tag-audit-shell {
-  padding: 1rpx;
+.anju-tag-discount-bg {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  display: block;
+  pointer-events: none;
+}
+
+.anju-tag-discount-label {
+  position: relative;
+  z-index: 1;
+  font-size: 18rpx;
+  color: rgba(255, 255, 255, 0.95);
+  line-height: 24rpx;
+}
+
+.anju-tag-audit-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 28rpx;
+  min-width: 76rpx;
+  padding: 0 10rpx;
+  box-sizing: border-box;
+  overflow: hidden;
   border-radius: 6rpx;
-  background: linear-gradient(157deg, #e7a3f6 0%, #df65b2 100%);
+  flex-shrink: 0;
 }
 
-.anju-tag-audit-inner {
-  padding: 1rpx 8rpx;
-  border-radius: 5rpx;
-  background: rgba(20, 24, 40, 0.92);
+.anju-tag-audit-bg {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  display: block;
+  pointer-events: none;
 }
 
-.anju-tag-text {
+.anju-tag-audit-label {
+  position: relative;
+  z-index: 1;
   font-size: 18rpx;
   color: rgba(255, 255, 255, 0.95);
   line-height: 24rpx;
@@ -378,21 +502,39 @@ const toProductDetail = () => {
   box-sizing: border-box;
 }
 
-.anju-btn-ghost {
+.anju-btn-detail-wrap {
+  position: relative;
+  width: 112rpx;
+  height: 35rpx;
+  flex-shrink: 0;
+  overflow: hidden;
+  border-radius: 18rpx;
+  box-sizing: border-box;
+}
+
+.anju-btn-detail-bg {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  display: block;
+  pointer-events: none;
+}
+
+.anju-btn-detail-label {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20rpx;
+  line-height: 1;
   color: rgba(255, 255, 255, 0.92);
-  background: linear-gradient(
-    0deg,
-    #5c92d8 0%,
-    rgba(92, 146, 216, 0.95) 33%,
-    rgba(103, 152, 214, 0.93) 55%,
-    rgba(110, 156, 213, 0.9) 71%,
-    rgba(113, 157, 212, 0.9) 77%
-  );
-  box-shadow:
-    inset 0 -3rpx 2rpx 0 rgba(255, 255, 255, 0.45),
-    inset 0 4rpx 6rpx 0 rgba(255, 255, 255, 0.25);
-  border: 1rpx solid rgba(162, 195, 230, 0.65);
-  opacity: 0.92;
+  box-sizing: border-box;
 }
 
 .anju-btn-primary {

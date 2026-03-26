@@ -281,7 +281,7 @@ onMounted(() => {
     border-radius: 24rpx;
     overflow: hidden;
     line-height: 0;
-    background: #0a1326;
+    background: #020713;
   }
 
   .kanghu-banner-img {

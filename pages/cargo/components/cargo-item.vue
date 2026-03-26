@@ -1,46 +1,58 @@
 <template>
-  <!-- 左滑删除容器：uni-swipe-action 实现左滑露出删除按钮 -->
+  <!-- 列表底色在父级 .cargo-list；单条 .34 外层条 -->
+  <view class="cargo-item-root" :class="{ 'cargo-item-root--last': isLast }">
   <uni-swipe-action
     :options="swipeOptions"
     @click="handleSwipeDelete"
     :disabled="cargo.status === 'disable'"
   >
     <uni-swipe-action-item>
-      <!-- 购物车卡片 - 左勾选 + 左图右文布局（自适应高度） -->
+      <!-- 稿 .34：750×240；#30539c @0.14 + 金描边；底色用 rgba -->
+      <view class="cargo-row-strip">
       <view
-        class="cargo-item-container"
+        class="cargo-row"
         :class="{ 'cargo-disabled': cargo.status === 'disable' }"
       >
-        <!-- 禁用蒙层（仅status=disable时显示） -->
-        <view
-          v-if="cargo.status === 'disable'"
-          class="cargo-disable-mask"
-        ></view>
-
-        <!-- 左侧勾选按钮（disable状态下不可点击） -->
         <view class="cargo-check-wrapper" @click="!isDisabled && toggleCheck()">
-          <view
-            class="cargo-check-box"
-            :class="{ 'cargo-check-active': isChecked && !isDisabled }"
-          >
-            <uni-icons
-              v-if="isChecked && !isDisabled"
-              type="checkmarkempty"
-              size="16"
-              color="#ffffff"
-            ></uni-icons>
+          <view class="cargo-check-outer">
+            <view
+              class="cargo-check-inner"
+              :class="{
+                'cargo-check-inner--on': isChecked && !isDisabled,
+              }"
+            >
+              <uni-icons
+                v-if="isChecked && !isDisabled"
+                type="checkmarkempty"
+                size="14"
+                color="#020713"
+              ></uni-icons>
+            </view>
           </view>
         </view>
 
-        <!-- 商品图片（自适应高度，保持宽高比） -->
-        <view class="cargo-img-wrapper">
+        <view class="cargo-card-shell">
           <image
-            class="cargo-img"
-            :src="getFirstProductImage()"
-            mode="aspectFill"
-            lazy-load="true"
-          ></image>
-        </view>
+            class="cargo-card-bg"
+            src="https://mvpme82.cloud/data/2b1ce32e-bde0-457d-9cbe-9ad5c56932f0_1774552961107.png"
+            mode="scaleToFill"
+          />
+          <view class="cargo-card-inner">
+            <view
+              v-if="cargo.status === 'disable'"
+              class="cargo-disable-mask"
+            ></view>
+
+          <view class="cargo-img-frame">
+            <view class="cargo-img-inner">
+              <image
+                class="cargo-img"
+                :src="getFirstProductImage()"
+                mode="aspectFill"
+                lazy-load="true"
+              ></image>
+            </view>
+          </view>
 
         <!-- 右侧商品信息（高度随内容自适应） -->
         <view class="cargo-info-wrapper">
@@ -62,23 +74,41 @@
           <!-- 商品价格（含购买数量计算） -->
           <view class="cargo-price">{{ getCargoPrice() }}</view>
 
-          <!-- 购买数量：uni-number-box 组件 -->
+          <!-- 兑换数量：自绘步进器（小程序下父组件样式无法穿透 uni-number-box 内部） -->
           <view class="cargo-amount-wrapper" v-if="!isDisabled">
             <view class="amount-label">兑换数量：</view>
-            <uni-number-box
-              :min="0"
-              :max="100"
-              v-model="currentAmount"
-              @change="handleAmountChange"
-            ></uni-number-box>
+            <view class="qty-stepper">
+              <view class="qty-cell qty-btn" @click="stepMinus">
+                <view class="qty-cell-fill">
+                  <text class="qty-btn-text">−</text>
+                </view>
+              </view>
+              <view class="qty-cell qty-input-outer">
+                <input
+                  class="qty-input-inner"
+                  type="number"
+                  :value="String(currentAmount)"
+                  @blur="onQtyInputBlur"
+                />
+              </view>
+              <view class="qty-cell qty-btn" @click="stepPlus">
+                <view class="qty-cell-fill">
+                  <text class="qty-btn-text">+</text>
+                </view>
+              </view>
+            </view>
           </view>
           <view class="cargo-amount-disabled" v-else>
             兑换数量：{{ cargo.buyamount || 1 }}
           </view>
         </view>
+        </view>
+        </view>
+      </view>
       </view>
     </uni-swipe-action-item>
   </uni-swipe-action>
+  </view>
 </template>
 
 <script setup>
@@ -99,6 +129,10 @@ const props = defineProps({
   checked: {
     type: Boolean,
     required: false,
+    default: false,
+  },
+  isLast: {
+    type: Boolean,
     default: false,
   },
 });
@@ -143,7 +177,7 @@ const isChecked = computed({
   },
 });
 
-// 当前购买数量（绑定uni-number-box）
+// 当前购买数量（自绘步进器）
 const currentAmount = ref(props.cargo.buyamount || 1);
 
 // 是否显示套餐信息（pricetype=2时显示）
@@ -254,10 +288,29 @@ const getCargoPrice = () => {
     case 2:
       // 2：套餐计价 - 套餐value * 购买数量
       const packagePrice = formatPrice(getPackageValue() * amount);
-      return `套餐总分 ${packagePrice}`;
+      return `套餐总分：${packagePrice}`;
     default:
       return "沟通面议";
   }
+};
+
+const stepMinus = () => {
+  handleAmountChange(currentAmount.value - 1);
+};
+
+const stepPlus = () => {
+  handleAmountChange(Math.min(100, currentAmount.value + 1));
+};
+
+const onQtyInputBlur = (e) => {
+  const raw = e.detail.value;
+  let v = parseInt(String(raw).trim(), 10);
+  if (Number.isNaN(v)) {
+    v = currentAmount.value;
+  } else {
+    v = Math.max(0, Math.min(100, v));
+  }
+  handleAmountChange(v);
 };
 
 // 处理购买数量变更
@@ -309,95 +362,186 @@ const handleSwipeDelete = () => {
 };
 </script>
 
-<style scoped>
-/* 购物车卡片容器（移除固定高度，自适应内容） */
-.cargo-item-container {
+<style scoped lang="scss">
+/* 底色在父级 .cargo-list；此处只负责布局与上下间距 */
+.cargo-item-root {
+  width: 100%;
+  margin: 0;
+  padding: 24rpx 0;
+  box-sizing: border-box;
+  border-bottom: 1rpx solid rgba(227, 211, 181, 0.14);
+}
+.cargo-item-root--last {
+  border-bottom: none;
+}
+
+/* 稿 .34 尺寸；内底透明，沿用根节点同色底 */
+.cargo-row-strip {
+  width: 750rpx;
+  max-width: 100%;
+  height: 240rpx;
+  margin: 0 auto;
+  box-sizing: border-box;
+  background-color: transparent;
+  overflow: hidden;
+}
+
+.cargo-row {
   display: flex;
-  align-items: flex-start; /* 改为顶部对齐，适配内容高度 */
-  padding: 16rpx;
-  border-bottom: 1rpx solid #f5f5f5;
-  background-color: #ffffff;
-  position: relative; /* 作为禁用蒙层的父容器 */
-  min-height: 160rpx; /* 保留最小高度，避免内容过少时布局塌陷 */
+  flex-direction: row;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  margin: 0 auto;
+  padding: 0 20rpx;
+  box-sizing: border-box;
+  gap: 16rpx;
 }
 
-/* 禁用状态样式 */
-.cargo-disabled {
-  opacity: 0.7;
+/* 稿：每条卡片固定 635×192 */
+
+.cargo-card-shell {
+  position: relative;
+  width: 635rpx;
+  flex-shrink: 0;
+  box-sizing: border-box;
+  border-radius: 24rpx;
+  overflow: hidden;
 }
 
-/* 禁用蒙层（淡灰色，不可点击，跟随卡片自适应高度） */
+.cargo-card-bg {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  display: block;
+  border-width: 0;
+}
+
+.cargo-card-inner {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+  /* 最后一行距卡片底边 27rpx */
+  padding: 12rpx 14rpx 27rpx 12rpx;
+  border-radius: 23rpx;
+  box-sizing: border-box;
+  background: transparent;
+}
+
+.cargo-row.cargo-disabled .cargo-card-shell {
+  filter: saturate(0.65) brightness(0.88);
+}
+
 .cargo-disable-mask {
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(245, 245, 245, 0.8);
+  background: rgba(2, 7, 19, 0.45);
   z-index: 10;
-  pointer-events: auto; /* 阻止下层元素点击 */
+  border-radius: 23rpx;
+  pointer-events: auto;
 }
 
-/* 勾选按钮容器（移除固定高度，跟随卡片自适应） */
 .cargo-check-wrapper {
-  width: 60rpx;
+  width: 40rpx;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding-top: 16rpx; /* 与图片顶部对齐，优化视觉 */
-  z-index: 5;
+  z-index: 12;
+  flex-shrink: 0;
+  align-self: center;
 }
 
-/* 勾选框样式 */
-.cargo-check-box {
+.cargo-check-outer {
   width: 36rpx;
-  height: 36rpx;
+  height: 37rpx;
+  padding: 1rpx;
   border-radius: 50%;
-  border: 2rpx solid #cccccc;
+  box-sizing: border-box;
+  background: linear-gradient(0deg, #faebcc 0%, #ddb877 100%);
+}
+
+.cargo-check-inner {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: rgba(2, 7, 19, 0.96);
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #ffffff;
-  transition: all 0.3s ease;
 }
 
-/* 勾选激活状态 */
-.cargo-check-active {
-  background-color: #e53935;
-  border-color: #e53935;
+.cargo-check-inner--on {
+  background: linear-gradient(0deg, #dab26b 0%, #fcefd4 100%);
 }
 
-/* 商品图片容器（移除固定高度，保持宽高比，自适应） */
-.cargo-img-wrapper {
-  width: 160rpx;
-  border-radius: 8rpx;
-  overflow: hidden;
-  background-color: #f9f9f9;
+/* 封面 129×129，圆角 18，底与描边见稿 */
+.cargo-img-frame {
+  width: 129rpx;
+  height: 129rpx;
+  flex-shrink: 0;
+  padding: 1rpx;
+  border-radius: 18rpx;
+  box-sizing: border-box;
+  background: linear-gradient(
+    178deg,
+    #5e97d2 0%,
+    #2c5f8f 49%,
+    #6a9ccf 100%
+  );
   z-index: 5;
-  flex-shrink: 0; /* 防止图片被挤压 */
+}
+
+.cargo-img-inner {
+  width: 100%;
+  height: 100%;
+  border-radius: 17rpx;
+  overflow: hidden;
+  background: linear-gradient(0deg, #1b4163 0%, #76aadf 100%);
 }
 
 .cargo-img {
   width: 100%;
-  height: 160rpx; /* 图片保留固定高度，保证视觉统一，卡片高度随右侧内容延伸 */
-  object-fit: cover; /* 防止图片变形 */
+  height: 100%;
+  display: block;
 }
 
-/* 商品信息容器（移除固定高度，高度随内容自适应） */
 .cargo-info-wrapper {
   flex: 1;
-  margin-left: 16rpx;
+  min-width: 0;
+  min-height: 0;
+  margin-left: 12rpx;
   display: flex;
   flex-direction: column;
-  gap: 8rpx; /* 使用gap控制内容间距，替代margin，布局更整洁 */
+  gap: 4rpx;
   z-index: 5;
+  justify-content: flex-start;
+  overflow: hidden;
 }
 
-/* 商品标题 */
+/* 稿 .34 标题 */
 .cargo-title {
-  font-size: 32rpx;
-  font-weight: 500;
-  color: #333333;
+  font-family:
+    PingFang SC,
+    PingFangSC-Semibold,
+    -apple-system,
+    sans-serif;
+  font-size: 35rpx;
+  font-weight: normal;
+  font-stretch: normal;
+  letter-spacing: 0;
+  color: #ffffff;
   overflow: hidden;
   text-overflow: ellipsis;
   display: -webkit-box;
@@ -405,67 +549,112 @@ const handleSwipeDelete = () => {
   -webkit-box-orient: vertical;
 }
 
-/* 供应商名称 */
 .cargo-supplier {
   font-size: 24rpx;
-  color: #999999;
+  color: rgba(200, 220, 240, 0.65);
 }
 
-/* 套餐信息 */
 .cargo-package {
   font-size: 24rpx;
-  color: #666666;
+  color: rgba(200, 220, 240, 0.7);
 }
 
-/* 商品价格 */
 .cargo-price {
-  font-size: 28rpx;
-  color: #e53935;
-  font-weight: 500;
+  font-size: 26rpx;
+  font-weight: 600;
+  color: #e8c87c;
   margin-top: 4rpx;
 }
 
-/* 数量选择容器 */
 .cargo-amount-wrapper {
   display: flex;
+  flex-direction: row;
   align-items: center;
+  flex-wrap: nowrap;
   margin-top: 4rpx;
 }
 
 .amount-label {
   font-size: 24rpx;
-  color: #999999;
-  margin-right: 16rpx;
+  color: rgba(255, 255, 255, 0.55);
+  margin-right: 12rpx;
 }
 
-/* 禁用状态下的数量展示 */
 .cargo-amount-disabled {
   font-size: 24rpx;
-  color: #999999;
-  margin-top: 4rpx;
+  color: rgba(255, 255, 255, 0.45);
+  margin-top: 8rpx;
 }
 
-/* 勾选框样式 */
-.cargo-check-box {
-  width: 36rpx;
-  height: 36rpx;
-  border-radius: 50%;
-  border: 2rpx solid #cccccc;
+/* 稿 .32-2：24×26 单元；蓝底渐变 + 金描边；0.4 用 rgba，不用整元素 opacity */
+.qty-stepper {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8rpx;
+}
+
+.qty-cell {
+  box-sizing: border-box;
+  flex-shrink: 0;
+}
+
+.qty-btn {
+  width: 24rpx;
+  height: 26rpx;
+  padding: 1rpx;
+  border-radius: 4rpx;
+  background: linear-gradient(178deg, #fcefd4 0%, #dab26b 100%);
+}
+
+.qty-cell-fill {
+  width: 100%;
+  height: 100%;
+  border-radius: 3rpx;
+  background: linear-gradient(
+    0deg,
+    rgba(27, 65, 99, 0.4) 0%,
+    rgba(118, 170, 223, 0.4) 100%
+  );
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #ffffff;
-  transition: all 0.3s ease;
 }
 
-/* 勾选激活状态：红色背景 + 白色对钩 */
-.cargo-check-active {
-  background-color: #e53935;
-  border-color: #e53935;
+.qty-btn-text {
+  font-size: 16rpx;
+  font-weight: 300;
+  color: #ffffff;
+  line-height: 1;
 }
 
-/* 对钩图标颜色 */
-.cargo-check-active uni-icons {
-  color: #ffffff !important;
+.qty-input-outer {
+  min-width: 24rpx;
+  width: 44rpx;
+  height: 26rpx;
+  padding: 1rpx;
+  border-radius: 4rpx;
+  background: linear-gradient(178deg, #fcefd4 0%, #dab26b 100%);
 }
+
+.qty-input-inner {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  padding: 0 4rpx;
+  box-sizing: border-box;
+  border: none;
+  border-radius: 3rpx;
+  font-size: 16rpx;
+  line-height: 22rpx;
+  text-align: center;
+  color: #ffffff;
+  background: linear-gradient(
+    0deg,
+    rgba(27, 65, 99, 0.4) 0%,
+    rgba(118, 170, 223, 0.4) 100%
+  );
+}
+
 </style>

@@ -19,7 +19,7 @@
 				"navigationBarTitleText": "个人中心",
 				"navigationBarBackgroundColor": "#F8F8F8",
 				"navigationBarTextStyle": "black",
-				"backgroundColor": "#061730"
+				"backgroundColor": "#020713"
 			}
 		},
 		{
@@ -49,19 +49,28 @@
 		{
 			"path": "pages/product/product-detail",
 			"style": {
-				"navigationBarTitleText": ""
+				"navigationStyle": "custom",
+				"navigationBarTextStyle": "black",
+				"navigationBarBackgroundColor": "#ffffff",
+				"backgroundColor": "#ffffff"
 			}
 		},
 		{
 			"path": "pages/cargo/cargo-list",
 			"style": {
-				"navigationBarTitleText": "购物车"
+				"navigationBarTitleText": "购物车",
+				"navigationBarBackgroundColor": "#F8F8F8",
+				"navigationBarTextStyle": "black",
+				"backgroundColor": "#020713"
 			}
 		},
 		{
 			"path": "pages/orderDetail/orderDetail",
 			"style": {
-				"navigationBarTitleText": ""
+				"navigationBarTitleText": "",
+				"navigationBarBackgroundColor": "#FFFFFF",
+				"navigationBarTextStyle": "black",
+				"backgroundColor": "#020713"
 			}
 		},
 		{
@@ -85,7 +94,10 @@
 		{
 			"path": "pages/askForTenantInfo/askForTenantInfo",
 			"style": {
-				"navigationBarTitleText": "补充承租人信息"
+				"navigationBarTitleText": "补充承租人信息",
+				"navigationBarBackgroundColor": "#F8F8F8",
+				"navigationBarTextStyle": "black",
+				"backgroundColor": "#020713"
 			}
 		},
 		{
@@ -98,9 +110,9 @@
 			"path": "pages/personal/personal",
 			"style": {
 				"navigationBarTitleText": "个人中心",
-				"navigationBarBackgroundColor": "#061730",
+				"navigationBarBackgroundColor": "#020713",
 				"navigationBarTextStyle": "white",
-				"backgroundColor": "#061730"
+				"backgroundColor": "#020713"
 			}
 		}
 	],
@@ -108,7 +120,7 @@
 		"navigationBarTextStyle": "black",
 		"navigationBarTitleText": "uni-app",
 		"navigationBarBackgroundColor": "#F8F8F8",
-		"backgroundColor": "#F8F8F8"
+		"backgroundColor": "#020713"
 	},
 	"uniIdRouter": {},
 	"tabBar": {

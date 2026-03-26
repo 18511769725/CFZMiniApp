@@ -1,128 +1,196 @@
 <template>
   <view class="add-user-container">
-    <view class="quota-card">
-      <view class="quota-title">配额使用情况</view>
-      <view class="quota-subtitle">请选择一个可用配额后再发起订单</view>
-      <view
-        class="quota-item"
-        v-for="(item, index) in quotaContentList"
-        :key="`${item.type || 'unknown'}-${index}`"
-        :class="{
-          'quota-item-selected': isQuotaSelected(index),
-          'quota-item-disabled': !isQuotaAvailable(item),
-        }"
-        @click="handleQuotaSelect(item, index)"
-      >
-        <view class="quota-item-header">
-          <text class="quota-type" :class="`quota-type-${item.type}`">{{
-            getQuotaTypeLabel(item)
-          }}</text>
-          <view class="quota-right-header">
-            <text class="quota-main-highlight">{{
-              getQuotaMainHighlight(item)
-            }}</text>
-            <view
-              class="quota-selector"
-              :class="{
-                checked: isQuotaSelected(index),
-                disabled: !isQuotaAvailable(item),
-              }"
-            >
-              <text v-if="isQuotaSelected(index)">✓</text>
+    <!-- 配额：669×573 稿，渐变描边 + 圆角 41（勿对整卡设 opacity，会连文字一起变淡） -->
+    <view class="tenant-card-shell tenant-card-shell--quota">
+      <view class="tenant-card-inner">
+        <view class="section-head">
+          <view class="section-bar" />
+          <text class="quota-title">配额使用情况</text>
+        </view>
+        <text class="quota-subtitle">请选择一个可用配额后再发起订单</text>
+        <view
+          class="quota-item"
+          v-for="(item, index) in quotaContentList"
+          :key="`${item.type || 'unknown'}-${index}`"
+          :class="{
+            'quota-item-selected': isQuotaSelected(index),
+            'quota-item-disabled': !isQuotaAvailable(item),
+          }"
+          @click="handleQuotaSelect(item, index)"
+        >
+          <view class="quota-item-header">
+            <view class="quota-type" :class="`quota-type-${item.type}`">
+              <text class="quota-type-text">{{
+                getQuotaTypeLabel(item)
+              }}</text>
+            </view>
+            <view class="quota-right-header">
+              <text class="quota-main-highlight">{{
+                getQuotaMainHighlight(item)
+              }}</text>
+              <view
+                class="quota-selector"
+                :class="{
+                  checked: isQuotaSelected(index),
+                  disabled: !isQuotaAvailable(item),
+                }"
+              />
+            </view>
+          </view>
+
+          <view class="quota-metrics">
+            <image
+              class="quota-metrics-bg"
+              src="https://mvpme82.cloud/data/01aea8d6-7b4a-44ed-8636-0b80aa7bf7be_1774551576825.png"
+              mode="scaleToFill"
+            />
+            <view class="quota-metrics-body">
+              <view class="quota-metric">
+                <text class="quota-metric-label">共计</text>
+                <text class="quota-metric-value">{{
+                  getQuotaStats(item).count
+                }}</text>
+              </view>
+              <view class="quota-metric-divider">
+                <view class="quota-metric-divider-line" />
+              </view>
+              <view class="quota-metric">
+                <text class="quota-metric-label">已使用</text>
+                <text class="quota-metric-value">{{
+                  getQuotaStats(item).used
+                }}</text>
+              </view>
+              <view class="quota-metric-divider">
+                <view class="quota-metric-divider-line" />
+              </view>
+              <view class="quota-metric">
+                <text class="quota-metric-label">可使用</text>
+                <text class="quota-metric-value">{{
+                  getQuotaStats(item).available
+                }}</text>
+              </view>
             </view>
           </view>
         </view>
-
-        <view class="quota-metrics">
-          <view class="quota-metric">
-            <text class="quota-metric-label">共计</text>
-            <text class="quota-metric-value">{{
-              getQuotaStats(item).count
-            }}</text>
-            <text class="quota-metric-unit">份</text>
-          </view>
-          <view class="quota-metric">
-            <text class="quota-metric-label">使用中</text>
-            <text class="quota-metric-value warning">{{
-              getQuotaStats(item).used
-            }}</text>
-            <text class="quota-metric-unit">份</text>
-          </view>
-          <view class="quota-metric">
-            <text class="quota-metric-label">可用</text>
-            <text class="quota-metric-value success">{{
-              getQuotaStats(item).available
-            }}</text>
-            <text class="quota-metric-unit">份</text>
-          </view>
+        <view v-if="quotaContentList.length === 0" class="quota-empty">
+          暂无配额数据
         </view>
-      </view>
-      <view v-if="quotaContentList.length === 0" class="quota-empty">
-        暂无配额数据
       </view>
     </view>
 
-    <view class="form-card">
-      <view class="form-item">
-        <text class="label required">承租人姓名</text>
-        <input
-          class="input"
-          type="text"
-          v-model="form.name"
-          placeholder="请输入承租人姓名"
-          maxlength="20"
-        />
-      </view>
+    <!-- 表单区：669×590 稿，同套渐变描边 -->
+    <view class="tenant-card-shell tenant-card-shell--form">
+      <view class="tenant-card-inner tenant-card-inner--form">
+        <view class="form-item">
+          <text class="label required">承租人姓名</text>
+          <view class="input-shell">
+            <input
+              class="input"
+              placeholder-class="tenant-input-ph"
+              type="text"
+              v-model="form.name"
+              placeholder="请输入承租人姓名"
+              maxlength="20"
+            />
+          </view>
+        </view>
 
-      <view class="form-item">
-        <text class="label required">身份证号</text>
-        <input
-          class="input"
-          type="text"
-          v-model="form.idCard"
-          placeholder="请输入身份证号"
-          maxlength="18"
-        />
-      </view>
+        <view class="form-item">
+          <text class="label required">身份证号</text>
+          <view class="input-shell">
+            <input
+              class="input"
+              placeholder-class="tenant-input-ph"
+              type="text"
+              v-model="form.idCard"
+              placeholder="请输入身份证号"
+              maxlength="18"
+            />
+          </view>
+        </view>
 
-      <view class="form-item">
-        <text class="label required">职务信息</text>
-        <input
-          class="input"
-          type="text"
-          v-model="form.title"
-          placeholder="请输入职务信息"
-          maxlength="30"
-        />
-      </view>
+        <view class="form-item">
+          <text class="label required">职务信息</text>
+          <view class="input-shell">
+            <input
+              class="input"
+              placeholder-class="tenant-input-ph"
+              type="text"
+              v-model="form.title"
+              placeholder="请输入职务信息"
+              maxlength="30"
+            />
+          </view>
+        </view>
 
-      <view class="form-item">
-        <text class="label required">手机号</text>
-        <input
-          class="input"
-          type="number"
-          v-model="form.phone"
-          placeholder="请输入手机号"
-          maxlength="11"
-        />
+        <view class="form-item">
+          <text class="label required">手机号</text>
+          <view class="input-shell">
+            <input
+              class="input"
+              placeholder-class="tenant-input-ph"
+              type="number"
+              v-model="form.phone"
+              placeholder="请输入手机号"
+              maxlength="11"
+            />
+          </view>
+        </view>
       </view>
     </view>
   </view>
 
   <view class="bottom-order-bar">
-    <button
-      class="bottom-order-btn"
-      :disabled="!canSubmitOrder"
-      @click="handleSubmit"
-    >
-      {{ submitting ? "提交中..." : "发起订单" }}
-    </button>
+    <view class="bottom-order-bar-bg" />
+    <view class="bottom-order-btn-wrap">
+      <button
+        class="bottom-order-btn"
+        :disabled="!canSubmitOrder"
+        @click="handleSubmit"
+      >
+        {{ submitting ? "提交中..." : "发起订单" }}
+      </button>
+    </view>
   </view>
 </template>
 
 <script setup>
-import { computed, reactive, ref } from "vue";
-import { onLoad } from "@dcloudio/uni-app";
+import { computed, nextTick, reactive, ref } from "vue";
+import { onLoad, onReady, onShow } from "@dcloudio/uni-app";
+
+/** 与 globalStyle 一致：默认浅色顶栏 #F8F8F8 + 黑字；避免从商品详情等页残留深色顶栏 */
+const TENANT_NAV_BAR_BG = "#F8F8F8";
+const TENANT_PAGE_BG = "#020713";
+
+const applyTenantNavBarStyle = () => {
+  try {
+    uni.setNavigationBarColor({
+      frontColor: "#000000",
+      backgroundColor: TENANT_NAV_BAR_BG,
+    });
+    // #ifdef MP-WEIXIN
+    uni.setBackgroundColor({
+      backgroundColor: TENANT_PAGE_BG,
+      backgroundColorTop: TENANT_PAGE_BG,
+      backgroundColorBottom: TENANT_PAGE_BG,
+    });
+    // #endif
+  } catch (e) {
+    /* ignore */
+  }
+};
+
+const scheduleTenantNavBarStyle = () => {
+  nextTick(() => applyTenantNavBarStyle());
+};
+
+onReady(() => {
+  scheduleTenantNavBarStyle();
+});
+
+onShow(() => {
+  scheduleTenantNavBarStyle();
+});
 
 const submitting = ref(false);
 const productId = ref("");
@@ -382,6 +450,7 @@ const handleSubmit = async () => {
 };
 
 onLoad((options) => {
+  scheduleTenantNavBarStyle();
   productId.value = options?.productId ? String(options.productId) : "";
 
   if (!productId.value) {
@@ -450,50 +519,93 @@ onLoad((options) => {
 </script>
 
 <style scoped lang="scss">
+/* 整页内容区 #020713；顶栏为默认浅底黑字（pages.json + applyTenantNavBarStyle） */
+
 .add-user-container {
   min-height: 100vh;
-  padding: 30rpx;
-  padding-bottom: 150rpx;
-  background: #f6f7fb;
+  padding: 24rpx 40rpx;
+  padding-bottom: calc(160rpx + env(safe-area-inset-bottom));
+  background: #020713;
   box-sizing: border-box;
 }
 
-.form-card {
-  background: #ffffff;
-  border-radius: 16rpx;
-  padding: 30rpx;
+/* 渐变描边卡片（小程序用 padding 模拟 border-image，171° 与 product-detail 一致）
+ * 描边用 rgba，禁止对容器设 opacity——否则子元素文字会一并乘透明度变暗 */
+.tenant-card-shell {
+  width: 669rpx;
+  max-width: 100%;
+  margin: 0 auto 24rpx;
+  padding: 2rpx;
+  box-sizing: border-box;
+  border-radius: 41rpx;
+  background: linear-gradient(
+    171deg,
+    rgba(128, 195, 246, 0.74) 0%,
+    rgba(36, 67, 104, 0.74) 48%,
+    rgba(156, 205, 240, 0.74) 100%
+  );
 }
 
-.quota-card {
-  background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
-  border-radius: 20rpx;
-  padding: 30rpx;
-  margin-bottom: 20rpx;
-  border: 1rpx solid #e8eef6;
-  box-shadow: 0 10rpx 28rpx rgba(16, 24, 40, 0.06);
+.tenant-card-shell--quota {
+  min-height: 573rpx;
+}
+
+.tenant-card-shell--form {
+  min-height: 590rpx;
+}
+
+.tenant-card-inner {
+  border-radius: 39rpx;
+  padding: 33rpx 31rpx 28rpx 31rpx;
+  box-sizing: border-box;
+  background: rgb(11, 26, 49);
+}
+
+.tenant-card-inner--form {
+  padding: 28rpx 31rpx 36rpx;
+}
+
+.section-head {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-bottom: 12rpx;
+}
+
+.section-bar {
+  width: 6rpx;
+  height: 28rpx;
+  margin-right: 12rpx;
+  border-radius: 3rpx;
+  background: linear-gradient(180deg, #80c3f6 0%, #2c6ebc 100%);
+  flex-shrink: 0;
 }
 
 .quota-title {
-  font-size: 32rpx;
-  color: #111827;
+  font-size: 28rpx;
   font-weight: 600;
-  margin-bottom: 8rpx;
+  color: #ffffff;
 }
 
 .quota-subtitle {
+  display: block;
   font-size: 24rpx;
-  color: #64748b;
-  margin-bottom: 18rpx;
+  color: rgba(184, 220, 237, 0.75);
+  margin-bottom: 24rpx;
+  line-height: 1.4;
 }
 
+/* 单条配额：608×205，圆角 23；选中仅边框改为 #e3c695，背景与未选一致 */
 .quota-item {
-  padding: 22rpx 20rpx;
-  background: #ffffff;
-  border-radius: 16rpx;
-  margin-bottom: 16rpx;
-  border: 1rpx solid #e5ebf5;
-  box-shadow: 0 6rpx 20rpx rgba(15, 23, 42, 0.04);
-  transition: all 0.2s ease;
+  width: 608rpx;
+  max-width: 100%;
+  height: 205rpx;
+  margin: 0 auto 20rpx;
+  padding: 20rpx 22rpx 18rpx;
+  box-sizing: border-box;
+  border-radius: 23rpx;
+  border: solid 1rpx #3662ac;
+  background: rgba(20, 42, 74, 0.65);
 }
 
 .quota-item:last-child {
@@ -501,158 +613,284 @@ onLoad((options) => {
 }
 
 .quota-item-selected {
-  border-color: #2563eb;
-  box-shadow: 0 10rpx 26rpx rgba(37, 99, 235, 0.16);
-  background: linear-gradient(180deg, #ffffff 0%, #f0f7ff 100%);
+  border: solid 1rpx #e3c695;
+  background: rgba(20, 42, 74, 0.65);
 }
 
 .quota-item-disabled {
-  opacity: 0.5;
+  opacity: 0.45;
 }
 
 .quota-item-header {
   display: flex;
+  flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 14rpx;
+  margin-bottom: 16rpx;
 }
 
 .quota-right-header {
   display: flex;
+  flex-direction: row;
   align-items: center;
-  gap: 12rpx;
+  gap: 16rpx;
+  flex: 1;
+  min-width: 0;
+  justify-content: flex-end;
 }
 
 .quota-type {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+}
+
+.quota-type-text {
+  font-family: PingFangSC-Regular, "PingFang SC", sans-serif;
   font-size: 22rpx;
+  font-weight: normal;
   line-height: 1;
-  padding: 10rpx 14rpx;
-  border-radius: 999rpx;
-  color: #1d4ed8;
-  background: #e8f0ff;
+  color: rgba(255, 255, 255, 0.92);
 }
 
 .quota-type-deduction {
-  color: #155e75;
-  background: #dff7ff;
+  width: 98rpx;
+  height: 31rpx;
+  border-radius: 8rpx;
+  border: none;
+  background-color: transparent;
+  background-image: url("https://mvpme82.cloud/data/0397e568-d54b-4e28-9ec0-653aed67e808_1774551384264.png");
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  background-position: center;
 }
 
 .quota-type-discount {
-  color: #7c2d12;
-  background: #ffedd5;
+  width: 99rpx;
+  height: 31rpx;
+  border-radius: 9rpx;
+  border: none;
+  background-color: transparent;
+  background-image: url("https://mvpme82.cloud/data/de767c00-2eb7-4197-a912-db096d8ab575_1774551462319.png");
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  background-position: center;
 }
 
 .quota-main-highlight {
-  font-size: 30rpx;
-  color: #0f172a;
-  font-weight: 700;
+  flex: 1;
+  min-width: 0;
+  text-align: right;
+  font-family: PingFangSC-Regular, "PingFang SC", sans-serif;
+  font-size: 25rpx;
+  font-weight: normal;
+  letter-spacing: 0;
+  color: #e9d591;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .quota-selector {
-  width: 34rpx;
-  height: 34rpx;
+  flex-shrink: 0;
+  width: 29rpx;
+  height: 29rpx;
   border-radius: 50%;
-  border: 2rpx solid #cbd5e1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #ffffff;
-  font-size: 20rpx;
-  background: #ffffff;
+  border: 2rpx solid rgba(255, 255, 255, 0.45);
+  box-sizing: border-box;
+  background: transparent;
 }
 
 .quota-selector.checked {
-  border-color: #2563eb;
-  background: #2563eb;
+  border-color: #f8d899;
+  background: #f8d899;
+}
+
+.quota-item-selected .quota-selector.checked {
+  border-color: #e3c695;
+  background: #f8d899;
 }
 
 .quota-selector.disabled {
-  border-color: #d1d5db;
-  background: #f3f4f6;
+  opacity: 0.35;
 }
 
+/* 与首页「优惠房源」下 data-row-anju 同一套底图；尺寸稿 555×97；竖线距上 20、距下 18 */
 .quota-metrics {
+  display: block;
+  position: relative;
+  width: 555rpx;
+  height: 97rpx;
+  margin: 0 auto;
+  padding: 0;
+  border-radius: 16rpx;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.quota-metrics-bg {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  border-width: 0;
+  display: block;
+}
+
+.quota-metrics-body {
+  position: relative;
+  z-index: 1;
   display: flex;
-  gap: 14rpx;
-  margin-bottom: 12rpx;
+  flex-direction: row;
+  align-items: stretch;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  padding: 0 12rpx;
 }
 
 .quota-metric {
   flex: 1;
-  background: #f8fafc;
-  border-radius: 12rpx;
-  padding: 12rpx;
-  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+/* 竖线不顶格：内区域高 97-20-18=59rpx */
+.quota-metric-divider {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  width: 1rpx;
+  height: 100%;
+  padding-top: 20rpx;
+  padding-bottom: 18rpx;
+  box-sizing: border-box;
+}
+
+.quota-metric-divider-line {
+  flex: 1;
+  width: 100%;
+  min-height: 0;
+  background: rgba(0, 0, 0, 0.45);
 }
 
 .quota-metric-label {
-  display: block;
-  font-size: 22rpx;
-  color: #64748b;
+  width: 71rpx;
+  max-width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 2rpx;
+  padding-top: 0;
+  font-family:
+    PingFang SC,
+    PingFangSC-Regular,
+    -apple-system,
+    sans-serif;
+  font-size: 16rpx;
+  font-weight: normal;
+  line-height: 22rpx;
+  color: rgba(255, 255, 255, 0.72);
+  text-align: center;
+  white-space: nowrap;
+  overflow: visible;
 }
 
 .quota-metric-value {
-  font-size: 34rpx;
-  font-weight: 700;
-  color: #1e293b;
-  line-height: 1.2;
-  margin: 4rpx 0;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  font-family:
+    PingFang SC,
+    PingFangSC-Semibold,
+    -apple-system,
+    sans-serif;
+  font-size: 47rpx;
+  font-weight: 600;
+  line-height: 1.05;
+  text-align: center;
 }
 
-.quota-metric-value.warning {
-  color: #ea580c;
+/* 深色底统计条：浅色字；勿用首页浅色底用的 #25395b */
+.quota-metric:nth-of-type(1) .quota-metric-value {
+  color: #ffffff;
+  min-height: 0;
 }
 
-.quota-metric-value.success {
-  color: #16a34a;
+.quota-metric:nth-of-type(3) .quota-metric-value {
+  color: #f0dff8;
+  min-height: 0;
 }
 
-.quota-metric-unit {
-  font-size: 20rpx;
-  color: #94a3b8;
-}
-
-.quota-text {
-  font-size: 24rpx;
-  color: #475569;
-  line-height: 1.6;
+.quota-metric:nth-of-type(5) .quota-metric-value {
+  color: #9cf5e8;
+  min-height: 0;
 }
 
 .quota-empty {
   font-size: 26rpx;
-  color: #9ca3af;
+  color: rgba(255, 255, 255, 0.4);
   text-align: center;
-  padding: 16rpx 0;
+  padding: 24rpx 0;
 }
 
 .form-item {
   margin-bottom: 28rpx;
 }
 
+.form-item:last-child {
+  margin-bottom: 0;
+}
+
 .label {
   display: block;
-  font-size: 28rpx;
-  color: #333333;
-  margin-bottom: 12rpx;
+  font-family: PingFangSC-Regular, "PingFang SC", sans-serif;
+  font-size: 30rpx;
+  font-weight: normal;
+  color: #ffffff;
+  margin-bottom: 14rpx;
+  letter-spacing: 0;
 }
 
 .required::before {
   content: "*";
-  color: #f56c6c;
+  color: #e9d591;
   margin-right: 6rpx;
+}
+
+/* 输入：608×65 稿，渐变描边 0°；内层实底 + 圆角 */
+.input-shell {
+  width: 608rpx;
+  max-width: 100%;
+  min-height: 65rpx;
+  padding: 1rpx;
+  box-sizing: border-box;
+  border-radius: 13rpx;
+  background: linear-gradient(
+    0deg,
+    #256ac3 0%,
+    #193b74 52%,
+    #2663b9 100%
+  );
 }
 
 .input {
   width: 100%;
-  height: 84rpx;
-  line-height: 84rpx;
-  border: 2rpx solid #e5e7eb;
+  height: 63rpx;
+  line-height: 63rpx;
   border-radius: 12rpx;
-  padding: 0 20rpx;
+  padding: 0 22rpx;
   box-sizing: border-box;
   font-size: 28rpx;
-  color: #333333;
-  background: #ffffff;
+  color: #ffffff;
+  background: rgba(8, 22, 48, 0.95);
 }
 
 .bottom-order-bar {
@@ -660,26 +898,47 @@ onLoad((options) => {
   left: 0;
   right: 0;
   bottom: 0;
-  height: 98rpx;
-  background-color: #ffffff;
-  border-top: 1rpx solid #f5f5f5;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 16rpx 24rpx;
-  box-sizing: border-box;
+  width: 100%;
+  max-width: 750rpx;
+  margin: 0 auto;
   z-index: 99;
+  min-height: 122rpx;
+  padding-bottom: calc(16rpx + env(safe-area-inset-bottom));
+  padding-top: 16rpx;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.bottom-order-bar-bg {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  background-color: #30539c;
+  opacity: 0.15;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.bottom-order-btn-wrap {
+  position: relative;
+  z-index: 1;
+  padding: 0 42rpx;
+  max-width: 750rpx;
+  margin: 0 auto;
 }
 
 .bottom-order-btn {
   width: 100%;
-  height: 72rpx;
-  line-height: 72rpx;
+  height: 71rpx;
+  line-height: 71rpx;
   border: none;
   border-radius: 36rpx;
-  background: #e53935;
-  color: #ffffff;
-  font-size: 32rpx;
+  font-size: 34rpx;
+  font-weight: 500;
+  color: #061730;
+  background: linear-gradient(0deg, #dab26b 0%, #fcefd4 100%);
 }
 
 .bottom-order-btn::after {
@@ -687,6 +946,15 @@ onLoad((options) => {
 }
 
 .bottom-order-btn[disabled] {
-  opacity: 0.6;
+  opacity: 0.45;
+  color: rgba(6, 23, 48, 0.55);
+}
+</style>
+
+<style>
+/* 小程序 input placeholder 需单独类名 */
+.tenant-input-ph {
+  color: rgba(184, 220, 237, 0.45);
+  font-size: 28rpx;
 }
 </style>

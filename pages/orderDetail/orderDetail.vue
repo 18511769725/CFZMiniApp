@@ -1,21 +1,26 @@
 <template>
   <view class="detail-container">
-    <!-- 页面头部 -->
-    <view class="page-header">
-      <text class="header-title">订单详情</text>
-    </view>
+    <scroll-view class="detail-scroll" scroll-y :show-scrollbar="false">
+      <view class="panel-7">
+        <!-- 页面头部（设计稿：42rpx 白字居中） -->
+        <view class="page-header">
+          <text class="header-title">订单详情</text>
+        </view>
 
-    <!-- 采购方企业信息 -->
-    <view class="info-card">
-      <view class="card-title">采购方企业信息</view>
-      <view class="info-item">
-        <text class="label">企业名称：</text>
-        <text class="value">{{ state.orderInfo.ccompanyname }}</text>
-      </view>
-    </view>
+        <!-- 采购方企业信息 -->
+        <view class="info-card-wrap">
+          <view class="info-card-inner">
+            <view class="card-title">采购方企业信息</view>
+            <view class="info-item">
+              <text class="label">企业名称：</text>
+              <text class="value">{{ state.orderInfo.ccompanyname }}</text>
+            </view>
+          </view>
+        </view>
 
     <!-- 采购方接口人信息 -->
-    <view class="info-card">
+    <view class="info-card-wrap">
+      <view class="info-card-inner">
       <view class="card-title">采购方接口人信息</view>
       <view class="info-item">
         <text class="label">姓名：</text>
@@ -29,10 +34,12 @@
         <text class="label">联系方式：</text>
         <text class="value">{{ state.orderInfo.cuserphone }}</text>
       </view>
+      </view>
     </view>
 
     <!-- 订单基础信息 -->
-    <view class="info-card">
+    <view class="info-card-wrap">
+      <view class="info-card-inner">
       <view class="card-title">订单基础信息</view>
       <view class="info-item">
         <text class="label">订单编码：</text>
@@ -56,10 +63,12 @@
         <text class="label">供应商名称：</text>
         <text class="value">{{ state.orderInfo.bcompanyname }}</text>
       </view>
+      </view>
     </view>
 
     <!-- 承租人信息（仅安居类订单展示） -->
-    <view class="info-card" v-if="state.orderInfo.categoryaid === 0">
+    <view class="info-card-wrap" v-if="state.orderInfo.categoryaid === 0">
+      <view class="info-card-inner">
       <view class="card-title">承租人信息</view>
       <view class="info-item">
         <text class="label">姓名：</text>
@@ -77,60 +86,78 @@
         <text class="label">手机号：</text>
         <text class="value">{{ state.tenantInfo.phone || "-" }}</text>
       </view>
+      </view>
     </view>
 
-    <!-- 支付信息（仅安居类订单展示） -->
-    <view class="info-card" v-if="state.orderInfo.categoryaid === 0">
+    <!-- 支付信息（仅安居类订单展示）：两列栅格 -->
+    <view class="info-card-wrap" v-if="state.orderInfo.categoryaid === 0">
+      <view class="info-card-inner">
       <view class="card-title">付款计划详情</view>
-      <view class="info-item">
-        <text class="label">订单总额：</text>
-        <text class="value">{{ state.paymentPlan.totalprice || "-" }}积分</text>
+      <view class="payment-grid">
+        <view class="payment-col">
+          <view class="info-item info-item--compact">
+            <text class="label">订单总额：</text>
+            <text class="value">{{ state.paymentPlan.totalprice || "-" }}积分</text>
+          </view>
+          <view
+            class="info-item info-item--compact"
+            v-if="state.paymentPlan.subsidytype === 'discount'"
+          >
+            <text class="label">折扣比例：</text>
+            <text class="value">{{ state.paymentPlan.face_value || "-" }}</text>
+          </view>
+          <view
+            class="info-item info-item--compact"
+            v-else-if="state.paymentPlan.subsidytype === 'deduction'"
+          >
+            <text class="label">积分补贴：</text>
+            <text class="value">{{ state.paymentPlan.face_value || "-" }}</text>
+          </view>
+          <view class="info-item info-item--compact" v-else>
+            <text class="label">积分补贴：</text>
+            <text class="value">-</text>
+          </view>
+          <view class="info-item info-item--compact">
+            <text class="label">平台补贴：</text>
+            <text class="value"
+              >{{ state.paymentPlan.totalSubsidyAmount || "-" }}积分</text
+            >
+          </view>
+        </view>
+        <view class="payment-col">
+          <view class="info-item info-item--compact">
+            <text class="label">补贴方式：</text>
+            <text class="value">{{
+              showsubsidytype(state.paymentPlan.subsidytype)
+            }}</text>
+          </view>
+          <view
+            class="info-item info-item--compact"
+            v-if="state.paymentPlan.subsidytype === 'discount'"
+          >
+            <text class="label">折扣限额：</text>
+            <text class="value"
+              >{{ state.paymentPlan.limitamount || "-" }}积分</text
+            >
+          </view>
+          <view class="info-item info-item--compact" v-else>
+            <text class="label">折扣限额：</text>
+            <text class="value">-</text>
+          </view>
+          <view class="info-item info-item--compact">
+            <text class="label">租户自付：</text>
+            <text class="value"
+              >{{ state.paymentPlan.userPayAmount || "-" }}积分</text
+            >
+          </view>
+        </view>
       </view>
-      <view class="info-item">
-        <text class="label">补贴方式：</text>
-        <text class="value">{{
-          showsubsidytype(state.paymentPlan.subsidytype)
-        }}</text>
-      </view>
-      <view
-        class="info-item"
-        v-if="state.paymentPlan.subsidytype === 'deduction'"
-      >
-        <text class="label">积分补贴：</text>
-        <text class="value">{{ state.paymentPlan.face_value || "-" }}</text>
-      </view>
-      <view
-        class="info-item"
-        v-if="state.paymentPlan.subsidytype === 'discount'"
-      >
-        <text class="label">折扣比例：</text>
-        <text class="value">{{ state.paymentPlan.face_value || "-" }}</text>
-      </view>
-      <view
-        class="info-item"
-        v-if="state.paymentPlan.subsidytype === 'discount'"
-      >
-        <text class="label">折扣限额：</text>
-        <text class="value"
-          >{{ state.paymentPlan.limitamount || "-" }}积分</text
-        >
-      </view>
-      <view class="info-item">
-        <text class="label">平台补贴：</text>
-        <text class="value"
-          >{{ state.paymentPlan.totalSubsidyAmount || "-" }}积分</text
-        >
-      </view>
-      <view class="info-item">
-        <text class="label">租户自付：</text>
-        <text class="value"
-          >{{ state.paymentPlan.userPayAmount || "-" }}积分</text
-        >
       </view>
     </view>
 
     <!-- 订单商品内容 -->
-    <view class="info-card">
+    <view class="info-card-wrap">
+      <view class="info-card-inner">
       <view class="card-title">订单商品明细</view>
       <view class="product-list">
         <view
@@ -138,12 +165,15 @@
           v-for="(product, index) in state.productList"
           :key="index"
         >
-          <!-- 商品图片 -->
+          <view class="product-card-inner">
+          <!-- 商品图片（设计稿 .24：129×129 渐变底+描边） -->
           <view class="product-img">
+            <view class="product-img-frame">
             <image
               :src="getFirstProductImage(product.imagelist)"
-              mode="widthFix"
+              mode="aspectFill"
             ></image>
+            </view>
           </view>
           <!-- 商品信息 -->
           <view class="product-info">
@@ -165,11 +195,16 @@
               <text class="value">{{ product.packagetitle }}</text>
             </view>
           </view>
+          </view>
         </view>
+      </view>
       </view>
     </view>
 
-    <!-- 底部操作按钮 -->
+      </view>
+    </scroll-view>
+
+    <!-- 底部操作按钮（设计稿 .33 / 底部条 .34） -->
     <view
       class="bottom-actions"
       v-if="state.orderInfo && state.orderInfo.status !== undefined"
@@ -628,175 +663,309 @@ const approvalorder = () => {
 </script>
 
 <style scoped lang="scss">
+/* 页面底色 */
 .detail-container {
-  padding: 20rpx;
-  padding-bottom: 170rpx;
-  background-color: #f5f5f5;
   min-height: 100vh;
+  background-color: #020713;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+}
+
+.detail-scroll {
+  flex: 1;
+  height: 0;
+  padding: 15rpx 15rpx 24rpx;
+  padding-bottom: calc(160rpx + env(safe-area-inset-bottom));
   box-sizing: border-box;
 }
 
+/* 设计稿 .7：720×1655，#31456b @73% — 用 rgba 避免子元素一起透明 */
+.panel-7 {
+  width: 720rpx;
+  max-width: 100%;
+  min-height: 1655rpx;
+  margin: 0 auto;
+  padding: 24rpx 16rpx 40rpx;
+  box-sizing: border-box;
+  border-radius: 34rpx;
+  overflow: hidden;
+  background-image: url("https://mvpme82.cloud/data/d1cd0bc9-7743-4a3a-b7d7-9f533e918148_1774557860287.png");
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  background-position: center center;
+}
+
 .page-header {
-  padding: 20rpx 0;
+  padding: 16rpx 0 32rpx;
   text-align: center;
-  background-color: #fff;
-  border-radius: 8rpx;
-  margin-bottom: 20rpx;
 
   .header-title {
-    font-size: 36rpx;
+    font-size: 42rpx;
     font-weight: 600;
-    color: #333;
+    color: #ffffff;
+    letter-spacing: 0;
   }
 }
 
-.info-card {
-  background-color: #fff;
-  border-radius: 8rpx;
-  padding: 20rpx;
-  margin-bottom: 20rpx;
+/* 内部信息卡：171° 渐变描边 2rpx，约 688 宽（设计稿） */
+.info-card-wrap {
+  width: 100%;
+  max-width: 688rpx;
+  margin: 0 auto 24rpx;
+  padding: 2rpx;
+  border-radius: 34rpx;
+  box-sizing: border-box;
+  background: linear-gradient(
+    171deg,
+    #80c3f6 0%,
+    #244368 48%,
+    #9ccdf0 100%
+  );
+}
+
+.info-card-inner {
+  border-radius: 32rpx;
+  padding: 28rpx 24rpx 30rpx;
+  box-sizing: border-box;
+  background: rgba(24, 43, 72, 0.4);
 }
 
 .card-title {
   font-size: 30rpx;
   font-weight: 600;
-  color: #333;
-  padding-bottom: 15rpx;
-  border-bottom: 1px solid #f0f0f0;
-  margin-bottom: 15rpx;
+  color: #e3ae68;
+  padding-bottom: 16rpx;
+  margin-bottom: 20rpx;
+  border-bottom: 1rpx solid rgba(156, 205, 240, 0.22);
 }
 
 .info-item {
   display: flex;
-  padding: 10rpx 0;
+  align-items: flex-start;
+  padding: 12rpx 0;
   font-size: 28rpx;
+  line-height: 1.45;
 
   .label {
-    color: #666;
-    width: 180rpx;
+    color: rgba(156, 205, 240, 0.92);
+    width: 200rpx;
     flex-shrink: 0;
   }
 
   .value {
-    color: #333;
+    color: #ffffff;
     flex: 1;
+    word-break: break-all;
   }
 }
 
-/* 状态样式 */
-.status-pending {
-  color: #ff9800;
-}
-.status-negotiate {
-  color: #4299e1;
-}
-.status-signed {
-  color: #38b2ac;
-}
-.status-finished {
-  color: #48bb78;
-}
-.status-terminated {
-  color: #e53e3e;
+.info-item--compact {
+  padding: 10rpx 0;
+
+  .label {
+    width: 160rpx;
+    font-size: 26rpx;
+  }
+
+  .value {
+    font-size: 26rpx;
+  }
 }
 
-/* 商品列表样式 */
+.payment-grid {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  gap: 24rpx;
+}
+
+.payment-col {
+  flex: 1;
+  min-width: 0;
+}
+
+/* 状态高亮（待审批等） */
+.status-pending {
+  color: #ff8a6a !important;
+}
+.status-negotiate {
+  color: #7ec8ff !important;
+}
+.status-signed {
+  color: #6ee7d8 !important;
+}
+.status-finished {
+  color: #8fd99f !important;
+}
+.status-terminated {
+  color: #f56c6c !important;
+}
+
+/* 订单商品：634×216 区域渐变描边 */
 .product-list {
   width: 100%;
 }
 
 .product-card {
+  width: 100%;
+  max-width: 634rpx;
+  margin: 0 auto 20rpx;
+  padding: 1rpx;
+  border-radius: 24rpx;
+  box-sizing: border-box;
+  background: linear-gradient(
+    171deg,
+    #ffd9ba 0%,
+    #244368 48%,
+    #7c755c 74%,
+    #d3a64f 100%
+  );
+}
+
+.product-card-inner {
   display: flex;
-  padding: 20rpx;
-  border: 1px solid #f0f0f0;
-  border-radius: 8rpx;
-  margin-bottom: 15rpx;
+  flex-direction: row;
   align-items: flex-start;
+  min-height: 200rpx;
+  padding: 20rpx;
+  border-radius: 22rpx;
+  box-sizing: border-box;
+  background: rgba(27, 48, 78, 0.74);
 }
 
 .product-img {
-  width: 120rpx;
+  width: 129rpx;
+  height: 129rpx;
   flex-shrink: 0;
   margin-right: 20rpx;
+  padding: 1rpx;
+  border-radius: 8rpx;
+  box-sizing: border-box;
+  background: linear-gradient(
+    178deg,
+    #5e97d2 0%,
+    #2c5f8f 49%,
+    #6a9ccf 100%
+  );
+}
+
+.product-img-frame {
+  width: 100%;
+  height: 100%;
+  border-radius: 6rpx;
+  overflow: hidden;
+  background: linear-gradient(0deg, #1b4163 0%, #76aaff 100%);
 
   image {
     display: block;
     width: 100%;
-    border-radius: 8rpx;
+    height: 100%;
   }
 }
 
 .product-info {
   flex: 1;
+  min-width: 0;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
 }
 
 .product-name {
   font-size: 28rpx;
-  font-weight: 500;
-  color: #333;
-  margin-bottom: 10rpx;
+  font-weight: 600;
+  color: #ffffff;
+  margin-bottom: 12rpx;
+  line-height: 1.35;
 }
 
 .product-price,
 .product-count,
 .product-subtotal {
   display: flex;
-  font-size: 26rpx;
-  margin-bottom: 5rpx;
+  flex-wrap: wrap;
+  font-size: 24rpx;
+  margin-bottom: 6rpx;
+  line-height: 1.4;
 
   .label {
-    color: #666;
-    width: 80rpx;
+    color: rgba(156, 205, 240, 0.88);
+    width: auto;
+    min-width: 72rpx;
     flex-shrink: 0;
   }
 
   .value {
-    color: #333;
+    color: rgba(255, 255, 255, 0.95);
+    flex: 1;
   }
 }
 
 .product-subtotal .value {
-  color: #e53e3e;
+  color: #e36a46;
   font-weight: 600;
 }
 
-/* 底部操作栏 */
+/* 底部 .34：750×123 浅金渐变 @0.15 + 1rpx 描边；按钮 .33：665×71 #f45d5d */
 .bottom-actions {
   position: fixed;
   left: 0;
   right: 0;
   bottom: 0;
-  padding: 20rpx;
-  padding-bottom: calc(20rpx + env(safe-area-inset-bottom));
-  background: rgba(255, 255, 255, 0.95);
+  z-index: 100;
+  min-height: 123rpx;
+  padding: 26rpx 42rpx;
+  padding-bottom: calc(26rpx + env(safe-area-inset-bottom));
+  box-sizing: border-box;
   display: flex;
+  flex-direction: row;
   justify-content: center;
   align-items: center;
-  gap: 12rpx;
-  border-top: 1rpx solid #f0f0f0;
-  box-sizing: border-box;
+  flex-wrap: wrap;
+  gap: 16rpx;
+  background-color: #020713;
+  border-top: 1rpx solid rgba(0, 0, 0, 0.45);
+  overflow: hidden;
+}
+
+.bottom-actions::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 123rpx;
+  background: linear-gradient(0deg, #dab26b 0%, #fcefd4 100%);
+  opacity: 0.15;
+  pointer-events: none;
 }
 
 .action-btn {
+  position: relative;
+  z-index: 1;
   flex: 1;
-  min-width: 0;
-  height: 88rpx;
-  line-height: 88rpx;
-  border-radius: 12rpx;
+  min-width: 200rpx;
+  max-width: 665rpx;
+  height: 71rpx;
+  line-height: 71rpx;
+  border-radius: 35rpx;
   border: none;
   margin: 0;
-  color: #fff;
-  font-size: 30rpx;
+  padding: 0;
+  color: #ffffff;
+  font-size: 28rpx;
+  font-weight: 600;
+}
+
+.action-btn::after {
+  border: none;
 }
 
 .action-cancel {
-  background: #e53e3e;
+  background-color: #f45d5d;
 }
 
 .action-confirm {
-  background: #38b2ac;
+  background-color: #3d9b95;
 }
 </style>

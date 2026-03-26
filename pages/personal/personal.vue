@@ -599,14 +599,14 @@ onShow(() => {
 
 <style lang="scss">
 page {
-  background-color: #061730;
+  background-color: #020713;
 }
 
 .container {
   min-height: 100vh;
   width: 100%;
   box-sizing: border-box;
-  background-color: #061730;
+  background-color: #020713;
   padding: 0;
   padding-bottom: env(safe-area-inset-bottom);
   color: #fff;

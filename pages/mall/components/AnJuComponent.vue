@@ -84,7 +84,7 @@
                 class="feed-service-card"
                 @tap="
                   uni.navigateTo({
-                    url: `/pages/product/product-detail?id=${product.id}`,
+                    url: `/pages/product/product-detail?id=${product.id}&categorya=0`,
                   })
                 "
               >

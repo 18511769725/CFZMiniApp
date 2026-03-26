@@ -26,6 +26,8 @@
         <cargo-item
           v-for="(item, index) in state.cargoList"
           :key="item.id"
+          class="cargo-list-item"
+          :is-last="index === state.cargoList.length - 1"
           :cargo="item"
           v-model:checked="item.checked"
           @checkChange="handleCargoCheckChange"
@@ -35,44 +37,69 @@
       </view>
     </scroll-view>
 
-    <!-- 底部吸底操作栏（仅购物车非空时显示） -->
-    <view v-if="state.cargoList.length > 0" class="bottom-bar">
-      <!-- 左侧全选 -->
-      <view class="bottom-select-all" @click="toggleSelectAll">
-        <view
-          class="select-all-check"
-          :class="{ 'cargo-check-active': isAllSelected }"
-        >
-          <uni-icons
-            v-if="isAllSelected"
-            type="checkmarkempty"
-            size="16"
-            color="#ffffff"
-          ></uni-icons>
+    <!-- 底栏 .23-4：750×108，1rpx 渐变描边 0deg；底用 rgba 模拟 opacity 0.83，避免压暗文字 -->
+    <view v-if="state.cargoList.length > 0" class="bottom-dock">
+      <view class="bottom-bar">
+        <view class="bottom-bar-inner">
+        <view class="bottom-select-all" @click="toggleSelectAll">
+          <view class="select-all-check">
+            <view
+              class="select-all-check-inner"
+              :class="{ 'select-all-check-inner--on': isAllSelected }"
+            >
+              <uni-icons
+                v-if="isAllSelected"
+                type="checkmarkempty"
+                size="14"
+                color="#020713"
+              ></uni-icons>
+            </view>
+          </view>
+          <text class="select-all-text">全选</text>
         </view>
-        <view class="select-all-text">全选</view>
-      </view>
-
-      <!-- 右侧总价 + 发起订单 -->
-      <view class="bottom-order">
-        <view class="total-price">
-          总积分：<span class="total-price-value">{{ totalPrice }}积分</span>
+        <view class="bottom-total-wrap">
+          <text class="total-label">总积分：</text>
+          <text class="total-value">{{ totalPrice }}积分</text>
         </view>
         <button class="create-order-btn" @click="handleCreateOrder">
           发起订单
         </button>
+        </view>
       </view>
     </view>
   </view>
 </template>
 
 <script setup>
-import { ref, computed, watch, reactive } from "vue";
-// 引入购物车卡片组件
+import { ref, computed, watch, reactive, nextTick } from "vue";
 import cargoItem from "./components/cargo-item.vue";
-// 引入uni-ui组件
-//import { UniIcons, onLoad } from '@dcloudio/uni-ui';
-import { onLoad, onShow } from "@dcloudio/uni-app";
+import { onLoad, onReady, onShow } from "@dcloudio/uni-app";
+
+const CARGO_NAV_BG = "#F8F8F8";
+/* 页面与滚动空白区；列表块底与条目 .34 一致 rgba(48,83,156,.14) */
+const CARGO_PAGE_BG = "#020713";
+
+const applyCargoNavBarStyle = () => {
+  try {
+    uni.setNavigationBarColor({
+      frontColor: "#000000",
+      backgroundColor: CARGO_NAV_BG,
+    });
+    // #ifdef MP-WEIXIN
+    uni.setBackgroundColor({
+      backgroundColor: CARGO_PAGE_BG,
+      backgroundColorTop: CARGO_PAGE_BG,
+      backgroundColorBottom: CARGO_PAGE_BG,
+    });
+    // #endif
+  } catch (e) {
+    /* ignore */
+  }
+};
+
+const scheduleCargoNavBarStyle = () => {
+  nextTick(() => applyCargoNavBarStyle());
+};
 
 const state = reactive({
   userinfo: {},
@@ -356,8 +383,13 @@ watch(
   { deep: true },
 );
 
+onReady(() => {
+  scheduleCargoNavBarStyle();
+});
+
 // 页面加载时初始化
 onLoad(() => {
+  scheduleCargoNavBarStyle();
   uni.getStorage({
     key: "userSessionChaoqitong",
     success: (res) => {
@@ -377,6 +409,7 @@ onLoad(() => {
 });
 
 onShow(() => {
+  scheduleCargoNavBarStyle();
   uni.getStorage({
     key: "userSessionChaoqitong",
     success: (res) => {
@@ -397,78 +430,136 @@ onShow(() => {
 </script>
 
 <style scoped>
+/* 整页原色 #020713；有内容的列表块为 rgba(48,83,156,.14) */
 .cargo-list-page {
   width: 100%;
   height: 100vh;
-  background-color: #fafafa;
+  display: flex;
+  flex-direction: column;
+  background-color: #020713;
+  box-sizing: border-box;
 }
 
 .scroll-container {
+  flex: 1;
+  height: 0;
+  min-height: 0;
   width: 100%;
-  height: 100%;
+  box-sizing: border-box;
+  background-color: #020713;
+  /* 仅预留自定义底栏高度；tab 页勿再加 safe-area，否则会与原生 tabBar 之间出现黑缝 */
+  padding-bottom: 108rpx;
 }
 
-/* 购物车为空样式 */
+/* 购物车为空 */
 .cargo-empty {
   width: 100%;
-  height: 100%;
+  min-height: 60vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 0 rpx;
+  padding: 40rpx;
+  box-sizing: border-box;
 }
 
 .empty-img {
   width: 300rpx;
   height: 300rpx;
   margin-bottom: 40rpx;
+  opacity: 0.85;
 }
 
 .empty-tip {
   font-size: 28rpx;
-  color: #999999;
+  color: rgba(255, 255, 255, 0.45);
 }
 
-/* 购物车列表 */
+/* 列表区含条目间距：与稿 .34 条同色 rgba(48,83,156,.14)，间隔区与条连续 */
 .cargo-list {
   width: 100%;
-  background-color: #ffffff;
-  margin-bottom: 100rpx; /* 预留底部操作栏空间 */
+ /* padding: 0 0 24rpx; */
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  background-color: rgba(48, 83, 156, 0.14);
 }
 
-/* 底部吸底操作栏 */
-.bottom-bar {
+/* 吸底：贴紧原生 tabBar 上沿；底栏安全区由系统 tabBar 承担，此处再加 inset 会挤出可视缝隙 */
+.bottom-dock {
   position: fixed;
   left: 0;
   right: 0;
   bottom: 0;
-  height: 98rpx;
-  background-color: #333333;
+  z-index: 99;
+  padding-bottom: 0;
+  box-sizing: border-box;
+}
+
+/*
+ * 稿 .23-4：750×108；描边 linear-gradient 0deg（稿为 border-image；各端用双背景实现「仅边框渐变」）
+ * opacity 0.83 → 内区底色 rgba(2,7,19,0.83)，勿对整栏设 opacity 以免压暗文案
+ */
+.bottom-bar {
+  width: 750rpx;
+  max-width: 100%;
+  height: 108rpx;
+  margin: 0 auto;
+  padding: 1rpx;
+  box-sizing: border-box;
+  border: none;
+  	border-style: solid;
+  	border-width: 1rpx;
+  	border-image-source: linear-gradient(0deg, 
+  		#faebcc 0%, 
+  		#1e4e97 53%, 
+  		#ddb877 100%);
+  	border-image-slice: 1;
+  	opacity: 0.83;
+}
+
+.bottom-bar-inner {
+  height: 100%;
   display: flex;
+  flex-direction: row;
   align-items: center;
   justify-content: space-between;
   padding: 0 24rpx;
   box-sizing: border-box;
-  z-index: 99;
+  background: transparent;
 }
 
-/* 左侧全选 */
 .bottom-select-all {
   display: flex;
+  flex-direction: row;
   align-items: center;
+  flex-shrink: 0;
 }
 
+/* 勾选：36×37，描边渐变 0° #faebcc → #ddb877 */
 .select-all-check {
   width: 36rpx;
-  height: 36rpx;
+  height: 37rpx;
   border-radius: 50%;
-  border: 2rpx solid #cccccc;
+  padding: 1rpx;
+  box-sizing: border-box;
+  background: linear-gradient(0deg, #faebcc 0%, #ddb877 100%);
+  margin-right: 12rpx;
+}
+
+.select-all-check-inner {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: rgba(2, 7, 19, 0.96);
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #ffffff;
-  margin-right: 16rpx;
+}
+
+.select-all-check-inner--on {
+  background: linear-gradient(0deg, #dab26b 0%, #fcefd4 100%);
 }
 
 .select-all-text {
@@ -476,60 +567,52 @@ onShow(() => {
   color: #ffffff;
 }
 
-/* 右侧总价 + 发起订单 */
-.bottom-order {
+.bottom-total-wrap {
+  flex: 1;
+  min-width: 0;
   display: flex;
-  align-items: center;
+  flex-direction: row;
+  align-items: baseline;
+  justify-content: center;
+  padding: 0 12rpx;
 }
 
-.total-price {
+.total-label {
   font-size: 26rpx;
   color: #ffffff;
-  margin-right: 24rpx;
 }
 
-.total-price-value {
-  font-size: 32rpx;
-  font-weight: 700;
-  color: #e53935;
-}
-
-.create-order-btn {
-  width: 200rpx;
-  height: 64rpx;
-  line-height: 64rpx;
-  background-color: #e53935;
-  color: #ffffff;
+.total-value {
   font-size: 28rpx;
+  font-weight: 600;
+  color: #e8c87c;
+}
+
+/* 发起订单：230×63；文案 PingFangSC-Medium 34rpx #061730 */
+.create-order-btn {
+  flex-shrink: 0;
+  width: 230rpx;
+  height: 63rpx;
+  line-height: 63rpx;
+  padding: 0;
+  margin: 0;
+  font-family:
+    PingFang SC,
+    PingFangSC-Medium,
+    -apple-system,
+    sans-serif;
+  font-size: 34rpx;
+  font-weight: normal;
+  font-stretch: normal;
+  letter-spacing: 0;
+  color: #061730;
   border: none;
   border-radius: 32rpx;
+  background: linear-gradient(0deg, #dab26b 0%, #fcefd4 100%);
+  box-sizing: border-box;
 }
 
 .create-order-btn::after {
   border: none;
-}
-
-.select-all-check {
-  width: 36rpx;
-  height: 36rpx;
-  border-radius: 50%;
-  border: 2rpx solid #cccccc;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: #ffffff;
-  margin-right: 16rpx;
-  transition: all 0.3s ease;
-}
-
-/* 全选激活状态：红色背景 + 白色对钩 */
-.select-all-check.cargo-check-active {
-  background-color: #e53935;
-  border-color: #e53935;
-}
-
-/* 全选对钩图标颜色 */
-.select-all-check.cargo-check-active uni-icons {
-  color: #ffffff !important;
 }
 </style>
