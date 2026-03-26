@@ -1,5 +1,8 @@
 <template>
-  <view class="product-detail-page">
+  <view
+    class="product-detail-page"
+    :class="{ 'is-kanghu-long-detail': isKanghuLongImageDetail }"
+  >
     <!-- 康护指定商品：整页长图 + 底部发起订单（与列表接口 imageurl 一致） -->
     <scroll-view
       v-if="isKanghuLongImageDetail"
@@ -125,14 +128,15 @@
         </view>
       </view>
     </view>
-  </view>
-  <view class="bottom-cart-bar" v-if="state.productDetailData.categorya === 2">
-    <view class="bottom-cart-bar-bg" />
-    <view class="bottom-cart-bar-inner">
-      <view class="bottom-btn-shell">
-        <button class="bottom-add-cart-btn" @click="handleCreateKanghuOrder">
-          发起订单
-        </button>
+    <!-- 康护底栏与其它分类同属一页根节点，避免真机上 flex 留白与白条 -->
+    <view class="bottom-cart-bar" v-if="state.productDetailData.categorya === 2">
+      <view class="bottom-cart-bar-bg" />
+      <view class="bottom-cart-bar-inner">
+        <view class="bottom-btn-shell">
+          <button class="bottom-add-cart-btn" @click="handleCreateKanghuOrder">
+            发起订单
+          </button>
+        </view>
       </view>
     </view>
   </view>
@@ -585,6 +589,11 @@ onLoad((options) => {
   box-sizing: border-box;
 }
 
+/* 康护长图详情：与底栏同色，避免 scroll 底部留白、padding 区呈白缝 */
+.product-detail-page.is-kanghu-long-detail {
+  background-color: #283341;
+}
+
 /* 1. 顶部走马灯样式 */
 .product-swiper {
   width: 100%;
@@ -607,8 +616,16 @@ onLoad((options) => {
 /* 2. 中部商品信息滚动容器 */
 .product-info-scroll {
   flex: 1; /* 占满除走马灯和底部按钮外的空间 */
+  min-height: 0; /* 真机 flex 子项默认可无限伸展，易在底部露出页底白边 */
   padding-bottom: 160rpx; /* 底栏 123rpx + 安全区，避免内容被遮挡 */
   overflow: hidden;
+}
+
+/* 康护长图：底栏同底色 + 与底栏高度对齐的 padding，消除长图与吸底之间的白条 */
+.product-info-scroll.kanghu-long-image-scroll {
+  background-color: #283341;
+  padding-bottom: calc(126rpx + constant(safe-area-inset-bottom));
+  padding-bottom: calc(126rpx + env(safe-area-inset-bottom));
 }
 
 .product-info-container {
