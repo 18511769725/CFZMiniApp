@@ -1,5 +1,8 @@
 <template>
-  <view class="product-list-page">
+  <view
+    class="product-list-page"
+    :class="{ 'product-list-page--anju': isAnjuList }"
+  >
     <!-- 下拉刷新容器 -->
     <scroll-view scroll-y class="scroll-container">
       <!-- 产品列表：循环渲染product-item组件 -->
@@ -8,6 +11,7 @@
           v-for="item in state.productList"
           :key="item.id"
           :product="item"
+          :variant="listVariant"
           @toDetail="handleToDetail"
           @addCart="handleAddCart"
         ></product-item>
@@ -25,11 +29,10 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, watch } from "vue";
-import { onLoad, onShow } from "@dcloudio/uni-app";
+import { ref, reactive, computed } from "vue";
+import { onLoad } from "@dcloudio/uni-app";
 import productItem from "./components/product-item.vue";
 
-// 引入产品列表项组件
 const state = reactive({
   userinfo: {},
   searchValue: "",
@@ -39,6 +42,23 @@ const state = reactive({
   categorya: 0, // 一级分类ID
   categoryb: 0, // 二级分类ID
 });
+
+const isAnjuList = computed(() => Number(state.categorya) === 0);
+const listVariant = computed(() => (isAnjuList.value ? "anju" : "default"));
+
+const applyNavigationStyle = () => {
+  if (Number(state.categorya) === 0) {
+    uni.setNavigationBarColor({
+      frontColor: "#ffffff",
+      backgroundColor: "#020713",
+    });
+  } else {
+    uni.setNavigationBarColor({
+      frontColor: "#000000",
+      backgroundColor: "#ffffff",
+    });
+  }
+};
 
 // 商品列表数据
 const productList = ref([]);
@@ -156,6 +176,7 @@ const getStorageAsync = (key) => {
 onLoad((options) => {
   state.categorya = options.categorya || 0; // 从页面参数获取一级分类ID，默认为0
   state.categoryb = options.categoryb || 0; // 从页面参数获取二级分类ID，默认为0
+  applyNavigationStyle();
   loadProductList();
 });
 
@@ -249,6 +270,31 @@ onLoad((options) => {
   width: 100%;
   background-color: #ffffff;
   margin-bottom: 20rpx;
+}
+
+/* 益企·安居：页底与大厅统一 #020713 */
+.product-list-page--anju {
+  background-color: #020713;
+}
+
+.product-list-page--anju .scroll-container {
+  background-color: #020713;
+}
+
+.product-list-page--anju .product-list {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24rpx;
+  background-color: transparent;
+  padding-top: 24rpx;
+  padding-bottom: 40rpx;
+  margin-bottom: 0;
+  box-sizing: border-box;
+}
+
+.product-list-page--anju .empty-tip {
+  color: rgba(255, 255, 255, 0.55);
 }
 
 /* 空数据提示 */

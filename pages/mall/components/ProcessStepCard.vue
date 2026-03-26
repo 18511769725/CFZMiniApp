@@ -1,5 +1,5 @@
 <template>
-  <view class="process-step-card">
+  <view class="process-step-card" :class="{ 'is-compact-flow': compactFlow }">
     <!-- 背景图片 -->
     <image
       :src="backgroundImage"
@@ -58,6 +58,11 @@ const props = defineProps({
   backgroundImage: {
     type: String,
     default: "/static/pages/mall/processitembg.png",
+  },
+  /** 申请流程 .29 容器内：高 161rpx（289 - 93顶 - 35底） */
+  compactFlow: {
+    type: Boolean,
+    default: false,
   },
 });
 
@@ -195,6 +200,55 @@ const isImgPath = (value) => {
       display: -webkit-box;
       -webkit-box-orient: vertical;
       -webkit-line-clamp: 4;
+    }
+  }
+
+  &.is-compact-flow {
+    width: 161rpx;
+    height: 161rpx;
+    margin-right: 12rpx;
+
+    .card-content-wrapper {
+      padding: 10rpx 0 8rpx;
+    }
+
+    .card-content-left {
+      width: 115rpx;
+      gap: 8rpx;
+    }
+
+    .card-content-right {
+      width: 38rpx;
+    }
+
+    .card-icon {
+      width: 44rpx;
+      height: 44rpx;
+    }
+
+    .card-icon-emoji {
+      font-size: 44rpx;
+    }
+
+    .step-number-badge {
+      width: 32rpx;
+      height: 32rpx;
+      margin-left: 4rpx;
+
+      text {
+        font-size: 22rpx;
+      }
+    }
+
+    .card-text .card-title {
+      font-size: 20rpx;
+      margin-bottom: 4rpx;
+      -webkit-line-clamp: 2;
+    }
+
+    .card-text .card-subtitle {
+      font-size: 15rpx;
+      -webkit-line-clamp: 3;
     }
   }
 }

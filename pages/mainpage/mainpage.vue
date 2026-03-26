@@ -1,20 +1,18 @@
 <template>
   <view class="main-page">
-    <!-- 顶部背景区域 -->
-    <view class="header-bg">
-      <!-- 背景图片 -->
-      <image
-        class="bg-placeholder"
-        src="https://mvpme82.cloud/data/a8e2fea5-029c-46f8-9589-7029aab1a66d_1774525936964.png"
-        mode="aspectFill"
-      ></image>
-
-      <!-- 平台标题 -->
-      <view class="platform-title">
-        <text class="title-cn">朝阳企业服务平台</text>
-        <text class="title-en">Chaoyang Enterprise Service Platform</text>
+    <image
+      class="page-full-bg"
+      src="https://mvpme82.cloud/data/d2b79840-d731-4e07-b52c-c10aa594067e_1774537067801.png"
+      mode="widthFix"
+    />
+    <view class="main-page-body">
+      <!-- 平台标题（叠在全页背景上，不再单独拼半张顶图） -->
+      <view class="header-section">
+        <view class="platform-title">
+          <text class="title-cn">朝阳企业服务平台</text>
+          <text class="title-en">Chaoyang Enterprise Service Platform</text>
+        </view>
       </view>
-    </view>
 
     <!-- 企业信息卡片 -->
     <view class="enterprise-card">
@@ -337,6 +335,7 @@
           </view>
         </view>
       </view>
+    </view>
     </view>
   </view>
 </template>
@@ -788,10 +787,32 @@ onLoad(() => {
 
 <style>
 .main-page {
-  background-color: #0a1a3a;
+  position: relative;
+  background-color: #020713;
   min-height: 100vh;
   color: #fff;
   padding-bottom: 30rpx;
+  overflow-x: hidden;
+}
+
+/* 全页背景：widthFix 按资源比例缩放宽度，避免 aspectFill+默认 320×240 导致看不见或只剩纯色底 */
+.page-full-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  display: block;
+  vertical-align: top;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.main-page-body {
+  position: relative;
+  z-index: 1;
 }
 
 /* 横向分割线：统一使用切图 8.png（小程序用 image） */
@@ -810,26 +831,15 @@ onLoad(() => {
   vertical-align: top;
 }
 
-/* 顶部背景区域：设计稿 距顶 120rpx、左右 176rpx；副标题与卡片顶 148rpx（由 .platform-title margin-bottom 实现） */
-.header-bg {
-  position: relative;
+/* 标题区：设计稿 距顶 120rpx、左右 176rpx；副标题与企业卡间距 148rpx */
+.header-section {
   padding: 120rpx 176rpx 0;
   box-sizing: border-box;
-  min-height: 340rpx;
-}
-.bg-placeholder {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 0;
 }
 .platform-title {
   text-align: center;
   margin: 0 0 148rpx;
   position: relative;
-  z-index: 1;
 }
 .title-cn {
   display: block;

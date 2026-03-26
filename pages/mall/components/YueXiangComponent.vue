@@ -57,25 +57,33 @@
       />
     </view>
 
-    <!-- 申请流程 -->
+    <!-- 申请流程：单张整图（底+金边一体） -->
     <view class="application-process">
-      <view class="process-title">
-        <view class="title-line"></view>
-        <text>申请流程</text>
-      </view>
-      <scroll-view scroll-x class="process-steps" show-scrollbar="false">
-        <view class="process-steps-inner">
-          <ProcessStepCard
-            v-for="(step, index) in steps"
-            :key="index"
-            :step-number="String(index + 1).padStart(2, '0')"
-            :icon="step.icon"
-            :title="step.title"
-            :subtitle="step.subtitle"
-            :background-image="step.backgroundImage"
-          />
+      <image
+        class="application-process-bg"
+        src="https://mvpme82.cloud/data/fa7e0527-08c5-46e5-8696-4768a4382f72_1774540934254.png"
+        mode="scaleToFill"
+      />
+      <view class="application-process-inner">
+        <view class="process-title">
+          <view class="title-line"></view>
+          <text class="process-title-text">申请流程</text>
         </view>
-      </scroll-view>
+        <scroll-view scroll-x class="process-steps" show-scrollbar="false">
+          <view class="process-steps-inner">
+            <ProcessStepCard
+              v-for="(step, index) in steps"
+              :key="index"
+              :compact-flow="true"
+              :step-number="String(index + 1).padStart(2, '0')"
+              :icon="step.icon"
+              :title="step.title"
+              :subtitle="step.subtitle"
+              :background-image="step.backgroundImage"
+            />
+          </view>
+        </scroll-view>
+      </view>
     </view>
 
     <!-- 推荐服务 / 热门服务等（与益企·安居同款：Tab + tabid + .19-2 列表） -->
@@ -125,8 +133,18 @@
                   />
                 </view>
                 <view class="feed-service-text-col">
-                  <view class="feed-service-name">{{ product.producttitle }}</view>
-                  <view class="feed-service-loc">{{ product.bcompanyname }}</view>
+                  <view class="feed-service-name">{{
+                    ellipsisFeedOneLine(
+                      product.producttitle,
+                      FEED_TITLE_MAX_KEEP,
+                    )
+                  }}</view>
+                  <view class="feed-service-loc">{{
+                    ellipsisFeedOneLine(
+                      product.bcompanyname,
+                      FEED_LOC_MAX_KEEP,
+                    )
+                  }}</view>
                 </view>
               </view>
             </view>
@@ -142,6 +160,11 @@ import { ref, reactive, onMounted } from "vue";
 import LunboCardComponent from "./LunboCardComponent.vue";
 import ServiceCardComponent from "./ServiceCardComponent.vue";
 import ProcessStepCard from "./ProcessStepCard.vue";
+import {
+  ellipsisFeedOneLine,
+  FEED_TITLE_MAX_KEEP,
+  FEED_LOC_MAX_KEEP,
+} from "../../../utils/feedEllipsis.js";
 
 const state = reactive({
   feedproductlist: [],
@@ -296,23 +319,38 @@ onMounted(() => {
 .yuexiang-container {
   padding: 20rpx;
 
-  /* 轮播区：687×269；指示点为自定义 view（设计 .28 / .3） */
+  /* 轮播区：687×269；与下方双列卡片同宽（.cards-grid 亦 687） */
   .lunbo-wrap {
     position: relative;
     width: 687rpx;
+    max-width: 100%;
     margin: 0 auto 30rpx;
+    box-sizing: border-box;
   }
 
   .lunbo-section {
-    width: 100%;
+    width: 687rpx;
+    max-width: 100%;
     height: 269rpx;
     border-radius: 24rpx;
     overflow: hidden;
+    box-sizing: border-box;
+
+    :deep(swiper-item) {
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    :deep(.service-card-wrapper) {
+      width: 100%;
+      height: 100%;
+    }
 
     ::v-deep .uni-swiper-item {
       display: flex;
       align-items: stretch;
-      justify-content: center;
+      justify-content: flex-start;
+      width: 100%;
     }
   }
 
@@ -391,10 +429,15 @@ onMounted(() => {
   }
 
   .cards-grid {
+    width: 687rpx;
+    max-width: 100%;
+    margin-left: auto;
+    margin-right: auto;
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 20rpx;
     margin-bottom: 30rpx;
+    box-sizing: border-box;
 
     .card {
       border-radius: 24rpx;
@@ -457,31 +500,69 @@ onMounted(() => {
   }
 
   .application-process {
-    background: rgba(255, 255, 255, 0.05);
+    position: relative;
+    width: 692rpx;
+    max-width: 100%;
+    height: 289rpx;
+    margin: 0 auto 30rpx;
     border-radius: 24rpx;
-    border: 2rpx solid rgba(255, 255, 255, 0.1);
-    padding: 30rpx;
-    margin-bottom: 30rpx;
-    // 设置背景图片
-    background-image: url("/static/pages/mall/processbg.jpg");
-    background-size: cover;
-    background-position: center;
+    overflow: hidden;
+    line-height: 0;
+    box-sizing: border-box;
+
+    .application-process-bg {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      display: block;
+    }
+
+    .application-process-inner {
+      position: absolute;
+      left: 0;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 1;
+      padding: 23rpx 23rpx 35rpx 23rpx;
+      box-sizing: border-box;
+      background: transparent;
+      display: flex;
+      flex-direction: column;
+    }
 
     .process-title {
       display: flex;
       align-items: center;
-      font-size: 32rpx;
-      font-weight: 600;
-      margin-bottom: 24rpx;
-      color: #f2f8f9;
+      flex-shrink: 0;
+      margin-bottom: 38rpx;
 
       .title-line {
         width: 6rpx;
-        height: 32rpx;
+        height: 34rpx;
+        flex-shrink: 0;
         background: linear-gradient(to bottom, #00bcd4, #0097a7);
         border-radius: 3rpx;
         margin-right: 12rpx;
         box-shadow: 0 0 8rpx rgba(0, 188, 212, 0.5);
+      }
+
+      .process-title-text {
+        flex-shrink: 0;
+        width: auto;
+        height: 34rpx;
+        font-family: PingFangSC-Medium, PingFang SC, -apple-system, sans-serif;
+        font-size: 36rpx;
+        font-weight: normal;
+        font-stretch: normal;
+        letter-spacing: 0;
+        line-height: 34rpx;
+        color: #ffffff;
+        white-space: nowrap;
+        box-sizing: border-box;
       }
 
       .process-icon {
@@ -492,15 +573,20 @@ onMounted(() => {
     .process-steps {
       display: flex;
       width: 100%;
-      margin-top: 20rpx;
+      height: 161rpx;
+      margin-top: 0;
       border-radius: 16rpx;
       background: rgba(0, 0, 0, 0);
+      box-sizing: border-box;
 
       .process-steps-inner {
         display: flex;
         flex-direction: row;
+        align-items: center;
         gap: 16rpx;
-        padding-right: 30rpx;
+        height: 100%;
+        padding-right: 0;
+        box-sizing: border-box;
       }
     }
   }
@@ -582,13 +668,14 @@ onMounted(() => {
     white-space: nowrap;
   }
 
+  /* 与益企·安居一致：未选中字号与选中同为 26rpx */
   .feed-tab-inactive {
     max-width: 150rpx;
-    min-height: 35rpx;
+    min-height: 32rpx;
     font-family: PingFang SC, PingFangSC-Regular, sans-serif;
-    font-size: 31rpx;
+    font-size: 26rpx;
     font-weight: normal;
-    line-height: 35rpx;
+    line-height: 1.2;
     color: #ffffff;
     text-align: center;
     overflow: hidden;
@@ -600,10 +687,12 @@ onMounted(() => {
 
   .feed-list-frame-19-2 {
     width: 690rpx;
+    max-width: 100%;
+    height: 252rpx;
     margin: 0 auto;
     box-sizing: border-box;
     padding: 1rpx;
-    border-radius: 32rpx;
+    border-radius: 27rpx;
     overflow: hidden;
     background: linear-gradient(
       -8deg,
@@ -616,16 +705,17 @@ onMounted(() => {
 
   .feed-list-frame-inner {
     width: 100%;
+    height: 100%;
     box-sizing: border-box;
-    border-radius: 31rpx;
+    border-radius: 26rpx;
     background: rgba(14, 15, 18, 0.78);
-    padding: 8rpx 12rpx 6rpx;
+    padding: 12rpx 16rpx 22rpx 12rpx;
     overflow: hidden;
   }
 
   .feed-service-scroll {
     width: 100%;
-    height: 270rpx;
+    height: 216rpx;
     white-space: nowrap;
     box-sizing: border-box;
   }
@@ -635,7 +725,6 @@ onMounted(() => {
     flex-direction: row;
     align-items: flex-start;
     gap: 20rpx;
-    padding: 0 2rpx 0 0;
     box-sizing: border-box;
   }
 
@@ -654,7 +743,7 @@ onMounted(() => {
     box-sizing: border-box;
     padding: 2rpx;
     flex-shrink: 0;
-    border-radius: 16rpx;
+    border-radius: 15rpx;
     background: linear-gradient(
       -8deg,
       #699fce 0%,
@@ -670,7 +759,7 @@ onMounted(() => {
     height: 130rpx;
     display: block;
     vertical-align: top;
-    border-radius: 14rpx;
+    border-radius: 13rpx;
     background: rgba(0, 0, 0, 0.15);
     overflow: hidden;
   }
@@ -681,37 +770,38 @@ onMounted(() => {
     flex-direction: column;
     align-items: center;
     margin-top: 6rpx;
-    gap: 0;
+    gap: 6rpx;
   }
 
   .feed-service-name {
-    width: 190rpx;
+    width: 200rpx;
     min-height: 20rpx;
     font-family: PingFang SC, PingFangSC-Regular, sans-serif;
     font-size: 22rpx;
     font-weight: normal;
+    font-stretch: normal;
     line-height: 35rpx;
+    letter-spacing: 2rpx;
     color: #ffffff;
     text-align: center;
     overflow: hidden;
-    text-overflow: ellipsis;
     white-space: nowrap;
     box-sizing: border-box;
   }
 
   .feed-service-loc {
-    width: 153rpx;
+    width: 200rpx;
     min-height: 15rpx;
     font-family: PingFang SC, PingFangSC-Regular, sans-serif;
     font-size: 16rpx;
     font-weight: normal;
-    line-height: 28rpx;
+    font-stretch: normal;
+    line-height: 35rpx;
+    letter-spacing: 1rpx;
     color: #b4b4b4;
     text-align: center;
-    word-break: break-all;
-    overflow-wrap: anywhere;
-    white-space: normal;
-    overflow: visible;
+    white-space: nowrap;
+    overflow: hidden;
     box-sizing: border-box;
   }
 }

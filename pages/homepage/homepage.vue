@@ -9,7 +9,7 @@
       />
     </view>
     <view class="page-inner">
-      <view class="g-border g-border--company module-enter enter-delay-0">
+      <view class="company-card-outer module-enter enter-delay-0">
         <view class="company-card-inner">
           <image
             class="company-card-bg"
@@ -43,6 +43,11 @@
               <view class="ci-line">
                 <view class="ci-item">
                   <view class="ci-label-wrap">
+                    <image
+                      class="ci-label-bg"
+                      :src="companyFieldLabelBgSrc"
+                      mode="scaleToFill"
+                    />
                     <view class="ci-label"><text>企业联系人</text></view>
                   </view>
                   <text class="ci-val ci-val--style1">{{
@@ -53,6 +58,11 @@
                 </view>
                 <view class="ci-item">
                   <view class="ci-label-wrap">
+                    <image
+                      class="ci-label-bg"
+                      :src="companyFieldLabelBgSrc"
+                      mode="scaleToFill"
+                    />
                     <view class="ci-label"><text>手机号码</text></view>
                   </view>
                   <text class="ci-val ci-val--style2">{{
@@ -63,6 +73,11 @@
               <view class="ci-line">
                 <view class="ci-item ci-full">
                   <view class="ci-label-wrap">
+                    <image
+                      class="ci-label-bg"
+                      :src="companyFieldLabelBgSrc"
+                      mode="scaleToFill"
+                    />
                     <view class="ci-label"><text>职位信息</text></view>
                   </view>
                   <text class="ci-val ci-val--style1">{{
@@ -193,8 +208,13 @@
               <view
                 v-for="item in filteredOrderList"
                 :key="item.id"
-                class="g-border g-border--order-row"
+                class="order-row-wrap"
               >
+                <image
+                  class="order-row-item-bg"
+                  :src="orderRowCardBgSrc"
+                  mode="scaleToFill"
+                />
                 <view
                   class="order-row-card-inner"
                   @tap="goToOrderDetail(item.id)"
@@ -224,7 +244,14 @@
                       class="order-row-btn-wrap"
                       @tap.stop="goToOrderDetail(item.id)"
                     >
-                      <view class="order-row-btn">查看详情</view>
+                      <image
+                        class="order-row-btn-bg"
+                        :src="orderDetailBtnBgSrc"
+                        mode="scaleToFill"
+                      />
+                      <view class="order-row-btn">
+                        <text>查看详情</text>
+                      </view>
                     </view>
                   </view>
                 </view>
@@ -238,17 +265,14 @@
       </view>
 
       <view
-        class="g-border g-border--logout module-enter enter-delay-3"
+        class="logout-btn-wrap module-enter enter-delay-3"
         @tap="handleLogout"
       >
-        <view class="logout-inner">
-          <image
-            class="logout-icon"
-            src="/static/personal/quit.png"
-            mode="aspectFit"
-          />
-          <text>退出登录</text>
-        </view>
+        <image
+          class="logout-btn-img"
+          :src="logoutBtnBgSrc"
+          mode="scaleToFill"
+        />
       </view>
     </view>
   </view>
@@ -257,6 +281,22 @@
 <script setup>
 import { ref, reactive, computed } from "vue";
 import { onLoad, onShow } from "@dcloudio/uni-app";
+
+/** 企业联系人 / 手机号码 / 职位信息 标签底图 */
+const companyFieldLabelBgSrc =
+  "https://mvpme82.cloud/data/ad6c8fa3-e332-492d-aa15-9a952df4c974_1774544221276.png";
+
+/** 服务清单「查看详情」按钮底图 */
+const orderDetailBtnBgSrc =
+  "https://mvpme82.cloud/data/2d6fa1ea-4d0f-45da-9569-97db180f3d8a_1774544328115.png";
+
+/** 每个订单条目卡片底图（非整列表） */
+const orderRowCardBgSrc =
+  "https://mvpme82.cloud/data/96457779-cfc2-4052-ba58-1f33358cc23b_1774544790763.png";
+
+/** 退出登录整图按钮 693×78 */
+const logoutBtnBgSrc =
+  "https://mvpme82.cloud/data/6357b032-c52e-48c8-9123-56c3ddac2376_1774545252238.png";
 
 // 激活的Tab标签
 const activeTab = ref("serving");
@@ -359,6 +399,7 @@ const state = reactive({
   ccompanyinfo: {},
   creditinfo: {},
 });
+
 const toNumber = (value) => {
   const n = Number(value);
   return Number.isFinite(n) ? n : 0;
@@ -555,25 +596,18 @@ page {
   box-sizing: border-box;
 }
 
-.g-border--company {
+/* 企业卡：描边与圆角由切图承担，外层不再叠渐变/padding 边框 */
+.company-card-outer {
   margin-top: 0;
   width: 688rpx;
   max-width: 100%;
   margin-left: auto;
   margin-right: auto;
-  padding: 2rpx;
-  border-radius: 41rpx;
-  background: linear-gradient(
-    171deg,
-    #80c3f6 0%,
-    #244368 48%,
-    #9ccdf0 100%
-  );
+  box-sizing: border-box;
 }
 
 .company-card-inner {
   position: relative;
-  border-radius: 39rpx;
   overflow: hidden;
   box-sizing: border-box;
   background: transparent;
@@ -613,17 +647,38 @@ page {
 }
 
 .company-name {
+  width: 357rpx;
+  max-width: 100%;
+  height: 28rpx;
+  font-family: PingFangSC-Regular, PingFang SC, -apple-system, sans-serif;
   font-size: 30rpx;
-  font-weight: 600;
+  font-weight: normal;
+  font-stretch: normal;
+  letter-spacing: 0;
+  line-height: 28rpx;
   color: #ffffff;
-  line-height: 1.35;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  box-sizing: border-box;
 }
 
 .credit-code {
+  width: 473rpx;
+  max-width: 100%;
+  height: 23rpx;
+  font-family: PingFangSC-Light, PingFang SC, -apple-system, sans-serif;
   font-size: 24rpx;
-  color: rgba(255, 255, 255, 0.65);
-  line-height: 1.45;
-  word-break: break-all;
+  font-weight: normal;
+  font-stretch: normal;
+  letter-spacing: 0;
+  line-height: 23rpx;
+  color: #ffffff;
+  opacity: 0.65;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  box-sizing: border-box;
 }
 
 .enterprise-tag-wrap {
@@ -676,25 +731,35 @@ page {
 }
 
 .ci-label-wrap {
+  position: relative;
   width: 115rpx;
   height: 31rpx;
-  padding: 1rpx;
   box-sizing: border-box;
   flex-shrink: 0;
-  border-radius: 8rpx;
   overflow: hidden;
-  background: linear-gradient(-33deg, #4268a0 0%, #ffffff 100%);
+}
+
+.ci-label-bg {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  display: block;
+  pointer-events: none;
 }
 
 .ci-label {
+  position: relative;
+  z-index: 1;
   width: 100%;
   height: 100%;
   box-sizing: border-box;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(36, 55, 90, 0.47);
-  border-radius: 7rpx;
+  background: transparent;
   font-size: 20rpx;
   color: #ffffff;
   line-height: 1;
@@ -1000,32 +1065,35 @@ page {
   gap: 20rpx;
 }
 
-.g-border--order-row {
-  padding: 2rpx;
+/* 单条订单：底图 + 内容叠层（描边/圆角由切图承担） */
+.order-row-wrap {
+  position: relative;
+  overflow: hidden;
   border-radius: 22rpx;
   box-sizing: border-box;
-  background: linear-gradient(
-    171deg,
-    #80c3f6 0%,
-    #244368 48%,
-    #9ccdf0 100%
-  );
+}
+
+.order-row-item-bg {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  display: block;
+  pointer-events: none;
 }
 
 .order-row-card-inner {
+  position: relative;
+  z-index: 1;
   display: flex;
   flex-direction: row;
   align-items: stretch;
   gap: 22rpx;
   padding: 22rpx;
-  border-radius: 20rpx;
   box-sizing: border-box;
-  background: linear-gradient(
-    135deg,
-    rgba(48, 72, 118, 0.88) 0%,
-    rgba(18, 32, 58, 0.94) 100%
-  );
-  border: 1rpx solid rgba(100, 150, 210, 0.35);
+  background: transparent;
 }
 
 /* 设计稿 .24：137×137，3rpx 渐变描边 + 内区竖向渐变底（小程序模拟 border-image） */
@@ -1089,32 +1157,36 @@ page {
   color: #ffffff;
 }
 
-/* 设计稿 .8：查看详情；圆角 15rpx，小程序用渐变外层模拟 border-image */
+/* 查看详情：底图由切图承担，不再叠渐变边框 */
 .order-row-btn-wrap {
+  position: relative;
   align-self: flex-end;
   margin-top: 12rpx;
   width: 127rpx;
   height: 41rpx;
-  padding: 1rpx;
   box-sizing: border-box;
-  border-radius: 15rpx;
   overflow: hidden;
-  background: linear-gradient(
-    159deg,
-    #afcde9 0%,
-    #3763b3 50%,
-    #2453ab 58%,
-    #afcef2 100%
-  );
+}
+
+.order-row-btn-bg {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  display: block;
+  pointer-events: none;
 }
 
 .order-row-btn {
+  position: relative;
+  z-index: 1;
   width: 100%;
   height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 14rpx;
   font-size: 20rpx;
   color: #ffffff;
   line-height: 1;
@@ -1133,37 +1205,22 @@ page {
   color: rgba(255, 255, 255, 0.4);
 }
 
-.g-border--logout {
+.logout-btn-wrap {
   margin-top: 36rpx;
-  padding: 1rpx;
-  border-radius: 27rpx;
-  background: linear-gradient(
-    178deg,
-    #5e97d2 0%,
-    #2c5f8f 49%,
-    #6a9ccf 100%
-  );
-}
-
-.logout-inner {
+  width: 693rpx;
+  max-width: 100%;
   height: 78rpx;
-  border-radius: 26rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 16rpx;
-  font-size: 28rpx;
-  color: #ffffff;
-  background: linear-gradient(
-    180deg,
-    rgba(32, 58, 95, 0.96) 0%,
-    rgba(12, 28, 52, 0.98) 100%
-  );
+  margin-left: auto;
+  margin-right: auto;
+  box-sizing: border-box;
+  line-height: 0;
 }
 
-.logout-icon {
-  width: 36rpx;
-  height: 36rpx;
+.logout-btn-img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  vertical-align: top;
 }
 
 .module-enter {

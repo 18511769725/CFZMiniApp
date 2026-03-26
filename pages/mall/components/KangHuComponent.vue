@@ -27,25 +27,33 @@
       />
     </view>
 
-    <!-- 申请流程 -->
+    <!-- 申请流程：单张整图（底+金边一体） -->
     <view class="application-process">
-      <view class="process-title">
-        <view class="title-line"></view>
-        <text>申请流程</text>
-      </view>
-      <scroll-view scroll-x class="process-steps" show-scrollbar="false">
-        <view class="process-steps-inner">
-          <ProcessStepCard
-            v-for="(step, index) in steps"
-            :key="index"
-            :step-number="String(index + 1).padStart(2, '0')"
-            :icon="step.icon"
-            :title="step.title"
-            :subtitle="step.subtitle"
-            :background-image="step.backgroundImage"
-          />
+      <image
+        class="application-process-bg"
+        src="https://mvpme82.cloud/data/fa7e0527-08c5-46e5-8696-4768a4382f72_1774540934254.png"
+        mode="scaleToFill"
+      />
+      <view class="application-process-inner">
+        <view class="process-title">
+          <view class="title-line"></view>
+          <text class="process-title-text">申请流程</text>
         </view>
-      </scroll-view>
+        <scroll-view scroll-x class="process-steps" show-scrollbar="false">
+          <view class="process-steps-inner">
+            <ProcessStepCard
+              v-for="(step, index) in steps"
+              :key="index"
+              :compact-flow="true"
+              :step-number="String(index + 1).padStart(2, '0')"
+              :icon="step.icon"
+              :title="step.title"
+              :subtitle="step.subtitle"
+              :background-image="step.backgroundImage"
+            />
+          </view>
+        </scroll-view>
+      </view>
     </view>
   </view>
 </template>
@@ -298,31 +306,69 @@ onMounted(() => {
   }
 
   .application-process {
-    background: rgba(255, 255, 255, 0.05);
+    position: relative;
+    width: 692rpx;
+    max-width: 100%;
+    height: 289rpx;
+    margin: 0 auto 30rpx;
     border-radius: 24rpx;
-    border: 2rpx solid rgba(255, 255, 255, 0.1);
-    padding: 30rpx;
-    margin-bottom: 30rpx;
-    // 设置背景图片
-    background-image: url("/static/pages/mall/processbg.jpg");
-    background-size: cover;
-    background-position: center;
+    overflow: hidden;
+    line-height: 0;
+    box-sizing: border-box;
+
+    .application-process-bg {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      display: block;
+    }
+
+    .application-process-inner {
+      position: absolute;
+      left: 0;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 1;
+      padding: 23rpx 23rpx 35rpx 23rpx;
+      box-sizing: border-box;
+      background: transparent;
+      display: flex;
+      flex-direction: column;
+    }
 
     .process-title {
       display: flex;
       align-items: center;
-      font-size: 32rpx;
-      font-weight: 600;
-      margin-bottom: 24rpx;
-      color: #f2f8f9;
+      flex-shrink: 0;
+      margin-bottom: 38rpx;
 
       .title-line {
         width: 6rpx;
-        height: 32rpx;
+        height: 34rpx;
+        flex-shrink: 0;
         background: linear-gradient(to bottom, #00bcd4, #0097a7);
         border-radius: 3rpx;
         margin-right: 12rpx;
         box-shadow: 0 0 8rpx rgba(0, 188, 212, 0.5);
+      }
+
+      .process-title-text {
+        flex-shrink: 0;
+        width: auto;
+        height: 34rpx;
+        font-family: PingFangSC-Medium, PingFang SC, -apple-system, sans-serif;
+        font-size: 36rpx;
+        font-weight: normal;
+        font-stretch: normal;
+        letter-spacing: 0;
+        line-height: 34rpx;
+        color: #ffffff;
+        white-space: nowrap;
+        box-sizing: border-box;
       }
 
       .process-icon {
@@ -334,15 +380,20 @@ onMounted(() => {
     .process-steps {
       display: flex;
       width: 100%;
-      margin-top: 20rpx;
+      height: 161rpx;
+      margin-top: 0;
       border-radius: 16rpx;
       background: rgba(0, 0, 0, 0);
+      box-sizing: border-box;
 
       .process-steps-inner {
         display: flex;
         flex-direction: row;
+        align-items: center;
         gap: 16rpx;
-        padding-right: 30rpx;
+        height: 100%;
+        padding-right: 0;
+        box-sizing: border-box;
       }
     }
   }

@@ -5,7 +5,7 @@
       <image
         class="anju-housing-banner-img"
         src="https://mvpme82.cloud/data/a385d669-b84d-4f61-ae1b-3e5b8fa6b040_1774526386651.png"
-        mode="widthFix"
+        mode="aspectFill"
       />
     </view>
 
@@ -14,29 +14,37 @@
       <image
         class="anju-promo-banner-img"
         src="https://mvpme82.cloud/data/efc34df3-0c6d-4911-bdc7-0094e104b483_1774526259483.png"
-        mode="widthFix"
+        mode="aspectFill"
       />
     </view>
 
-    <!-- 申请流程 -->
+    <!-- 申请流程：单张整图（底+金边一体），无代码叠金边 -->
     <view class="application-process">
-      <view class="process-title">
-        <view class="title-line"></view>
-        <text>申请流程</text>
-      </view>
-      <scroll-view scroll-x class="process-steps" show-scrollbar="false">
-        <view class="process-steps-inner">
-          <ProcessStepCard
-            v-for="(step, index) in steps"
-            :key="index"
-            :step-number="String(index + 1).padStart(2, '0')"
-            :icon="step.icon"
-            :title="step.title"
-            :subtitle="step.subtitle"
-            :background-image="step.backgroundImage"
-          />
+      <image
+        class="application-process-bg"
+        src="https://mvpme82.cloud/data/fa7e0527-08c5-46e5-8696-4768a4382f72_1774540934254.png"
+        mode="scaleToFill"
+      />
+      <view class="application-process-inner">
+        <view class="process-title">
+          <view class="title-line"></view>
+          <text class="process-title-text">申请流程</text>
         </view>
-      </scroll-view>
+        <scroll-view scroll-x class="process-steps" show-scrollbar="false">
+          <view class="process-steps-inner">
+            <ProcessStepCard
+              v-for="(step, index) in steps"
+              :key="index"
+              :compact-flow="true"
+              :step-number="String(index + 1).padStart(2, '0')"
+              :icon="step.icon"
+              :title="step.title"
+              :subtitle="step.subtitle"
+              :background-image="step.backgroundImage"
+            />
+          </view>
+        </scroll-view>
+      </view>
     </view>
 
     <!-- 推荐服务 / 热门服务等 Tab + 列表（Tab：.19-3 / .20；列表外框：.19-2；图：.16-2） -->
@@ -88,8 +96,18 @@
                   />
                 </view>
                 <view class="feed-service-text-col">
-                  <view class="feed-service-name">{{ product.producttitle }}</view>
-                  <view class="feed-service-loc">{{ product.bcompanyname }}</view>
+                  <view class="feed-service-name">{{
+                    ellipsisFeedOneLine(
+                      product.producttitle,
+                      FEED_TITLE_MAX_KEEP,
+                    )
+                  }}</view>
+                  <view class="feed-service-loc">{{
+                    ellipsisFeedOneLine(
+                      product.bcompanyname,
+                      FEED_LOC_MAX_KEEP,
+                    )
+                  }}</view>
                 </view>
               </view>
             </view>
@@ -103,6 +121,11 @@
 <script setup>
 import { ref, reactive, onMounted } from "vue";
 import ProcessStepCard from "./ProcessStepCard.vue";
+import {
+  ellipsisFeedOneLine,
+  FEED_TITLE_MAX_KEEP,
+  FEED_LOC_MAX_KEEP,
+} from "../../../utils/feedEllipsis.js";
 
 const state = reactive({
   feedproductlist: [],
@@ -203,58 +226,110 @@ onMounted(() => {
 .anju-container {
   padding: 20rpx;
 
+  /* 朝阳安居服务：稿 684×273，宽度与其它块统一 690 */
   .anju-housing-banner {
-    margin-bottom: 18rpx;
+    width: 690rpx;
+    max-width: 100%;
+    height: 273rpx;
+    margin: 0 auto 24rpx;
     border-radius: 24rpx;
     overflow: hidden;
     line-height: 0;
+    box-sizing: border-box;
 
     .anju-housing-banner-img {
       width: 100%;
+      height: 100%;
       display: block;
       vertical-align: top;
     }
   }
 
+  /* 一键申报横幅：690×448 */
   .anju-promo-banner {
-    margin-bottom: 18rpx;
+    width: 690rpx;
+    max-width: 100%;
+    height: 448rpx;
+    margin: 0 auto 24rpx;
     border-radius: 24rpx;
     overflow: hidden;
     line-height: 0;
+    box-sizing: border-box;
 
     .anju-promo-banner-img {
       width: 100%;
+      height: 100%;
       display: block;
       vertical-align: top;
     }
   }
 
   .application-process {
-    background: rgba(255, 255, 255, 0.05);
+    position: relative;
+    width: 690rpx;
+    max-width: 100%;
+    height: 289rpx;
+    margin: 0 auto 24rpx;
     border-radius: 24rpx;
-    border: 2rpx solid rgba(255, 255, 255, 0.1);
-    padding: 30rpx;
-    margin-bottom: 20rpx;
-    // 设置背景图片
-    background-image: url("/static/pages/mall/processbg.jpg");
-    background-size: cover;
-    background-position: center;
+    overflow: hidden;
+    line-height: 0;
+    box-sizing: border-box;
+
+    .application-process-bg {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      display: block;
+    }
+
+    .application-process-inner {
+      position: absolute;
+      left: 0;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 1;
+      /* 稿 .29：步骤顶距容器顶 93；底距 35；左/右 23 */
+      padding: 23rpx 23rpx 35rpx 23rpx;
+      box-sizing: border-box;
+      background: transparent;
+      display: flex;
+      flex-direction: column;
+    }
 
     .process-title {
       display: flex;
       align-items: center;
-      font-size: 32rpx;
-      font-weight: 600;
-      margin-bottom: 24rpx;
-      color: #f2f8f9;
+      flex-shrink: 0;
+      margin-bottom: 38rpx;
 
       .title-line {
         width: 6rpx;
-        height: 32rpx;
+        height: 34rpx;
+        flex-shrink: 0;
         background: linear-gradient(to bottom, #00bcd4, #0097a7);
         border-radius: 3rpx;
         margin-right: 12rpx;
         box-shadow: 0 0 8rpx rgba(0, 188, 212, 0.5);
+      }
+
+      .process-title-text {
+        /* 稿 138rpx 为标注框；36rpx 四字实际更宽，固定宽度会裁掉「程」 */
+        flex-shrink: 0;
+        width: auto;
+        height: 34rpx;
+        font-family: PingFangSC-Medium, PingFang SC, -apple-system, sans-serif;
+        font-size: 36rpx;
+        font-weight: normal;
+        font-stretch: normal;
+        letter-spacing: 0;
+        line-height: 34rpx;
+        color: #ffffff;
+        white-space: nowrap;
+        box-sizing: border-box;
       }
 
       .process-icon {
@@ -266,15 +341,21 @@ onMounted(() => {
     .process-steps {
       display: flex;
       width: 100%;
-      margin-top: 20rpx;
+      /* 289 - 23顶内边距 - 35底内边距 - 标题区(32+38) = 161 */
+      height: 161rpx;
+      margin-top: 0;
       border-radius: 16rpx;
       background: rgba(0, 0, 0, 0);
+      box-sizing: border-box;
 
       .process-steps-inner {
         display: flex;
         flex-direction: row;
+        align-items: center;
         gap: 16rpx;
-        padding-right: 30rpx;
+        height: 100%;
+        padding-right: 0;
+        box-sizing: border-box;
       }
     }
   }
@@ -283,11 +364,11 @@ onMounted(() => {
     margin-top: 0;
   }
 
-  /* .19-3 外框：690×86，渐变描边（小程序用双层模拟 border-image） */
+  /* .19-3 外框：690×86，与上方块同宽 */
   .feed-tabs-outer {
     width: 690rpx;
     height: 86rpx;
-    margin: 0 auto 13rpx;
+    margin: 0 auto 24rpx;
     box-sizing: border-box;
     padding: 1rpx;
     /* 大圆角：高度一半，整条 Tab 呈胶囊外框 */
@@ -359,14 +440,14 @@ onMounted(() => {
     white-space: nowrap;
   }
 
-  /* 未选中文案（不设死宽，避免「当前可预约」截断；字号按稿 31rpx） */
+  /* 未选中文案：字号与选中 .feed-tab-active-text 一致（26rpx） */
   .feed-tab-inactive {
     max-width: 150rpx;
-    min-height: 35rpx;
+    min-height: 32rpx;
     font-family: PingFang SC, PingFangSC-Regular, sans-serif;
-    font-size: 31rpx;
+    font-size: 26rpx;
     font-weight: normal;
-    line-height: 35rpx;
+    line-height: 1.2;
     color: #ffffff;
     text-align: center;
     overflow: hidden;
@@ -376,13 +457,15 @@ onMounted(() => {
     box-sizing: border-box;
   }
 
-  /* .19-2 列表整体外框：690 宽，渐变描边 + 大圆角（小程序用 1rpx padding 模拟 border-image） */
+  /* .19-2：690 宽 */
   .feed-list-frame-19-2 {
     width: 690rpx;
+    max-width: 100%;
+    height: 252rpx;
     margin: 0 auto;
     box-sizing: border-box;
     padding: 1rpx;
-    border-radius: 32rpx;
+    border-radius: 27rpx;
     overflow: hidden;
     /* 外框渐变描边保留 */
     background: linear-gradient(
@@ -396,18 +479,19 @@ onMounted(() => {
 
   .feed-list-frame-inner {
     width: 100%;
+    height: 100%;
     box-sizing: border-box;
-    border-radius: 31rpx;
+    border-radius: 26rpx;
     /* 内底改为偏中性暗色、略透明，减轻「整块发蓝」 */
     background: rgba(14, 15, 18, 0.78);
-    padding: 8rpx 12rpx 6rpx;
+    /* 上12 左12 右16 底22；滚动区高 = 216（134 图 + 6 + 35 + 6 + 35） */
+    padding: 12rpx 16rpx 22rpx 12rpx;
     overflow: hidden;
   }
 
   .feed-service-scroll {
     width: 100%;
-    /* 与卡片实际高度对齐：避免 scroll-view 固定过高导致框内底部空一条 */
-    height: 270rpx;
+    height: 216rpx;
     white-space: nowrap;
     box-sizing: border-box;
   }
@@ -417,7 +501,6 @@ onMounted(() => {
     flex-direction: row;
     align-items: flex-start;
     gap: 20rpx;
-    padding: 0 2rpx 0 0;
     box-sizing: border-box;
   }
 
@@ -430,14 +513,14 @@ onMounted(() => {
     background: transparent;
   }
 
-  /* .16-2 图片区：204×134，2rpx 渐变描边（小程序用 padding + 渐变底模拟） */
+  /* .16-2 图区：204×134，2rpx 渐变描边 */
   .feed-service-img-frame {
     width: 204rpx;
     height: 134rpx;
     box-sizing: border-box;
     padding: 2rpx;
     flex-shrink: 0;
-    border-radius: 16rpx;
+    border-radius: 15rpx;
     background: linear-gradient(
       -8deg,
       #699fce 0%,
@@ -453,7 +536,7 @@ onMounted(() => {
     height: 130rpx;
     display: block;
     vertical-align: top;
-    border-radius: 14rpx;
+    border-radius: 13rpx;
     background: rgba(0, 0, 0, 0.15);
     overflow: hidden;
   }
@@ -464,38 +547,40 @@ onMounted(() => {
     flex-direction: column;
     align-items: center;
     margin-top: 6rpx;
-    gap: 0;
+    /* 大字与小字之间 6rpx；与图间距仍由 margin-top 承担 */
+    gap: 6rpx;
   }
 
   .feed-service-name {
-    width: 190rpx;
+    width: 200rpx;
     min-height: 20rpx;
     font-family: PingFang SC, PingFangSC-Regular, sans-serif;
     font-size: 22rpx;
     font-weight: normal;
+    font-stretch: normal;
     line-height: 35rpx;
+    /* 与上图等宽约 200rpx；略加字距，6 字 +「 ... ...」可撑满 */
+    letter-spacing: 2rpx;
     color: #ffffff;
     text-align: center;
     overflow: hidden;
-    text-overflow: ellipsis;
     white-space: nowrap;
     box-sizing: border-box;
   }
 
-  /* 第二行：允许换行，不使用省略号；行高略紧于 35，多行时减少框底留白 */
   .feed-service-loc {
-    width: 153rpx;
+    width: 200rpx;
     min-height: 15rpx;
     font-family: PingFang SC, PingFangSC-Regular, sans-serif;
     font-size: 16rpx;
     font-weight: normal;
-    line-height: 28rpx;
+    font-stretch: normal;
+    line-height: 35rpx;
+    letter-spacing: 1rpx;
     color: #b4b4b4;
     text-align: center;
-    word-break: break-all;
-    overflow-wrap: anywhere;
-    white-space: normal;
-    overflow: visible;
+    white-space: nowrap;
+    overflow: hidden;
     box-sizing: border-box;
   }
 }

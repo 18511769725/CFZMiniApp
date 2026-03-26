@@ -3,14 +3,27 @@
     <!-- Tab 选项卡 -->
     <scroll-view scroll-x class="tab-scroll" show-scrollbar="false">
       <view class="tab-container">
-        <view
-          v-for="(tab, index) in tabs"
-          :key="tab.id"
-          class="tab-item"
-          :class="{ active: activeTabId === tab.id }"
-          @click="switchTab(tab.id)"
-        >
-          {{ tab.label }}
+        <image
+          class="tab-container-frame"
+          src="https://mvpme82.cloud/data/cbfc06ca-f049-4f0e-ba0c-0be540cf73a3_1774539208989.png"
+          mode="scaleToFill"
+        />
+        <view class="tab-container-body">
+          <view
+            v-for="(tab, index) in tabs"
+            :key="tab.id"
+            class="tab-item"
+            :class="{ active: activeTabId === tab.id }"
+            @click="switchTab(tab.id)"
+          >
+            <image
+              v-if="activeTabId === tab.id"
+              class="tab-item-active-bg"
+              src="https://mvpme82.cloud/data/7995a8a3-36c6-4cb7-95ca-23884da30be5_1774540022437.png"
+              mode="scaleToFill"
+            />
+            <text class="tab-item-label">{{ tab.label }}</text>
+          </view>
         </view>
       </view>
     </scroll-view>
@@ -56,7 +69,7 @@ const switchTab = (tabId) => {
   display: flex;
   flex-direction: column;
   height: 100vh;
-  background: linear-gradient(135deg, #1a3a52 0%, #0d2438 100%);
+  background-color: #020713;
   color: #fff;
 
   .mall-header {
@@ -88,17 +101,40 @@ const switchTab = (tabId) => {
   }
 
   .tab-container {
+    position: relative;
     width: 90%;
     display: inline-flex;
-    flex-direction: row;
-    justify-content: center;
-    gap: 20rpx;
+    box-sizing: border-box;
     padding: 10rpx 15rpx;
-    border: 3rpx solid #d4a574;
     border-radius: 50rpx;
-    background-color: #242e3a;
+    overflow: hidden;
+    vertical-align: top;
+    background-color: transparent;
+
+    .tab-container-frame {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      display: block;
+      pointer-events: none;
+    }
+
+    .tab-container-body {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      align-items: center;
+      gap: 20rpx;
+      width: 100%;
+    }
 
     .tab-item {
+      position: relative;
       flex: 1;
       padding: 16rpx 32rpx;
       border-radius: 50rpx;
@@ -110,11 +146,32 @@ const switchTab = (tabId) => {
       font-family: PingFang SC, -apple-system, BlinkMacSystemFont, sans-serif;
       letter-spacing: 0;
       white-space: nowrap;
-      transition: all 0.3s ease;
+      transition: opacity 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+
+      .tab-item-active-bg {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 0;
+        display: block;
+        border-radius: 50rpx;
+        pointer-events: none;
+      }
+
+      .tab-item-label {
+        position: relative;
+        z-index: 1;
+        text-align: center;
+        line-height: 1.2;
+      }
 
       &.active {
-        background: linear-gradient(135deg, #f3cb9f 0%, #c9945f 100%);
-        border: 2rpx solid #e98a24;
         color: #061730;
         font-weight: normal;
       }
