@@ -2,7 +2,7 @@
   <view class="login-container">
     <image
       class="bg-image"
-      src="/static/login_bg1.png"
+      src="https://mvpme82.cloud/data/fc40e6c4-e178-4c26-9837-b79c108a52da_1774528166249.png"
       mode="aspectFill"
     ></image>
 
