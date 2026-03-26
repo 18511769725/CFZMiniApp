@@ -185,7 +185,7 @@
                   >订单编号：{{ displayOrder.contractid }}</view
                 >
                 <view class="order-row"
-                  >服务类型：{{ displayOrder.typeLabel }}</view
+                  >供应商名称：{{ displayOrder.typeLabel }}</view
                 >
                 <view class="order-row status"
                   >进度状态：{{ displayOrder.statusText }}</view

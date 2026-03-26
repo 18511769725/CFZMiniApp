@@ -214,7 +214,7 @@
                         >订单编号：{{ item.contractid }}</text
                       >
                       <text class="order-row-line"
-                        >服务类型：{{ orderServiceType(item) }}</text
+                        >供应商名称：{{ orderServiceType(item) }}</text
                       >
                       <text class="order-row-line order-row-line--status"
                         >进度状态：{{ orderProgressLine(item) }}</text

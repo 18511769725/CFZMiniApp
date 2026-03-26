@@ -302,17 +302,35 @@ onMounted(() => {
     margin-top: 16rpx;
     .cn {
       display: block;
-      font-size: 54rpx;
-      font-weight: 700;
+      width: 398rpx;
+      max-width: 100%;
+      min-height: 47rpx;
+      margin-left: auto;
+      margin-right: auto;
+      box-sizing: border-box;
+      font-family: PingFang SC, PingFangSC-Light, -apple-system,
+        BlinkMacSystemFont, sans-serif;
+      font-size: 50rpx;
+      font-weight: normal;
+      letter-spacing: 0;
       color: #ffffff;
-      letter-spacing: 4rpx;
+      line-height: 1.12;
     }
     .en {
       display: block;
-      font-size: 22rpx;
-      color: rgba(255, 255, 255, 0.5);
-      margin-top: 8rpx;
-      text-transform: uppercase;
+      width: fit-content;
+      max-width: none;
+      min-height: 22rpx;
+      margin: 13rpx auto 0;
+      box-sizing: border-box;
+      white-space: nowrap;
+      font-family: PingFang SC, PingFangSC-Light, -apple-system,
+        BlinkMacSystemFont, sans-serif;
+      font-size: 23rpx;
+      font-weight: normal;
+      letter-spacing: 0;
+      color: #ffffff;
+      line-height: 1.2;
     }
   }
 

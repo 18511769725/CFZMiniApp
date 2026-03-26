@@ -6,7 +6,7 @@
         v-for="(card, index) in kanghuBannerCards"
         :key="index"
         class="kanghu-banner-item"
-        @tap="onKanghuBannerTap(card.productId)"
+        @tap="onKanghuBannerTap(card)"
       >
         <view class="kanghu-banner-inner">
           <image
@@ -62,11 +62,13 @@ const state = reactive({
 const kanghuBannerCards = ref([
   {
     productId: null,
+    listImageUrl: "",
     imageSrc:
       "https://mvpme82.cloud/data/e52688fc-1624-404c-8aa5-f5e143b3c041_1774526485013.png",
   },
   {
     productId: null,
+    listImageUrl: "",
     imageSrc:
       "https://mvpme82.cloud/data/217ac77c-184e-410b-a05b-7301726e9101_1774526515097.png",
   },
@@ -85,6 +87,8 @@ const normalizeKanghuProductRow = (row) => {
     producttitle: p.producttitle ?? row.producttitle ?? "",
     bcompanyid: p.bcompanyid ?? row.bcompanyid,
     bcompanyname: b.bcompanyname ?? row.bcompanyname ?? "",
+    /** getkanghuproductlist 长图地址，详情接口可能无此字段，跳转详情时带入 */
+    imageurl: p.imageurl ?? row.imageurl ?? "",
   };
 };
 
@@ -102,11 +106,13 @@ const applyKanghuBannerProducts = (sorted) => {
   kanghuBannerCards.value = [
     {
       productId: one?.id ?? null,
+      listImageUrl: String(one?.imageurl ?? "").trim(),
       imageSrc:
         "https://mvpme82.cloud/data/e52688fc-1624-404c-8aa5-f5e143b3c041_1774526485013.png",
     },
     {
       productId: two?.id ?? null,
+      listImageUrl: String(two?.imageurl ?? "").trim(),
       imageSrc:
         "https://mvpme82.cloud/data/217ac77c-184e-410b-a05b-7301726e9101_1774526515097.png",
     },
@@ -159,13 +165,16 @@ const ensureCCompanyIdThenLoadKanghu = () => {
   });
 };
 
-const onKanghuBannerTap = (productId) => {
+const onKanghuBannerTap = (card) => {
+  const productId = card?.productId;
   if (productId === null || productId === undefined || productId === "") {
     uni.showToast({ title: "数据加载中", icon: "none" });
     return;
   }
+  const img = String(card?.listImageUrl || "").trim();
+  const imgQ = img ? `&imageurl=${encodeURIComponent(img)}` : "";
   uni.navigateTo({
-    url: `/pages/product/product-detail?id=${productId}`,
+    url: `/pages/product/product-detail?id=${productId}${imgQ}`,
   });
 };
 

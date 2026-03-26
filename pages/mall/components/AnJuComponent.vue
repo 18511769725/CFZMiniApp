@@ -204,7 +204,7 @@ onMounted(() => {
   padding: 20rpx;
 
   .anju-housing-banner {
-    margin-bottom: 30rpx;
+    margin-bottom: 18rpx;
     border-radius: 24rpx;
     overflow: hidden;
     line-height: 0;
@@ -217,7 +217,7 @@ onMounted(() => {
   }
 
   .anju-promo-banner {
-    margin-bottom: 24rpx;
+    margin-bottom: 18rpx;
     border-radius: 24rpx;
     overflow: hidden;
     line-height: 0;
@@ -234,7 +234,7 @@ onMounted(() => {
     border-radius: 24rpx;
     border: 2rpx solid rgba(255, 255, 255, 0.1);
     padding: 30rpx;
-    margin-bottom: 30rpx;
+    margin-bottom: 20rpx;
     // 设置背景图片
     background-image: url("/static/pages/mall/processbg.jpg");
     background-size: cover;
@@ -280,14 +280,14 @@ onMounted(() => {
   }
 
   .services-section {
-    margin-top: 8rpx;
+    margin-top: 0;
   }
 
   /* .19-3 外框：690×86，渐变描边（小程序用双层模拟 border-image） */
   .feed-tabs-outer {
     width: 690rpx;
     height: 86rpx;
-    margin: 0 auto 16rpx;
+    margin: 0 auto 13rpx;
     box-sizing: border-box;
     padding: 1rpx;
     /* 大圆角：高度一半，整条 Tab 呈胶囊外框 */

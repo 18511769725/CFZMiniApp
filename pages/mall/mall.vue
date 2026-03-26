@@ -83,7 +83,8 @@ const switchTab = (tabId) => {
     background: rgba(0, 0, 0, 0);
     width: 100%;
     text-align: center;
-    padding: 20rpx 0;
+    /* 仅保留顶部留白；底部交给内容区 padding，益企·安居首块与 Tab 间距为 20rpx */
+    padding: 20rpx 0 0;
   }
 
   .tab-container {
@@ -101,16 +102,21 @@ const switchTab = (tabId) => {
       flex: 1;
       padding: 16rpx 32rpx;
       border-radius: 50rpx;
-      color: rgba(255, 255, 255, 0.6);
-      font-size: 28rpx;
+      box-sizing: border-box;
+      min-height: 30rpx;
+      color: #ffffff;
+      font-size: 31rpx;
+      font-weight: normal;
+      font-family: PingFang SC, -apple-system, BlinkMacSystemFont, sans-serif;
+      letter-spacing: 0;
       white-space: nowrap;
       transition: all 0.3s ease;
 
       &.active {
         background: linear-gradient(135deg, #f3cb9f 0%, #c9945f 100%);
         border: 2rpx solid #e98a24;
-        color: #1a3a52;
-        font-weight: 600;
+        color: #061730;
+        font-weight: normal;
       }
 
       &:active {

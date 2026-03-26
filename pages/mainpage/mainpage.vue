@@ -810,11 +810,12 @@ onLoad(() => {
   vertical-align: top;
 }
 
-/* 顶部背景区域 */
+/* 顶部背景区域：设计稿 距顶 120rpx、左右 176rpx；副标题与卡片顶 148rpx（由 .platform-title margin-bottom 实现） */
 .header-bg {
   position: relative;
-  padding: 40rpx 30rpx 20rpx;
-  height: 460rpx;
+  padding: 120rpx 176rpx 0;
+  box-sizing: border-box;
+  min-height: 340rpx;
 }
 .bg-placeholder {
   position: absolute;
@@ -826,20 +827,41 @@ onLoad(() => {
 }
 .platform-title {
   text-align: center;
-  margin-bottom: 30rpx;
+  margin: 0 0 148rpx;
   position: relative;
   z-index: 1;
-  margin-top: 140rpx;
 }
 .title-cn {
   display: block;
-  font-size: 48rpx;
-  font-weight: 500;
+  width: 398rpx;
+  max-width: 100%;
+  min-height: 47rpx;
+  margin-left: auto;
+  margin-right: auto;
+  box-sizing: border-box;
+  font-family: PingFang SC, PingFangSC-Light, -apple-system, BlinkMacSystemFont,
+    sans-serif;
+  font-size: 50rpx;
+  font-weight: normal;
+  letter-spacing: 0;
+  color: #ffffff;
+  line-height: 1.12;
 }
 .title-en {
   display: block;
-  font-size: 28rpx;
-  margin-top: 8rpx;
+  width: fit-content;
+  max-width: none;
+  min-height: 22rpx;
+  margin: 13rpx auto 0;
+  box-sizing: border-box;
+  white-space: nowrap;
+  font-family: PingFang SC, PingFangSC-Light, -apple-system, BlinkMacSystemFont,
+    sans-serif;
+  font-size: 23rpx;
+  font-weight: normal;
+  letter-spacing: 0;
+  color: #ffffff;
+  line-height: 1.2;
 }
 
 /* 企业信息卡片 - 背景与边框（远程切图） */
@@ -852,7 +874,7 @@ onLoad(() => {
   padding: 30rpx;
   position: relative;
   z-index: 1;
-  margin: -60rpx 30rpx 20rpx 30rpx;
+  margin: 0 30rpx 20rpx 30rpx;
   overflow: hidden;
   box-sizing: border-box;
 }

@@ -1,120 +1,174 @@
 <template>
   <view class="product-detail-page">
-    <!-- 1. 顶部图片走马灯 -->
-    <swiper
-      class="product-swiper"
-      indicator-dots
-      circular
-      autoplay
-      interval="3000"
+    <!-- 康护指定商品：整页长图 + 底部发起订单（与列表接口 imageurl 一致） -->
+    <scroll-view
+      v-if="isKanghuLongImageDetail"
+      class="product-info-scroll kanghu-long-image-scroll"
+      scroll-y
     >
-      <swiper-item v-for="(imgItem, index) in swiperImageList" :key="index">
-        <image class="swiper-img" :src="imgItem" mode="aspectFill"></image>
-      </swiper-item>
-    </swiper>
-
-    <!-- 2. 中部商品信息（可滚动，避免内容溢出） -->
-    <scroll-view class="product-info-scroll" scroll-y>
-      <view class="product-info-container">
-        <!-- 商品名称 -->
-        <view class="product-name">{{
-          state.productDetailData.producttitle || "未命名商品"
-        }}</view>
-
-        <!-- 供应商名称 -->
-        <view class="product-supplier">{{
-          state.productDetailData.bcompanyname || "未知供应商"
-        }}</view>
-
-        <!-- 商品价格 -->
-        <view class="product-price">{{ getProductPrice() }}</view>
-
-        <!-- 套餐展示区域（仅pricetype=2时显示） -->
-        <view v-if="showPackageArea" class="package-container">
-          <view class="package-title">套餐选项</view>
-          <view
-            class="package-item"
-            v-for="(item, index) in packageList"
-            :key="index"
-            :class="{ 'package-item-active': selectedPackageIndex === index }"
-            @click="selectPackage(index)"
-          >
-            <view
-              class="package-item-title"
-              @longpress="showTitleTooltip(item.title, $event)"
-              @touchend="hideTitleTooltip"
-              @touchcancel="hideTitleTooltip"
-              @mouseenter="showTitleTooltip(item.title, $event)"
-              @mouseleave="hideTitleTooltip"
-              >{{ item.title || "未命名套餐" }}</view
-            >
-            <view class="package-item-price"
-              >{{ formatPrice(item.value || 0) }}分</view
-            >
-          </view>
-          <view
-            v-if="titleTooltip.visible"
-            class="title-tooltip-popup"
-            :style="titleTooltip.style"
-          >
-            {{ titleTooltip.text }}
-          </view>
-        </view>
-
-        <!-- 商品详情 -->
-        <view class="product-details-title">商品详情</view>
-        <view
-          class="product-details-content detail-text-wrap"
-          v-if="state.productDetailData.details"
-          >{{ state.productDetailData.details || "暂无商品详情介绍" }}</view
-        >
-
-        <view v-if="detailImageList.length > 0" class="detail-image-section">
-          <view class="detail-image-list">
-            <image
-              v-for="(imgItem, index) in detailImageList"
-              :key="index"
-              class="detail-image-item"
-              :src="imgItem"
-              mode="widthFix"
-            ></image>
-          </view>
-        </view>
-      </view>
+      <image
+        class="kanghu-long-detail-img"
+        :src="kanghuLongImageUrl"
+        mode="widthFix"
+      />
     </scroll-view>
 
-    <!-- 3. 底部吸底：安居产品显示发起订单按钮，点击跳转补充承租人页面；悦享产品显示加入购物车按钮；康护产品显示发起订单按钮，点击直接发起订单 -->
+    <template v-else>
+      <!-- 1. 顶部图片走马灯 -->
+      <swiper
+        class="product-swiper"
+        indicator-dots
+        circular
+        autoplay
+        interval="3000"
+      >
+        <swiper-item v-for="(imgItem, index) in swiperImageList" :key="index">
+          <image class="swiper-img" :src="imgItem" mode="aspectFill"></image>
+        </swiper-item>
+      </swiper>
+
+      <!-- 2. 中部商品信息（可滚动，避免内容溢出） -->
+      <scroll-view class="product-info-scroll" scroll-y>
+        <view class="product-info-container">
+          <!-- 商品名称 -->
+          <view class="product-name">{{
+            state.productDetailData.producttitle || "未命名商品"
+          }}</view>
+
+          <!-- 供应商名称 -->
+          <view class="product-supplier">{{
+            state.productDetailData.bcompanyname || "未知供应商"
+          }}</view>
+
+          <!-- 商品价格 -->
+          <view class="product-price">{{ getProductPrice() }}</view>
+
+          <!-- 套餐展示区域（仅pricetype=2时显示） -->
+          <view v-if="showPackageArea" class="package-container">
+            <view class="package-title">套餐选项</view>
+            <view
+              class="package-item"
+              v-for="(item, index) in packageList"
+              :key="index"
+              :class="{ 'package-item-active': selectedPackageIndex === index }"
+              @click="selectPackage(index)"
+            >
+              <view
+                class="package-item-title"
+                @longpress="showTitleTooltip(item.title, $event)"
+                @touchend="hideTitleTooltip"
+                @touchcancel="hideTitleTooltip"
+                @mouseenter="showTitleTooltip(item.title, $event)"
+                @mouseleave="hideTitleTooltip"
+                >{{ item.title || "未命名套餐" }}</view
+              >
+              <view class="package-item-price"
+                >{{ formatPrice(item.value || 0) }}分</view
+              >
+            </view>
+            <view
+              v-if="titleTooltip.visible"
+              class="title-tooltip-popup"
+              :style="titleTooltip.style"
+            >
+              {{ titleTooltip.text }}
+            </view>
+          </view>
+
+          <!-- 商品详情 -->
+          <view class="product-details-title">商品详情</view>
+          <view
+            class="product-details-content detail-text-wrap"
+            v-if="state.productDetailData.details"
+            >{{ state.productDetailData.details || "暂无商品详情介绍" }}</view
+          >
+
+          <view v-if="detailImageList.length > 0" class="detail-image-section">
+            <view class="detail-image-list">
+              <image
+                v-for="(imgItem, index) in detailImageList"
+                :key="index"
+                class="detail-image-item"
+                :src="imgItem"
+                mode="widthFix"
+              ></image>
+            </view>
+          </view>
+        </view>
+      </scroll-view>
+    </template>
+
+    <!-- 3. 底部吸底：.34 底栏（渐变+opacity 仅作用在 bg 层）+ .33 胶囊按钮 -->
     <view
       class="bottom-cart-bar"
       v-if="state.productDetailData.categorya === 0"
     >
-      <button class="bottom-add-cart-btn" @click="handleAskForTenantInfo">
-        发起订单
-      </button>
+      <view class="bottom-cart-bar-bg" />
+      <view class="bottom-cart-bar-inner">
+        <view class="bottom-btn-shell">
+          <button class="bottom-add-cart-btn" @click="handleAskForTenantInfo">
+            发起订单
+          </button>
+        </view>
+      </view>
     </view>
     <view
       class="bottom-cart-bar"
       v-if="state.productDetailData.categorya === 1"
     >
-      <button class="bottom-add-cart-btn" @click="handleAddCart">
-        加入购物车
-      </button>
+      <view class="bottom-cart-bar-bg" />
+      <view class="bottom-cart-bar-inner">
+        <view class="bottom-btn-shell">
+          <button class="bottom-add-cart-btn" @click="handleAddCart">
+            加入购物车
+          </button>
+        </view>
+      </view>
     </view>
   </view>
   <view class="bottom-cart-bar" v-if="state.productDetailData.categorya === 2">
-    <button class="bottom-add-cart-btn" @click="handleCreateKanghuOrder">
-      发起订单
-    </button>
+    <view class="bottom-cart-bar-bg" />
+    <view class="bottom-cart-bar-inner">
+      <view class="bottom-btn-shell">
+        <button class="bottom-add-cart-btn" @click="handleCreateKanghuOrder">
+          发起订单
+        </button>
+      </view>
+    </view>
   </view>
 </template>
 
 <script setup>
-import { ref, reactive } from "vue";
+import { ref, reactive, computed } from "vue";
 import { onLoad } from "@dcloudio/uni-app";
+
+/** 康护列表中「整张长图详情」的商品 id（与 getkanghuproductlist 一致） */
+const KANGHU_LONG_IMAGE_PRODUCT_IDS = new Set([19, 75]);
 
 const state = reactive({
   userinfo: {},
   productDetailData: {},
+});
+
+const defaultImg = "/static/images/default-product.png";
+
+/** 从康护列表跳转时带入的 imageurl（getproductdetailsforminiapp 常不带此字段） */
+const kanghuListImageUrlFromRoute = ref("");
+
+const isKanghuLongImageDetail = computed(() => {
+  const d = state.productDetailData;
+  if (!d || d.id === undefined || d.id === null) return false;
+  const categorya = Number(d.categorya);
+  if (categorya !== 2) return false;
+  const pid = Number(d.id);
+  return KANGHU_LONG_IMAGE_PRODUCT_IDS.has(pid);
+});
+
+const kanghuLongImageUrl = computed(() => {
+  const d = state.productDetailData;
+  const fromDetail = String(d.imageurl || d.imageUrl || "").trim();
+  const fromRoute = kanghuListImageUrlFromRoute.value.trim();
+  return fromDetail || fromRoute || defaultImg;
 });
 
 // 商品详情数据
@@ -123,8 +177,6 @@ const productInfo = ref({});
 const swiperImageList = ref([]);
 // 详情页图片列表
 const detailImageList = ref([]);
-// 默认占位图
-const defaultImg = "/static/images/default-product.png";
 // 套餐列表
 const packageList = ref([]);
 // 选中的套餐索引
@@ -496,6 +548,14 @@ const handleAskForTenantInfo = () => {
 
 // 页面加载时，先获取用户信息，成功后再获取url传递的商品id并加载详情，否则返回登录
 onLoad((options) => {
+  const rawImg = options?.imageurl;
+  if (rawImg !== undefined && rawImg !== null && rawImg !== "") {
+    try {
+      kanghuListImageUrlFromRoute.value = decodeURIComponent(String(rawImg));
+    } catch {
+      kanghuListImageUrlFromRoute.value = String(rawImg);
+    }
+  }
   uni.getStorage({
     key: "userSessionChaoqitong",
     success: (res) => {
@@ -537,10 +597,17 @@ onLoad((options) => {
   height: 100%;
 }
 
+/* 康护长图详情：单张 imageurl，宽度撑满、高度随比例 */
+.kanghu-long-detail-img {
+  display: block;
+  width: 100%;
+  vertical-align: top;
+}
+
 /* 2. 中部商品信息滚动容器 */
 .product-info-scroll {
   flex: 1; /* 占满除走马灯和底部按钮外的空间 */
-  padding-bottom: 100rpx; /* 预留底部按钮空间，避免内容被遮挡 */
+  padding-bottom: 160rpx; /* 底栏 123rpx + 安全区，避免内容被遮挡 */
   overflow: hidden;
 }
 
@@ -674,32 +741,81 @@ onLoad((options) => {
   margin-bottom: 0;
 }
 
-/* 3. 底部吸底购物车按钮 */
+/* 3. 底部吸底：.34 区域纯色底（设计导出渐变/透明度易与实机不符，改用 #283341） */
 .bottom-cart-bar {
   position: fixed;
   left: 0;
   right: 0;
   bottom: 0;
-  height: 98rpx;
-  background-color: #ffffff;
-  border-top: 1rpx solid #f5f5f5;
+  width: 100%;
+  max-width: 750rpx;
+  margin: 0 auto;
+  box-sizing: border-box;
+  border: solid 1rpx #000000;
+  z-index: 99;
+  overflow: hidden;
+}
+
+/* 铺满底栏（border 内侧） */
+.bottom-cart-bar-bg {
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #283341;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* 设计稿矩形 34：按钮距四边 上23 / 下29 / 左42 / 右43（23+71+29=123rpx）；底侧叠加安全区 */
+.bottom-cart-bar-inner {
+  position: relative;
+  z-index: 1;
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 123rpx;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 16rpx 24rpx;
+  padding-top: 23rpx;
+  padding-right: 43rpx;
+  padding-left: 42rpx;
+  padding-bottom: calc(29rpx + constant(safe-area-inset-bottom));
+  padding-bottom: calc(29rpx + env(safe-area-inset-bottom));
+}
+
+/* .33 渐变描边：小程序中 border-image 与圆角互斥，用 1rpx padding + 渐变底模拟 */
+.bottom-btn-shell {
+  width: 665rpx;
+  height: 71rpx;
   box-sizing: border-box;
-  z-index: 99;
+  padding: 1rpx;
+  border-radius: 36rpx;
+  background-image: linear-gradient(
+    0deg,
+    #f2c287 0%,
+    #f8dab2 72%,
+    #fdf2dd 100%
+  );
 }
 
 .bottom-add-cart-btn {
   width: 100%;
-  height: 72rpx;
-  line-height: 72rpx;
-  background-color: #e53935;
-  color: #ffffff;
-  font-size: 32rpx;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1.2;
   border: none;
-  border-radius: 36rpx;
+  border-radius: 35rpx;
+  background-image: linear-gradient(0deg, #dab26b 0%, #fcefd4 100%);
+  color: #061730;
+  font-size: 34rpx;
+  font-weight: 500;
+  font-family: PingFang SC, -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 .bottom-add-cart-btn::after {
