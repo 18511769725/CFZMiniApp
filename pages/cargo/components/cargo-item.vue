@@ -81,22 +81,23 @@
                       <view class="amount-label">兑换数量：</view>
                       <view class="qty-stepper">
                         <view class="qty-cell qty-btn" @click="stepMinus">
-                          <view class="qty-cell-fill">
-                            <text class="qty-btn-text">−</text>
-                          </view>
+                          <view class="qty-btn-fill" />
+                          <text class="qty-btn-text">−</text>
                         </view>
                         <view class="qty-cell qty-input-outer">
-                          <input
-                            class="qty-input-inner"
-                            type="number"
-                            :value="String(currentAmount)"
-                            @blur="onQtyInputBlur"
-                          />
+                          <view class="qty-input-fill" />
+                          <view class="qty-input-center">
+                            <input
+                              class="qty-input-inner"
+                              type="number"
+                              :value="String(currentAmount)"
+                              @blur="onQtyInputBlur"
+                            />
+                          </view>
                         </view>
                         <view class="qty-cell qty-btn" @click="stepPlus">
-                          <view class="qty-cell-fill">
-                            <text class="qty-btn-text">+</text>
-                          </view>
+                          <view class="qty-btn-fill" />
+                          <text class="qty-btn-text">+</text>
                         </view>
                       </view>
                     </view>
@@ -626,7 +627,7 @@ const handleSwipeDelete = () => {
   white-space: nowrap;
 }
 
-/* 稿 .32-2：24×26 单元；蓝底渐变 + 金描边；0.4 用 rgba，不用整元素 opacity */
+/* 金边仅外圈 1rpx：外层金渐变；内区绝对定位蓝底；数字区外包一层 flex 居中，避免 input 贴底 */
 .qty-stepper {
   display: flex;
   flex-direction: row;
@@ -640,60 +641,96 @@ const handleSwipeDelete = () => {
 }
 
 .qty-btn {
+  position: relative;
+  z-index: 0;
   width: 24rpx;
   height: 26rpx;
-  padding: 1rpx;
-  border-radius: 4rpx;
+  border-radius: 5rpx;
+  box-sizing: border-box;
+  overflow: hidden;
   background: linear-gradient(178deg, #fcefd4 0%, #dab26b 100%);
-}
-
-.qty-cell-fill {
-  width: 100%;
-  height: 100%;
-  border-radius: 3rpx;
-  background: linear-gradient(
-    0deg,
-    rgba(27, 65, 99, 0.4) 0%,
-    rgba(118, 170, 223, 0.4) 100%
-  );
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
+.qty-btn-fill {
+  position: absolute;
+  left: 1rpx;
+  top: 1rpx;
+  right: 1rpx;
+  bottom: 1rpx;
+  z-index: 0;
+  border-radius: 4rpx;
+  pointer-events: none;
+  /* 内区用实色蓝渐变，避免 0.4 透明叠在金底上整格发金 */
+  background: linear-gradient(0deg, #1b4163 0%, #76aadf 100%);
+}
+
 .qty-btn-text {
+  position: relative;
+  z-index: 1;
   font-size: 16rpx;
   font-weight: 300;
   color: #ffffff;
-  line-height: 1;
+  /* 与内区可视高度 24rpx（26−2）一致，避免符号贴底 */
+  line-height: 24rpx;
+  height: 24rpx;
+  text-align: center;
 }
 
 .qty-input-outer {
+  position: relative;
+  z-index: 0;
   min-width: 24rpx;
   width: 44rpx;
   height: 26rpx;
-  padding: 1rpx;
-  border-radius: 4rpx;
+  border-radius: 5rpx;
+  box-sizing: border-box;
+  overflow: hidden;
   background: linear-gradient(178deg, #fcefd4 0%, #dab26b 100%);
 }
 
+.qty-input-fill {
+  position: absolute;
+  left: 1rpx;
+  top: 1rpx;
+  right: 1rpx;
+  bottom: 1rpx;
+  z-index: 0;
+  border-radius: 4rpx;
+  pointer-events: none;
+  background: linear-gradient(0deg, #1b4163 0%, #76aadf 100%);
+}
+
+/* 小程序 input 绝对定位时易贴底，用 flex 容器做垂直居中 */
+.qty-input-center {
+  position: absolute;
+  left: 1rpx;
+  top: 1rpx;
+  right: 1rpx;
+  bottom: 1rpx;
+  z-index: 1;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+}
+
 .qty-input-inner {
-  display: block;
   width: 100%;
-  height: 100%;
-  min-height: 0;
+  height: 24rpx;
+  min-height: 24rpx;
   padding: 0 4rpx;
+  margin: 0;
   box-sizing: border-box;
   border: none;
-  border-radius: 3rpx;
+  border-radius: 4rpx;
   font-size: 16rpx;
-  line-height: 22rpx;
+  line-height: 24rpx;
   text-align: center;
   color: #ffffff;
-  background: linear-gradient(
-    0deg,
-    rgba(27, 65, 99, 0.4) 0%,
-    rgba(118, 170, 223, 0.4) 100%
-  );
+  background-color: transparent;
 }
 </style>

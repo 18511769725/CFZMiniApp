@@ -505,7 +505,7 @@ onMounted(() => {
     position: relative;
     width: 692rpx;
     max-width: 100%;
-    height: 289rpx;
+    height: 309rpx;
     margin: 0 auto 30rpx;
     border-radius: 24rpx;
     overflow: hidden;
@@ -575,7 +575,7 @@ onMounted(() => {
     .process-steps {
       display: flex;
       width: 100%;
-      height: 161rpx;
+      height: 181rpx;
       margin-top: 0;
       border-radius: 16rpx;
       background: rgba(0, 0, 0, 0);
@@ -735,7 +735,7 @@ onMounted(() => {
     flex-shrink: 0;
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: flex-start;
     background: transparent;
   }
 
@@ -779,29 +779,30 @@ onMounted(() => {
     width: 204rpx;
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: flex-start;
     margin-top: 6rpx;
     gap: 6rpx;
   }
 
   .feed-service-name {
-    width: 200rpx;
+    width: 100%;
     min-height: 20rpx;
     font-family: PingFang SC, PingFangSC-Regular, sans-serif;
     font-size: 22rpx;
     font-weight: normal;
     font-stretch: normal;
     line-height: 28rpx;
-    letter-spacing: 2rpx;
+    /* 收紧字距以便 7 字 +「 ... ...」贴近设计稿 */
+    letter-spacing: 0;
     color: #ffffff;
-    text-align: center;
+    text-align: left;
     overflow: hidden;
     white-space: nowrap;
     box-sizing: border-box;
   }
 
   .feed-service-loc {
-    width: 200rpx;
+    width: 100%;
     min-height: 15rpx;
     font-family: PingFang SC, PingFangSC-Regular, sans-serif;
     font-size: 16rpx;
@@ -810,7 +811,7 @@ onMounted(() => {
     line-height: 22rpx;
     letter-spacing: 1rpx;
     color: #b4b4b4;
-    text-align: center;
+    text-align: left;
     white-space: nowrap;
     overflow: hidden;
     box-sizing: border-box;

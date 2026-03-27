@@ -5,29 +5,7 @@
       'is-kanghu-long-detail': isKanghuLongImageDetail,
       'is-anju-detail': isDarkProductDetail,
     }"
-    :style="{ paddingTop: pdNavTotalPx + 'px' }"
   >
-    <!-- 自定义导航栏：标题可写死 #FFFFFF，避免原生导航白字发灰 -->
-    <view
-      class="pd-custom-nav"
-      :class="pdNavIsDark ? 'pd-custom-nav--dark' : 'pd-custom-nav--light'"
-      :style="pdCustomNavStyle"
-    >
-      <view
-        class="pd-custom-nav-inner"
-        :style="{ height: navBarContentHeight + 'px' }"
-      >
-        <view class="pd-custom-nav-back" @click="handlePdNavBack">
-          <text class="pd-custom-nav-back-txt">‹</text>
-        </view>
-        <text
-          v-if="pdNavTitleText"
-          class="pd-custom-nav-title"
-          :style="pdNavTitleStyle"
-          >{{ pdNavTitleText }}</text>
-      </view>
-    </view>
-
     <!-- 康护指定商品：整页长图 + 底部发起订单（与列表接口 imageurl 一致） -->
     <scroll-view
       v-if="isKanghuLongImageDetail"
@@ -322,8 +300,8 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, watch } from "vue";
-import { onLoad, onShow, onUnload } from "@dcloudio/uni-app";
+import { ref, reactive, computed } from "vue";
+import { onLoad } from "@dcloudio/uni-app";
 
 /** 康护列表中「整张长图详情」的商品 id（与 getkanghuproductlist 一致） */
 const KANGHU_LONG_IMAGE_PRODUCT_IDS = new Set([19, 75]);
@@ -358,40 +336,8 @@ const anjuPackageItemActiveShellStyle = {
 /** 从康护列表跳转时带入的 imageurl（getproductdetailsforminiapp 常不带此字段） */
 const kanghuListImageUrlFromRoute = ref("");
 
-/** 列表传入的一级分类：0=益企·安居，用于首屏导航栏与布局 */
+/** 列表传入的一级分类：0=益企·安居，用于首屏布局 */
 const categoryaFromRoute = ref(null);
-
-/** 自定义导航栏占位（状态栏 + 胶囊对齐高度） */
-const statusBarHeight = ref(20);
-const navBarContentHeight = ref(44);
-
-const initPdNavLayout = () => {
-  try {
-    const sys = uni.getSystemInfoSync();
-    const sh = sys.statusBarHeight || 20;
-    statusBarHeight.value = sh;
-    const mb = uni.getMenuButtonBoundingClientRect();
-    if (mb && mb.top != null && mb.height != null) {
-      navBarContentHeight.value = (mb.top - sh) * 2 + mb.height;
-    } else {
-      navBarContentHeight.value = 44;
-    }
-  } catch {
-    navBarContentHeight.value = 44;
-  }
-};
-
-const pdNavTotalPx = computed(
-  () => statusBarHeight.value + navBarContentHeight.value,
-);
-
-const handlePdNavBack = () => {
-  uni.navigateBack({
-    fail: () => {
-      uni.switchTab({ url: "/pages/mall/mall" });
-    },
-  });
-};
 
 const isKanghuLongImageDetail = computed(() => {
   const d = state.productDetailData;
@@ -454,90 +400,6 @@ const onDarkProductDetailBottomClick = () => {
   if (detailCategorya.value === 0) handleAskForTenantInfo();
   else handleAddCart();
 };
-
-/** 深色顶栏仅康护长图；益企·安居顶栏为白底黑字 */
-const pdNavIsDark = computed(() => isKanghuLongImageDetail.value);
-
-const pdNavBgColor = computed(() => {
-  if (isKanghuLongImageDetail.value) return "#283341";
-  if (isDarkProductDetail.value) return "#ffffff";
-  return "#F8F8F8";
-});
-
-const pdCustomNavStyle = computed(() => ({
-  paddingTop: `${statusBarHeight.value}px`,
-  backgroundColor: pdNavBgColor.value,
-}));
-
-/** 与小程序 navigationBarTextStyle: white 一致，避免继承 page 字色发灰 */
-const pdNavTitleStyle = computed(() =>
-  pdNavIsDark.value ? { color: "#ffffff" } : {},
-);
-
-const pdNavTitleText = computed(() => {
-  if (isDarkProductDetail.value || isKanghuLongImageDetail.value)
-    return "项目详情";
-  return "";
-});
-
-/** 自定义导航时同步微信窗口顶栏背景（康护深色 / 其它含安居白顶） */
-const applyPdNavWindowStyle = () => {
-  // #ifdef MP-WEIXIN
-  try {
-    const dark = pdNavIsDark.value;
-    const bg = pdNavBgColor.value;
-    if (dark) {
-      uni.setNavigationBarColor({
-        frontColor: "#ffffff",
-        backgroundColor: bg,
-      });
-      uni.setBackgroundColor({
-        backgroundColor: bg,
-        backgroundColorTop: bg,
-        backgroundColorBottom: bg,
-      });
-    } else {
-      uni.setNavigationBarColor({
-        frontColor: "#000000",
-        backgroundColor: bg,
-      });
-      uni.setBackgroundColor({
-        backgroundColor: bg,
-        backgroundColorTop: bg,
-        backgroundColorBottom: bg,
-      });
-    }
-  } catch (e) {
-    /* ignore */
-  }
-  // #endif
-};
-
-watch(
-  [pdNavIsDark, pdNavBgColor],
-  () => {
-    applyPdNavWindowStyle();
-  },
-  { immediate: true },
-);
-
-onShow(() => {
-  applyPdNavWindowStyle();
-});
-
-onUnload(() => {
-  // #ifdef MP-WEIXIN
-  try {
-    uni.setBackgroundColor({
-      backgroundColor: "#ffffff",
-      backgroundColorTop: "#ffffff",
-      backgroundColorBottom: "#ffffff",
-    });
-  } catch (e) {
-    /* ignore */
-  }
-  // #endif
-});
 
 /** 套餐计价时标题旁「套餐计分」角标 */
 const showAnjuScoreBadge = computed(() => {
@@ -980,7 +842,6 @@ onLoad((options) => {
     const ca = Number(options.categorya);
     categoryaFromRoute.value = Number.isNaN(ca) ? null : ca;
   }
-  initPdNavLayout();
   uni.getStorage({
     key: "userSessionChaoqitong",
     success: (res) => {
@@ -1002,68 +863,6 @@ onLoad((options) => {
 </script>
 
 <style scoped>
-/* 自定义导航栏：标题 #FFFFFF，不受小程序原生导航白字发灰影响 */
-.pd-custom-nav {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 10000;
-  box-sizing: border-box;
-}
-
-.pd-custom-nav-inner {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.pd-custom-nav-back {
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  z-index: 2;
-  display: flex;
-  align-items: center;
-  padding-left: 12rpx;
-  padding-right: 24rpx;
-}
-
-.pd-custom-nav-back-txt {
-  font-size: 48rpx;
-  line-height: 1;
-  font-weight: 400;
-}
-
-.pd-custom-nav--dark .pd-custom-nav-back-txt {
-  color: #ffffff;
-}
-
-.pd-custom-nav--light .pd-custom-nav-back-txt {
-  color: #000000;
-}
-
-.pd-custom-nav-title {
-  max-width: 70%;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  font-size: 34rpx;
-  font-weight: 500;
-  font-family: "PingFang SC", -apple-system, BlinkMacSystemFont, sans-serif;
-}
-
-.pd-custom-nav--dark .pd-custom-nav-title {
-  color: #ffffff;
-  opacity: 1;
-}
-
-.pd-custom-nav--light .pd-custom-nav-title {
-  color: #000000;
-}
-
 .product-detail-page {
   width: 100%;
   height: 100vh;

@@ -309,7 +309,7 @@ onMounted(() => {
     position: relative;
     width: 692rpx;
     max-width: 100%;
-    height: 289rpx;
+    height: 309rpx;
     margin: 0 auto 30rpx;
     border-radius: 24rpx;
     overflow: hidden;
@@ -380,7 +380,7 @@ onMounted(() => {
     .process-steps {
       display: flex;
       width: 100%;
-      height: 161rpx;
+      height: 181rpx;
       margin-top: 0;
       border-radius: 16rpx;
       background: rgba(0, 0, 0, 0);

@@ -254,11 +254,6 @@
                       class="order-row-btn-wrap"
                       @tap.stop="goToOrderDetail(item.id)"
                     >
-                      <image
-                        class="order-row-btn-bg"
-                        :src="orderDetailBtnBgSrc"
-                        mode="scaleToFill"
-                      />
                       <view class="order-row-btn">
                         <text>查看详情</text>
                       </view>
@@ -295,10 +290,6 @@ import { onLoad, onShow } from "@dcloudio/uni-app";
 /** 企业联系人 / 手机号码 / 职位信息 标签底图 */
 const companyFieldLabelBgSrc =
   "https://mvpme82.cloud/data/ad6c8fa3-e332-492d-aa15-9a952df4c974_1774544221276.png";
-
-/** 服务清单「查看详情」按钮底图 */
-const orderDetailBtnBgSrc =
-  "https://mvpme82.cloud/data/87edb7e3-00ac-4f48-9c2c-2589f9f802ac_1774546014161.png";
 
 /** 每个订单条目卡片底图（非整列表） */
 const orderRowCardBgSrc =
@@ -1173,8 +1164,10 @@ page {
   z-index: 1;
   display: flex;
   flex-direction: row;
-  align-items: stretch;
-  gap: 22rpx;
+  align-items: flex-start;
+  /* 设计稿：图与文字块间距 19rpx */
+  gap: 19rpx;
+  /* 顶 22rpx：缩略图距卡片顶；左右底保持 22rpx */
   padding: 22rpx;
   box-sizing: border-box;
   background: transparent;
@@ -1223,17 +1216,22 @@ page {
 .order-row-text {
   display: flex;
   flex-direction: column;
-  gap: 10rpx;
+  /* 三行总高 94rpx：3×30 + 2×gap → gap = (94−90)/2 = 2rpx */
+  gap: 2rpx;
+  /* 首行距卡片顶 38rpx = 内边距 22rpx + 本区顶距 16rpx（与图顶 22rpx 错开） */
+  padding-top: 16rpx;
 }
 
-/* 设计稿订单信息块：全文 #ffffff，19rpx / 35rpx */
+/* 个人中心·服务清单订单信息：PingFang 正文；三行占位 3×30 + 2×2 = 94rpx */
 .order-row-line {
   display: block;
+  font-family: PingFangSC-Regular, "PingFang SC", -apple-system, sans-serif;
   font-size: 19rpx;
-  line-height: 35rpx;
   font-weight: normal;
+  font-stretch: normal;
+  line-height: 30rpx;
+  letter-spacing: 0rpx;
   color: #ffffff;
-  letter-spacing: 0;
   word-break: break-all;
 }
 
@@ -1241,31 +1239,34 @@ page {
   color: #ffffff;
 }
 
-/* 查看详情：底图由切图承担，不再叠渐变边框 */
+/* 查看详情：无填充底图，1rpx 渐变描边 + 15rpx 圆角（双层 background-clip，避免 border-image 与圆角冲突） */
 .order-row-btn-wrap {
-  position: relative;
   align-self: flex-end;
   margin-top: 12rpx;
   width: 127rpx;
   height: 41rpx;
   box-sizing: border-box;
+  border-radius: 15rpx;
+  border: 1rpx solid transparent;
+  /* 内层与 .order-panel-inner 同色，仅留出 1rpx 渐变描边（全透明会透出下层渐变） */
+  background-image: linear-gradient(
+      rgba(6, 20, 40, 0.94),
+      rgba(6, 20, 40, 0.94)
+    ),
+    linear-gradient(
+      159deg,
+      #afcde9 0%,
+      #3763b3 50%,
+      #2453ab 58%,
+      #afcef2 100%
+    );
+  background-origin: padding-box, border-box;
+  -webkit-background-clip: padding-box, border-box;
+  background-clip: padding-box, border-box;
   overflow: hidden;
 }
 
-.order-row-btn-bg {
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 0;
-  display: block;
-  pointer-events: none;
-}
-
 .order-row-btn {
-  position: relative;
-  z-index: 1;
   width: 100%;
   height: 100%;
   display: flex;

@@ -13,8 +13,8 @@ export function ellipsisFeedOneLine(text, maxKeep) {
   return s.slice(0, k) + FEED_LINE_SUFFIX;
 }
 
-/** 大字：6 个汉字 +「 ... ...」（勿再叠 CSS text-overflow，否则窄盒会只剩约 5 字） */
-export const FEED_TITLE_MAX_KEEP = 6;
+/** 大字：7 个汉字 +「 ... ...」（勿再叠 CSS text-overflow，否则窄盒会只剩约 5 字） */
+export const FEED_TITLE_MAX_KEEP = 7;
 
 /** 小字：8 个汉字 +「 ... ...」 */
 export const FEED_LOC_MAX_KEEP = 8;

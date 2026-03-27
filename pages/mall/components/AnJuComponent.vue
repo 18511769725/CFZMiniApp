@@ -158,13 +158,13 @@ const goHousingProductList = () => {
 const steps = ref([
   {
     title: "企业在线申报",
-    subtitle: "企业填报人信息并提交申请",
+    subtitle: "企业填写申请人信息并提交申请",
     icon: "/static/pages/mall/process_yiju_1.png",
     backgroundImage: "/static/pages/mall/processitembg.png",
   },
   {
     title: "数据核验",
-    subtitle: "工作、社保、住房信息核验",
+    subtitle: "婚姻、社保、住房等信息核验",
     icon: "/static/pages/mall/process_yiju_2.png",
     backgroundImage: "/static/pages/mall/processitembg.png",
     /* 该切图构图更满，同 44rpx 下显大，略缩以与其它步一致 */
@@ -172,13 +172,13 @@ const steps = ref([
   },
   {
     title: "复核备案",
-    subtitle: "服务机构管理部门工作验证",
+    subtitle: "服务机构复核并完成备案",
     icon: "/static/pages/mall/process_yiju_3.png",
     backgroundImage: "/static/pages/mall/processitembg.png",
   },
   {
     title: "预约看房",
-    subtitle: "申请人预约看房并认房源",
+    subtitle: "申请人预约看房并确认房源",
     icon: "/static/pages/mall/process_yiju_4.png",
     backgroundImage: "/static/pages/mall/processitembg.png",
   },
@@ -189,8 +189,8 @@ const steps = ref([
     backgroundImage: "/static/pages/mall/processitembg.png",
   },
   {
-    title: "签约并录入合同",
-    subtitle: "签约后完成合同录入",
+    title: "签约入住并录入合同",
+    subtitle: "签约入住后完成合同录入",
     icon: "/static/pages/mall/process_yiju_6.png",
     backgroundImage: "/static/pages/mall/processitembg.png",
   },
@@ -273,7 +273,7 @@ onMounted(() => {
     position: relative;
     width: 690rpx;
     max-width: 100%;
-    height: 289rpx;
+    height: 309rpx;
     margin: 0 auto 24rpx;
     border-radius: 24rpx;
     overflow: hidden;
@@ -346,8 +346,8 @@ onMounted(() => {
     .process-steps {
       display: flex;
       width: 100%;
-      /* 289 - 23顶内边距 - 35底内边距 - 标题区(32+38) = 161 */
-      height: 161rpx;
+      /* 309 - 23顶内边距 - 35底内边距 - 标题区(32+38) = 181 */
+      height: 181rpx;
       margin-top: 0;
       border-radius: 16rpx;
       background: rgba(0, 0, 0, 0);
@@ -514,7 +514,7 @@ onMounted(() => {
     flex-shrink: 0;
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: flex-start;
     background: transparent;
   }
 
@@ -560,31 +560,31 @@ onMounted(() => {
     width: 204rpx;
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: flex-start;
     margin-top: 6rpx;
     /* 大字与小字之间 6rpx；与图间距仍由 margin-top 承担 */
     gap: 6rpx;
   }
 
   .feed-service-name {
-    width: 200rpx;
+    width: 100%;
     min-height: 20rpx;
     font-family: PingFang SC, PingFangSC-Regular, sans-serif;
     font-size: 22rpx;
     font-weight: normal;
     font-stretch: normal;
     line-height: 28rpx;
-    /* 与上图等宽约 200rpx；略加字距，6 字 +「 ... ...」可撑满 */
-    letter-spacing: 2rpx;
+    /* 与上图同宽左对齐；收紧字距以便 7 字 +「 ... ...」贴近设计稿 */
+    letter-spacing: 0;
     color: #ffffff;
-    text-align: center;
+    text-align: left;
     overflow: hidden;
     white-space: nowrap;
     box-sizing: border-box;
   }
 
   .feed-service-loc {
-    width: 200rpx;
+    width: 100%;
     min-height: 15rpx;
     font-family: PingFang SC, PingFangSC-Regular, sans-serif;
     font-size: 16rpx;
@@ -593,7 +593,7 @@ onMounted(() => {
     line-height: 22rpx;
     letter-spacing: 1rpx;
     color: #b4b4b4;
-    text-align: center;
+    text-align: left;
     white-space: nowrap;
     overflow: hidden;
     box-sizing: border-box;

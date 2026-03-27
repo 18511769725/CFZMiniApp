@@ -62,7 +62,7 @@ const props = defineProps({
     type: String,
     default: "/static/pages/mall/processitembg.png",
   },
-  /** 申请流程 .29 容器内：高 161rpx（289 - 93顶 - 35底） */
+  /** 申请流程 .29 容器内：高 181rpx（与父级 .process-steps 一致） */
   compactFlow: {
     type: Boolean,
     default: false,
@@ -106,7 +106,6 @@ const isImgPath = (value) => {
   height: 210rpx;
   display: flex;
   align-items: stretch;
-  margin-right: 20rpx;
   background: rgba(0, 0, 0, 0);
 
   .card-background {
@@ -230,9 +229,8 @@ const isImgPath = (value) => {
   }
 
   &.is-compact-flow {
-    width: 161rpx;
-    height: 161rpx;
-    margin-right: 12rpx;
+    width: 181rpx;
+    height: 181rpx;
 
     /* 设计稿：icon 距卡片顶 15rpx */
     .card-content-wrapper {
@@ -261,6 +259,7 @@ const isImgPath = (value) => {
     .step-number-badge {
       width: 32rpx;
       height: 32rpx;
+      transform: translate(14rpx, -5rpx);
 
       text {
         font-size: 22rpx;
@@ -272,7 +271,7 @@ const isImgPath = (value) => {
       word-break: normal;
     }
 
-    /* 申请流程：标题/副标题较设计稿各 +2rpx，间距略收以保持 161 高内不乱版 */
+    /* 申请流程：标题/副标题较设计稿各 +2rpx，间距略收以保持卡片高内不乱版 */
     .card-text .card-title {
       font-size: 19rpx;
       line-height: 1.25;
