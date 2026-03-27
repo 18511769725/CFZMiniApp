@@ -1,0 +1,1 @@
+"use strict";exports.FEED_LOC_MAX_KEEP=8,exports.FEED_TITLE_MAX_KEEP=6,exports.ellipsisFeedOneLine=function(e,r){if(null==e||""===e)return"";const t=String(e).replace(/\r|\n/g,"").trim(),n=Math.max(1,Math.floor(Number(r)||8));return t.length<=n?t:t.slice(0,n)+" ... ..."};

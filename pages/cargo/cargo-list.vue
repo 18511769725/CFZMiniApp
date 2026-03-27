@@ -18,7 +18,6 @@
           src="/static/images/empty-cargo.png"
           mode="aspectFit"
         ></image>
-        <view class="empty-tip">购物车空空如也~</view>
       </view>
 
       <!-- 购物车列表 -->
@@ -41,29 +40,29 @@
     <view v-if="state.cargoList.length > 0" class="bottom-dock">
       <view class="bottom-bar">
         <view class="bottom-bar-inner">
-        <view class="bottom-select-all" @click="toggleSelectAll">
-          <view class="select-all-check">
-            <view
-              class="select-all-check-inner"
-              :class="{ 'select-all-check-inner--on': isAllSelected }"
-            >
-              <uni-icons
-                v-if="isAllSelected"
-                type="checkmarkempty"
-                size="14"
-                color="#020713"
-              ></uni-icons>
+          <view class="bottom-select-all" @click="toggleSelectAll">
+            <view class="select-all-check">
+              <view
+                class="select-all-check-inner"
+                :class="{ 'select-all-check-inner--on': isAllSelected }"
+              >
+                <uni-icons
+                  v-if="isAllSelected"
+                  type="checkmarkempty"
+                  size="14"
+                  color="#020713"
+                ></uni-icons>
+              </view>
             </view>
+            <text class="select-all-text">全选</text>
           </view>
-          <text class="select-all-text">全选</text>
-        </view>
-        <view class="bottom-total-wrap">
-          <text class="total-label">总积分：</text>
-          <text class="total-value">{{ totalPrice }}积分</text>
-        </view>
-        <button class="create-order-btn" @click="handleCreateOrder">
-          发起订单
-        </button>
+          <view class="bottom-total-wrap">
+            <text class="total-label">总积分：</text>
+            <text class="total-value">{{ totalPrice }}积分</text>
+          </view>
+          <button class="create-order-btn" @click="handleCreateOrder">
+            发起订单
+          </button>
         </view>
       </view>
     </view>
@@ -478,7 +477,7 @@ onShow(() => {
 /* 列表区含条目间距：与稿 .34 条同色 rgba(48,83,156,.14)，间隔区与条连续 */
 .cargo-list {
   width: 100%;
- /* padding: 0 0 24rpx; */
+  /* padding: 0 0 24rpx; */
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
@@ -509,14 +508,16 @@ onShow(() => {
   padding: 1rpx;
   box-sizing: border-box;
   border: none;
-  	border-style: solid;
-  	border-width: 1rpx;
-  	border-image-source: linear-gradient(0deg, 
-  		#faebcc 0%, 
-  		#1e4e97 53%, 
-  		#ddb877 100%);
-  	border-image-slice: 1;
-  	opacity: 0.83;
+  border-style: solid;
+  border-width: 1rpx 0;
+  border-image-source: linear-gradient(
+    0deg,
+    #faebcc 0%,
+    #1e4e97 53%,
+    #ddb877 100%
+  );
+  border-image-slice: 1;
+  opacity: 0.83;
 }
 
 .bottom-bar-inner {

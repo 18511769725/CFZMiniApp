@@ -1,113 +1,116 @@
 <template>
   <!-- 列表底色在父级 .cargo-list；单条 .34 外层条 -->
   <view class="cargo-item-root" :class="{ 'cargo-item-root--last': isLast }">
-  <uni-swipe-action
-    :options="swipeOptions"
-    @click="handleSwipeDelete"
-    :disabled="cargo.status === 'disable'"
-  >
-    <uni-swipe-action-item>
-      <!-- 稿 .34：750×240；#30539c @0.14 + 金描边；底色用 rgba -->
-      <view class="cargo-row-strip">
-      <view
-        class="cargo-row"
-        :class="{ 'cargo-disabled': cargo.status === 'disable' }"
-      >
-        <view class="cargo-check-wrapper" @click="!isDisabled && toggleCheck()">
-          <view class="cargo-check-outer">
+    <uni-swipe-action
+      :options="swipeOptions"
+      @click="handleSwipeDelete"
+      :disabled="cargo.status === 'disable'"
+    >
+      <uni-swipe-action-item>
+        <!-- 稿 .34：750×240；#30539c @0.14 + 金描边；底色用 rgba -->
+        <view class="cargo-row-strip">
+          <view
+            class="cargo-row"
+            :class="{ 'cargo-disabled': cargo.status === 'disable' }"
+          >
             <view
-              class="cargo-check-inner"
-              :class="{
-                'cargo-check-inner--on': isChecked && !isDisabled,
-              }"
+              class="cargo-check-wrapper"
+              @click="!isDisabled && toggleCheck()"
             >
-              <uni-icons
-                v-if="isChecked && !isDisabled"
-                type="checkmarkempty"
-                size="14"
-                color="#020713"
-              ></uni-icons>
+              <view class="cargo-check-outer">
+                <view
+                  class="cargo-check-inner"
+                  :class="{
+                    'cargo-check-inner--on': isChecked && !isDisabled,
+                  }"
+                >
+                  <uni-icons
+                    v-if="isChecked && !isDisabled"
+                    type="checkmarkempty"
+                    size="14"
+                    color="#020713"
+                  ></uni-icons>
+                </view>
+              </view>
             </view>
-          </view>
-        </view>
 
-        <view class="cargo-card-shell">
-          <image
-            class="cargo-card-bg"
-            src="https://mvpme82.cloud/data/2b1ce32e-bde0-457d-9cbe-9ad5c56932f0_1774552961107.png"
-            mode="scaleToFill"
-          />
-          <view class="cargo-card-inner">
-            <view
-              v-if="cargo.status === 'disable'"
-              class="cargo-disable-mask"
-            ></view>
-
-          <view class="cargo-img-frame">
-            <view class="cargo-img-inner">
+            <view class="cargo-card-shell">
               <image
-                class="cargo-img"
-                :src="getFirstProductImage()"
-                mode="aspectFill"
-                lazy-load="true"
-              ></image>
-            </view>
-          </view>
+                class="cargo-card-bg"
+                src="https://mvpme82.cloud/data/2b1ce32e-bde0-457d-9cbe-9ad5c56932f0_1774552961107.png"
+                mode="scaleToFill"
+              />
+              <view class="cargo-card-inner">
+                <view
+                  v-if="cargo.status === 'disable'"
+                  class="cargo-disable-mask"
+                ></view>
 
-        <!-- 右侧商品信息（高度随内容自适应） -->
-        <view class="cargo-info-wrapper">
-          <!-- 商品标题 -->
-          <view class="cargo-title">{{
-            cargo.productInfo.producttitle || "未命名商品"
-          }}</view>
+                <view class="cargo-img-frame">
+                  <view class="cargo-img-inner">
+                    <image
+                      class="cargo-img"
+                      :src="getFirstProductImage()"
+                      mode="aspectFill"
+                      lazy-load="true"
+                    ></image>
+                  </view>
+                </view>
 
-          <!-- 供应商名称 -->
-          <view class="cargo-supplier">{{
-            cargo.productInfo.bcompanyname || "未知供应商"
-          }}</view>
+                <!-- 右侧商品信息（高度随内容自适应） -->
+                <view class="cargo-info-wrapper">
+                  <!-- 商品标题 -->
+                  <view class="cargo-title">{{
+                    cargo.productInfo.producttitle || "未命名商品"
+                  }}</view>
 
-          <!-- 套餐信息（仅pricetype=2时显示） -->
-          <view v-if="showPackageInfo" class="cargo-package">
-            所选套餐：{{ getPackageTitle() }}
-          </view>
+                  <!-- 供应商名称 -->
+                  <view class="cargo-supplier">{{
+                    cargo.productInfo.bcompanyname || "未知供应商"
+                  }}</view>
 
-          <!-- 商品价格（含购买数量计算） -->
-          <view class="cargo-price">{{ getCargoPrice() }}</view>
+                  <!-- 套餐信息（仅pricetype=2时显示） -->
+                  <view v-if="showPackageInfo" class="cargo-package">
+                    所选套餐：{{ getPackageTitle() }}
+                  </view>
 
-          <!-- 兑换数量：自绘步进器（小程序下父组件样式无法穿透 uni-number-box 内部） -->
-          <view class="cargo-amount-wrapper" v-if="!isDisabled">
-            <view class="amount-label">兑换数量：</view>
-            <view class="qty-stepper">
-              <view class="qty-cell qty-btn" @click="stepMinus">
-                <view class="qty-cell-fill">
-                  <text class="qty-btn-text">−</text>
+                  <!-- 商品价格（含购买数量计算） -->
+                  <view class="cargo-price">{{ getCargoPrice() }}</view>
+
+                  <!-- 兑换数量：自绘步进器（小程序下父组件样式无法穿透 uni-number-box 内部） -->
+                  <view class="cargo-amount-wrapper" v-if="!isDisabled">
+                    <view class="amount-label">兑换数量：</view>
+                    <view class="qty-stepper">
+                      <view class="qty-cell qty-btn" @click="stepMinus">
+                        <view class="qty-cell-fill">
+                          <text class="qty-btn-text">−</text>
+                        </view>
+                      </view>
+                      <view class="qty-cell qty-input-outer">
+                        <input
+                          class="qty-input-inner"
+                          type="number"
+                          :value="String(currentAmount)"
+                          @blur="onQtyInputBlur"
+                        />
+                      </view>
+                      <view class="qty-cell qty-btn" @click="stepPlus">
+                        <view class="qty-cell-fill">
+                          <text class="qty-btn-text">+</text>
+                        </view>
+                      </view>
+                    </view>
+                  </view>
+                  <view class="cargo-amount-disabled" v-else>
+                    兑换数量：{{ cargo.buyamount || 1 }}
+                  </view>
                 </view>
               </view>
-              <view class="qty-cell qty-input-outer">
-                <input
-                  class="qty-input-inner"
-                  type="number"
-                  :value="String(currentAmount)"
-                  @blur="onQtyInputBlur"
-                />
-              </view>
-              <view class="qty-cell qty-btn" @click="stepPlus">
-                <view class="qty-cell-fill">
-                  <text class="qty-btn-text">+</text>
-                </view>
-              </view>
             </view>
           </view>
-          <view class="cargo-amount-disabled" v-else>
-            兑换数量：{{ cargo.buyamount || 1 }}
-          </view>
         </view>
-        </view>
-        </view>
-      </view>
-      </view>
-    </uni-swipe-action-item>
-  </uni-swipe-action>
+      </uni-swipe-action-item>
+    </uni-swipe-action>
   </view>
 </template>
 
@@ -494,12 +497,7 @@ const handleSwipeDelete = () => {
   padding: 1rpx;
   border-radius: 18rpx;
   box-sizing: border-box;
-  background: linear-gradient(
-    178deg,
-    #5e97d2 0%,
-    #2c5f8f 49%,
-    #6a9ccf 100%
-  );
+  background: linear-gradient(178deg, #5e97d2 0%, #2c5f8f 49%, #6a9ccf 100%);
   z-index: 5;
 }
 
@@ -656,5 +654,4 @@ const handleSwipeDelete = () => {
     rgba(118, 170, 223, 0.4) 100%
   );
 }
-
 </style>

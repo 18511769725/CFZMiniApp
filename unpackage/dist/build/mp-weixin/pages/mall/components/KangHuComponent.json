@@ -1,7 +1,6 @@
 {
   "component": true,
   "usingComponents": {
-    "service-card-component": "./ServiceCardComponent",
     "process-step-card": "./ProcessStepCard"
   }
 }

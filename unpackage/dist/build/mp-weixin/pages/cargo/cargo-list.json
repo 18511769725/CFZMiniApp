@@ -1,5 +1,8 @@
 {
   "navigationBarTitleText": "购物车",
+  "navigationBarBackgroundColor": "#F8F8F8",
+  "navigationBarTextStyle": "black",
+  "backgroundColor": "#020713",
   "usingComponents": {
     "uni-icons": "../../node-modules/@dcloudio/uni-ui/lib/uni-icons/uni-icons",
     "cargo-item": "./components/cargo-item"
