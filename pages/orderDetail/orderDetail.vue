@@ -18,196 +18,211 @@
           </view>
         </view>
 
-    <!-- 采购方接口人信息 -->
-    <view class="info-card-wrap">
-      <view class="info-card-inner">
-      <view class="card-title">采购方接口人信息</view>
-      <view class="info-item">
-        <text class="label">姓名：</text>
-        <text class="value">{{ state.orderInfo.cusername }}</text>
-      </view>
-      <view class="info-item">
-        <text class="label">职位：</text>
-        <text class="value">{{ state.orderInfo.cusertitle }}</text>
-      </view>
-      <view class="info-item">
-        <text class="label">联系方式：</text>
-        <text class="value">{{ state.orderInfo.cuserphone }}</text>
-      </view>
-      </view>
-    </view>
-
-    <!-- 订单基础信息 -->
-    <view class="info-card-wrap">
-      <view class="info-card-inner">
-      <view class="card-title">订单基础信息</view>
-      <view class="info-item">
-        <text class="label">订单编码：</text>
-        <text class="value">{{ state.orderInfo.contractid }}</text>
-      </view>
-      <view class="info-item">
-        <text class="label">发起时间：</text>
-        <text class="value">{{ formatTime(state.orderInfo.createtime) }}</text>
-      </view>
-      <view class="info-item">
-        <text class="label">订单总额：</text>
-        <text class="value">{{ state.orderInfo.contractprice }}积分</text>
-      </view>
-      <view class="info-item">
-        <text class="label">订单状态：</text>
-        <text class="value" :class="getStatusClass(state.orderInfo.status)">{{
-          getStatusText(state.orderInfo.status)
-        }}</text>
-      </view>
-      <view class="info-item">
-        <text class="label">供应商名称：</text>
-        <text class="value">{{ state.orderInfo.bcompanyname }}</text>
-      </view>
-      </view>
-    </view>
-
-    <!-- 承租人信息（仅安居类订单展示） -->
-    <view class="info-card-wrap" v-if="state.orderInfo.categoryaid === 0">
-      <view class="info-card-inner">
-      <view class="card-title">承租人信息</view>
-      <view class="info-item">
-        <text class="label">姓名：</text>
-        <text class="value">{{ state.tenantInfo.name || "-" }}</text>
-      </view>
-      <view class="info-item">
-        <text class="label">身份证号：</text>
-        <text class="value">{{ state.tenantInfo.idCard || "-" }}</text>
-      </view>
-      <view class="info-item">
-        <text class="label">职务：</text>
-        <text class="value">{{ state.tenantInfo.title || "-" }}</text>
-      </view>
-      <view class="info-item">
-        <text class="label">手机号：</text>
-        <text class="value">{{ state.tenantInfo.phone || "-" }}</text>
-      </view>
-      </view>
-    </view>
-
-    <!-- 支付信息（仅安居类订单展示）：两列栅格 -->
-    <view class="info-card-wrap" v-if="state.orderInfo.categoryaid === 0">
-      <view class="info-card-inner">
-      <view class="card-title">付款计划详情</view>
-      <view class="payment-grid">
-        <view class="payment-col">
-          <view class="info-item info-item--compact">
-            <text class="label">订单总额：</text>
-            <text class="value">{{ state.paymentPlan.totalprice || "-" }}积分</text>
-          </view>
-          <view
-            class="info-item info-item--compact"
-            v-if="state.paymentPlan.subsidytype === 'discount'"
-          >
-            <text class="label">折扣比例：</text>
-            <text class="value">{{ state.paymentPlan.face_value || "-" }}</text>
-          </view>
-          <view
-            class="info-item info-item--compact"
-            v-else-if="state.paymentPlan.subsidytype === 'deduction'"
-          >
-            <text class="label">积分补贴：</text>
-            <text class="value">{{ state.paymentPlan.face_value || "-" }}</text>
-          </view>
-          <view class="info-item info-item--compact" v-else>
-            <text class="label">积分补贴：</text>
-            <text class="value">-</text>
-          </view>
-          <view class="info-item info-item--compact">
-            <text class="label">平台补贴：</text>
-            <text class="value"
-              >{{ state.paymentPlan.totalSubsidyAmount || "-" }}积分</text
-            >
-          </view>
-        </view>
-        <view class="payment-col">
-          <view class="info-item info-item--compact">
-            <text class="label">补贴方式：</text>
-            <text class="value">{{
-              showsubsidytype(state.paymentPlan.subsidytype)
-            }}</text>
-          </view>
-          <view
-            class="info-item info-item--compact"
-            v-if="state.paymentPlan.subsidytype === 'discount'"
-          >
-            <text class="label">折扣限额：</text>
-            <text class="value"
-              >{{ state.paymentPlan.limitamount || "-" }}积分</text
-            >
-          </view>
-          <view class="info-item info-item--compact" v-else>
-            <text class="label">折扣限额：</text>
-            <text class="value">-</text>
-          </view>
-          <view class="info-item info-item--compact">
-            <text class="label">租户自付：</text>
-            <text class="value"
-              >{{ state.paymentPlan.userPayAmount || "-" }}积分</text
-            >
-          </view>
-        </view>
-      </view>
-      </view>
-    </view>
-
-    <!-- 订单商品内容：外框与其它信息卡一致，内框（图+标题+明细）单独背景 -->
-    <view class="info-card-wrap">
-      <view class="info-card-inner">
-      <view class="card-title">订单商品明细</view>
-      <view class="product-list">
-        <view
-          class="product-card"
-          v-for="(product, index) in state.productList"
-          :key="index"
-        >
-          <view class="product-card-inner">
-          <!-- 商品图片（设计稿 .24：129×129 渐变底+描边） -->
-          <view class="product-img">
-            <view class="product-img-frame">
-            <image
-              :src="getFirstProductImage(product.imagelist)"
-              mode="aspectFill"
-            ></image>
+        <!-- 采购方接口人信息 -->
+        <view class="info-card-wrap">
+          <view class="info-card-inner">
+            <view class="card-title">采购方接口人信息</view>
+            <view class="info-item">
+              <text class="label">姓名：</text>
+              <text class="value">{{ state.orderInfo.cusername }}</text>
+            </view>
+            <view class="info-item">
+              <text class="label">职位：</text>
+              <text class="value">{{ state.orderInfo.cusertitle }}</text>
+            </view>
+            <view class="info-item">
+              <text class="label">联系方式：</text>
+              <text class="value">{{ state.orderInfo.cuserphone }}</text>
             </view>
           </view>
-          <!-- 商品信息 -->
-          <view class="product-info">
-            <text class="product-name">{{ product.producttitle }}</text>
-            <view class="product-metric-grid">
-              <text class="product-metric-key">单价：</text>
-              <view class="product-metric-val">
-                <text class="product-metric-base"
-                  >{{ product.singleprice }}积分</text
+        </view>
+
+        <!-- 订单基础信息 -->
+        <view class="info-card-wrap">
+          <view class="info-card-inner">
+            <view class="card-title">订单基础信息</view>
+            <view class="info-item">
+              <text class="label">订单编码：</text>
+              <text class="value">{{ state.orderInfo.contractid }}</text>
+            </view>
+            <view class="info-item">
+              <text class="label">发起时间：</text>
+              <text class="value">{{
+                formatTime(state.orderInfo.createtime)
+              }}</text>
+            </view>
+            <view class="info-item">
+              <text class="label">订单总额：</text>
+              <text class="value">{{ state.orderInfo.contractprice }}积分</text>
+            </view>
+            <view class="info-item">
+              <text class="label">订单状态：</text>
+              <text
+                class="value"
+                :class="getStatusClass(state.orderInfo.status)"
+                >{{ getStatusText(state.orderInfo.status) }}</text
+              >
+            </view>
+            <view class="info-item">
+              <text class="label">供应商名称：</text>
+              <text class="value">{{ state.orderInfo.bcompanyname }}</text>
+            </view>
+          </view>
+        </view>
+
+        <!-- 承租人信息（仅安居类订单展示） -->
+        <view class="info-card-wrap" v-if="state.orderInfo.categoryaid === 0">
+          <view class="info-card-inner">
+            <view class="card-title">承租人信息</view>
+            <view class="info-item">
+              <text class="label">姓名：</text>
+              <text class="value">{{ state.tenantInfo.name || "-" }}</text>
+            </view>
+            <view class="info-item">
+              <text class="label">身份证号：</text>
+              <text class="value">{{ state.tenantInfo.idCard || "-" }}</text>
+            </view>
+            <view class="info-item">
+              <text class="label">职务：</text>
+              <text class="value">{{ state.tenantInfo.title || "-" }}</text>
+            </view>
+            <view class="info-item">
+              <text class="label">手机号：</text>
+              <text class="value">{{ state.tenantInfo.phone || "-" }}</text>
+            </view>
+          </view>
+        </view>
+
+        <!-- 支付信息（仅安居类订单展示）：两列栅格 -->
+        <view class="info-card-wrap" v-if="state.orderInfo.categoryaid === 0">
+          <view class="info-card-inner">
+            <view class="card-title">付款计划详情</view>
+            <view class="payment-grid">
+              <view class="payment-col">
+                <view class="info-item info-item--compact">
+                  <text class="label">订单总额：</text>
+                  <text class="value"
+                    >{{ state.paymentPlan.totalprice || "-" }}积分</text
+                  >
+                </view>
+                <view
+                  class="info-item info-item--compact"
+                  v-if="state.paymentPlan.subsidytype === 'discount'"
                 >
+                  <text class="label">折扣比例：</text>
+                  <text class="value">{{
+                    state.paymentPlan.face_value || "-"
+                  }}</text>
+                </view>
+                <view
+                  class="info-item info-item--compact"
+                  v-else-if="state.paymentPlan.subsidytype === 'deduction'"
+                >
+                  <text class="label">积分补贴：</text>
+                  <text class="value">{{
+                    state.paymentPlan.face_value || "-"
+                  }}</text>
+                </view>
+                <view class="info-item info-item--compact" v-else>
+                  <text class="label">积分补贴：</text>
+                  <text class="value">-</text>
+                </view>
+                <view class="info-item info-item--compact">
+                  <text class="label">平台补贴：</text>
+                  <text class="value"
+                    >{{ state.paymentPlan.totalSubsidyAmount || "-" }}积分</text
+                  >
+                </view>
               </view>
-              <text class="product-metric-key">数量：</text>
-              <view class="product-metric-val">
-                <text class="product-metric-base">{{ product.buyamount }}</text>
+              <view class="payment-col">
+                <view class="info-item info-item--compact">
+                  <text class="label">补贴方式：</text>
+                  <text class="value">{{
+                    showsubsidytype(state.paymentPlan.subsidytype)
+                  }}</text>
+                </view>
+                <view
+                  class="info-item info-item--compact"
+                  v-if="state.paymentPlan.subsidytype === 'discount'"
+                >
+                  <text class="label">折扣限额：</text>
+                  <text class="value"
+                    >{{ state.paymentPlan.limitamount || "-" }}积分</text
+                  >
+                </view>
+                <view class="info-item info-item--compact" v-else>
+                  <text class="label">折扣限额：</text>
+                  <text class="value">-</text>
+                </view>
+                <view class="info-item info-item--compact">
+                  <text class="label">租户自付：</text>
+                  <text class="value"
+                    >{{ state.paymentPlan.userPayAmount || "-" }}积分</text
+                  >
+                </view>
               </view>
-              <text class="product-metric-key">小计：</text>
-              <view class="product-metric-val product-metric-val--inline">
-                <text class="product-metric-base">{{ product.singleamount }}</text>
-                <text class="product-metric-jifen">积分</text>
-              </view>
-              <template v-if="product.categoryaid === 0">
-                <text class="product-metric-key">说明：</text>
-                <text class="product-metric-base product-metric-desc">{{
-                  product.packagetitle
-                }}</text>
-              </template>
             </view>
           </view>
+        </view>
+
+        <!-- 订单商品内容：外框与其它信息卡一致，内框（图+标题+明细）单独背景 -->
+        <view class="info-card-wrap">
+          <view class="info-card-inner">
+            <view class="card-title">订单商品明细</view>
+            <view class="product-list">
+              <view
+                class="product-card"
+                v-for="(product, index) in state.productList"
+                :key="index"
+              >
+                <view class="product-card-inner">
+                  <!-- 商品图片（设计稿 .24：129×129 渐变底+描边） -->
+                  <view class="product-img">
+                    <view class="product-img-frame">
+                      <image
+                        :src="getFirstProductImage(product.imagelist)"
+                        mode="aspectFill"
+                      ></image>
+                    </view>
+                  </view>
+                  <!-- 商品信息 -->
+                  <view class="product-info">
+                    <text class="product-name">{{ product.producttitle }}</text>
+                    <view class="product-metric-grid">
+                      <text class="product-metric-key">单价：</text>
+                      <view class="product-metric-val">
+                        <text class="product-metric-base"
+                          >{{ product.singleprice }}积分</text
+                        >
+                      </view>
+                      <text class="product-metric-key">数量：</text>
+                      <view class="product-metric-val">
+                        <text class="product-metric-base">{{
+                          product.buyamount
+                        }}</text>
+                      </view>
+                      <text class="product-metric-key">小计：</text>
+                      <view
+                        class="product-metric-val product-metric-val--inline"
+                      >
+                        <text class="product-metric-base">{{
+                          product.singleamount
+                        }}</text>
+                        <text class="product-metric-jifen">积分</text>
+                      </view>
+                      <template v-if="product.categoryaid === 0">
+                        <text class="product-metric-key">说明：</text>
+                        <text class="product-metric-base product-metric-desc">{{
+                          product.packagetitle
+                        }}</text>
+                      </template>
+                    </view>
+                  </view>
+                </view>
+              </view>
+            </view>
           </view>
         </view>
-      </view>
-      </view>
-    </view>
-
       </view>
     </scroll-view>
 
@@ -676,16 +691,19 @@ $order-product-row-bg: "https://mvpme82.cloud/data/a480b220-ffb8-4240-b1e9-ade6f
 
 /* 页面底色 */
 .detail-container {
+  height: 100vh;
   min-height: 100vh;
   background-color: #020713;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 }
 
 .detail-scroll {
   flex: 1;
   height: 0;
+  min-height: 0;
   padding: 15rpx 15rpx 24rpx;
   padding-bottom: calc(160rpx + env(safe-area-inset-bottom));
   box-sizing: border-box;
@@ -754,7 +772,11 @@ $order-product-row-bg: "https://mvpme82.cloud/data/a480b220-ffb8-4240-b1e9-ade6f
   display: flex;
   align-items: flex-start;
   padding: 12rpx 0;
-  font-family: "PingFang SC", PingFangSC-Regular, -apple-system, sans-serif;
+  font-family:
+    "PingFang SC",
+    PingFangSC-Regular,
+    -apple-system,
+    sans-serif;
   font-size: 28rpx;
   font-weight: normal;
   line-height: 1.64;
@@ -845,12 +867,7 @@ $order-product-row-bg: "https://mvpme82.cloud/data/a480b220-ffb8-4240-b1e9-ade6f
   border-radius: 18rpx;
   box-sizing: border-box;
   overflow: hidden;
-  background: linear-gradient(
-    178deg,
-    #5e97d2 0%,
-    #2c5f8f 49%,
-    #6a9ccf 100%
-  );
+  background: linear-gradient(178deg, #5e97d2 0%, #2c5f8f 49%, #6a9ccf 100%);
 }
 
 .product-img-frame {
@@ -875,7 +892,11 @@ $order-product-row-bg: "https://mvpme82.cloud/data/a480b220-ffb8-4240-b1e9-ade6f
 }
 
 .product-name {
-  font-family: "PingFang SC", PingFangSC-Regular, -apple-system, sans-serif;
+  font-family:
+    "PingFang SC",
+    PingFangSC-Regular,
+    -apple-system,
+    sans-serif;
   font-size: 28rpx;
   font-weight: normal;
   color: #ffffff;
@@ -896,7 +917,11 @@ $order-product-row-bg: "https://mvpme82.cloud/data/a480b220-ffb8-4240-b1e9-ade6f
 }
 
 .product-metric-key {
-  font-family: "PingFang SC", PingFangSC-Regular, -apple-system, sans-serif;
+  font-family:
+    "PingFang SC",
+    PingFangSC-Regular,
+    -apple-system,
+    sans-serif;
   font-size: 21rpx;
   font-weight: normal;
   line-height: 28rpx;
@@ -920,7 +945,11 @@ $order-product-row-bg: "https://mvpme82.cloud/data/a480b220-ffb8-4240-b1e9-ade6f
 }
 
 .product-metric-base {
-  font-family: "PingFang SC", PingFangSC-Regular, -apple-system, sans-serif;
+  font-family:
+    "PingFang SC",
+    PingFangSC-Regular,
+    -apple-system,
+    sans-serif;
   font-size: 21rpx;
   font-weight: normal;
   line-height: 28rpx;
@@ -930,7 +959,11 @@ $order-product-row-bg: "https://mvpme82.cloud/data/a480b220-ffb8-4240-b1e9-ade6f
 
 /* 仅小计行的「积分」 */
 .product-metric-jifen {
-  font-family: "PingFang SC", PingFangSC-Regular, -apple-system, sans-serif;
+  font-family:
+    "PingFang SC",
+    PingFangSC-Regular,
+    -apple-system,
+    sans-serif;
   font-size: 21rpx;
   font-weight: normal;
   line-height: 28rpx;
