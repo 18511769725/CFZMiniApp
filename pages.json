@@ -76,7 +76,13 @@
 		{
 			"path": "pages/login/agreement",
 			"style": {
-				"navigationBarTitleText": ""
+				"navigationBarTitleText": "服务规则、积分规则及隐私授权确认书"
+			}
+		},
+		{
+			"path": "pages/login/copyright",
+			"style": {
+				"navigationBarTitleText": "版权及权利声明"
 			}
 		},
 		{

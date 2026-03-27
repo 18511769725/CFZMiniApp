@@ -10,6 +10,7 @@
     "pages/cargo/cargo-list",
     "pages/orderDetail/orderDetail",
     "pages/login/agreement",
+    "pages/login/copyright",
     "pages/webview/webview",
     "pages/addUser/addUser",
     "pages/askForTenantInfo/askForTenantInfo",

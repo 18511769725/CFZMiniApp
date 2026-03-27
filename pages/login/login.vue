@@ -3,7 +3,7 @@
     <!-- 登录全屏底图统一走 CDN，请勿改回 /static 本地路径，避免同事环境不一致 -->
     <image
       class="bg-image"
-      src="https://mvpme82.cloud/data/fc40e6c4-e178-4c26-9837-b79c108a52da_1774528166249.png"
+      src="https://mvpme82.cloud/data/4a2fcb29-aa9d-4e8c-9692-ec88bfa536a6_1774597975109.jpg"
       mode="aspectFill"
     ></image>
 
@@ -139,6 +139,11 @@
               >
             </view>
           </view>
+          <view class="notice-section" @click.stop="goToCopyrightPage">
+            <view class="bottom-notice">
+              <text>© 2026 北京朝阳发展有限公司 版权所有</text>
+            </view>
+          </view>
         </view>
       </view>
     </view>
@@ -169,6 +174,9 @@ const handleAgreementCheck = () => {
 
 const goToAgreementPage = () => {
   uni.navigateTo({ url: "/pages/login/agreement" });
+};
+const goToCopyrightPage = () => {
+  uni.navigateTo({ url: "/pages/login/copyright" });
 };
 
 // 通过手机号查询用户信息
@@ -285,7 +293,7 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding: 0 60rpx 80rpx;
+  padding: 0 60rpx 40rpx;
   box-sizing: border-box;
   /* 极轻渐变：略压顶部方便读状态栏，底部略压衬字；过重会像整屏蒙灰 */
   /* 先注释掉，便于对比无底图蒙版效果
