@@ -34,64 +34,64 @@
           class="audit-notice-and-btn"
           :class="{ 'has-audit-notice': state.showAuditNotice }"
         >
-        <view v-if="state.showAuditNotice" class="audit-notice-wrap">
-          <image
-            class="audit-notice-slice"
-            src="https://mvpme82.cloud/data/ea2bc9b5-1c47-4da5-a738-ffa05758135e_1774525831621.png"
-            mode="widthFix"
-          />
-          <view class="audit-notice-content">
-            <view class="audit-notice-title">企业认证审核中</view>
-            <view class="audit-notice-sub">Verification Under Review</view>
-            <view class="audit-notice-line-cn"
-              >已提交申请，预计1-2个工作日完成审核</view
-            >
-            <view class="audit-notice-line-en"
-              >Application submitted, 1-2 business days expected</view
-            >
-            <view class="audit-notice-hint-cn"
-              >审核通过后即可进入平台使用完整服务</view
-            >
-            <view class="audit-notice-hint-en"
-              >Access full services after approval</view
-            >
+          <view v-if="state.showAuditNotice" class="audit-notice-wrap">
+            <image
+              class="audit-notice-slice"
+              src="https://mvpme82.cloud/data/ea2bc9b5-1c47-4da5-a738-ffa05758135e_1774525831621.png"
+              mode="widthFix"
+            />
+            <view class="audit-notice-content">
+              <view class="audit-notice-title">企业认证审核中</view>
+              <view class="audit-notice-sub">Verification Under Review</view>
+              <view class="audit-notice-line-cn"
+                >已提交申请，预计1-2个工作日完成审核</view
+              >
+              <view class="audit-notice-line-en"
+                >Application submitted, 1-2 business days expected</view
+              >
+              <view class="audit-notice-hint-cn"
+                >审核通过后即可进入平台使用完整服务</view
+              >
+              <view class="audit-notice-hint-en"
+                >Access full services after approval</view
+              >
+            </view>
           </view>
-        </view>
 
-        <!-- 审核态用 view 代替原生 button，避免微信默认 padding/min-height 把切图与间距撑乱 -->
-        <view
-          v-if="state.showAuditNotice"
-          class="glass-login-btn is-audit-mode audit-fake-btn"
-        >
-          <image
-            class="audit-btn-bg-img"
-            src="https://mvpme82.cloud/data/9e4ce967-0a25-413b-82d0-9eaf16683fd6_1774525878022.png"
-            mode="scaleToFill"
-          />
-          <view class="audit-btn-inner">
+          <!-- 审核态用 view 代替原生 button，避免微信默认 padding/min-height 把切图与间距撑乱 -->
+          <view
+            v-if="state.showAuditNotice"
+            class="glass-login-btn is-audit-mode audit-fake-btn"
+          >
+            <image
+              class="audit-btn-bg-img"
+              src="https://mvpme82.cloud/data/9e4ce967-0a25-413b-82d0-9eaf16683fd6_1774525878022.png"
+              mode="scaleToFill"
+            />
+            <view class="audit-btn-inner">
+              <view class="glass-login-btn-line-cn">{{
+                state.loginButtonTextCN
+              }}</view>
+              <view class="glass-login-btn-line-en">{{
+                state.loginButtonTextEN
+              }}</view>
+            </view>
+          </view>
+          <button
+            v-else
+            class="glass-login-btn"
+            :class="{ disabled: state.loginButtonDisabled }"
+            :disabled="state.loginButtonDisabled"
+            @getphonenumber="handleGetPhoneNumber"
+            open-type="getPhoneNumber"
+          >
             <view class="glass-login-btn-line-cn">{{
               state.loginButtonTextCN
             }}</view>
             <view class="glass-login-btn-line-en">{{
               state.loginButtonTextEN
             }}</view>
-          </view>
-        </view>
-        <button
-          v-else
-          class="glass-login-btn"
-          :class="{ disabled: state.loginButtonDisabled }"
-          :disabled="state.loginButtonDisabled"
-          @getphonenumber="handleGetPhoneNumber"
-          open-type="getPhoneNumber"
-        >
-          <view class="glass-login-btn-line-cn">{{
-            state.loginButtonTextCN
-          }}</view>
-          <view class="glass-login-btn-line-en">{{
-            state.loginButtonTextEN
-          }}</view>
-        </button>
+          </button>
         </view>
 
         <!-- 协议和提示区域 -->
@@ -108,17 +108,22 @@
               <view class="agreement-texts">
                 <view class="agreement-text-box">
                   <text class="white-text">我已阅读并同意</text>
-                  <text class="gold-text" @click.stop="goToAgreementPage"
-                    >《用户注册协议》</text
+                  <text class="white-text" @click.stop="goToAgreementPage"
+                    >《平台服务规则》《积分规则》《隐私政策》</text
                   >
                 </view>
               </view>
             </view>
             <view class="agreement-text-en">
               <text class="white-text">I have read and agree to the </text>
-              <text class="gold-text" @click.stop="goToAgreementPage"
-                >User Registration Agreement</text
-              >
+              <text class="white-text" @click.stop="goToAgreementPage">{{
+                enAgreementLinksA
+              }}</text>
+            </view>
+            <view class="agreement-text-en" style="margin-top: -4rpx">
+              <text class="white-text" @click.stop="goToAgreementPage">{{
+                enAgreementLinksB
+              }}</text>
             </view>
           </view>
 
@@ -142,6 +147,9 @@
 
 <script setup>
 import { reactive, onMounted } from "vue";
+
+const enAgreementLinksA = "<Platform Service Rules>"; //" <Privacy Policy>";
+const enAgreementLinksB = "<Points Rules> <Privacy Policy>"; //" ";
 
 const state = reactive({
   checked: 0,
@@ -309,8 +317,12 @@ onMounted(() => {
       margin-left: auto;
       margin-right: auto;
       box-sizing: border-box;
-      font-family: PingFang SC, PingFangSC-Light, -apple-system,
-        BlinkMacSystemFont, sans-serif;
+      font-family:
+        PingFang SC,
+        PingFangSC-Light,
+        -apple-system,
+        BlinkMacSystemFont,
+        sans-serif;
       font-size: 50rpx;
       font-weight: normal;
       letter-spacing: 0;
@@ -325,8 +337,12 @@ onMounted(() => {
       margin: 13rpx auto 0;
       box-sizing: border-box;
       white-space: nowrap;
-      font-family: PingFang SC, PingFangSC-Light, -apple-system,
-        BlinkMacSystemFont, sans-serif;
+      font-family:
+        PingFang SC,
+        PingFangSC-Light,
+        -apple-system,
+        BlinkMacSystemFont,
+        sans-serif;
       font-size: 23rpx;
       font-weight: normal;
       letter-spacing: 0;
@@ -403,17 +419,20 @@ onMounted(() => {
   }
 
   .glass-login-btn-line-cn {
-    font-size: 32rpx;
+    font-size: 40rpx;
     color: #ffffff;
     line-height: 1.2;
-    font-weight: 500;
+    font-weight: 400;
   }
 
   .glass-login-btn-line-en {
-    font-size: 18rpx;
-    color: rgba(255, 255, 255, 0.75);
+    font-size: 24rpx;
+    color: rgb(255, 255, 255);
     line-height: 1.1;
     margin-top: 6rpx;
+    font-weight: 200;
+    letter-spacing: 0;
+    word-spacing: -1rpx;
   }
 
   .audit-notice-and-btn {
@@ -438,7 +457,7 @@ onMounted(() => {
     width: 100%;
     /* 略下移 + 多叠一点，消掉底图与按钮顶之间的细缝 */
     margin-top: 0;
-    margin-bottom: -36rpx;
+    margin-bottom: -16rpx;
     overflow: visible;
   }
 
@@ -478,7 +497,10 @@ onMounted(() => {
       max-width: 100%;
       height: auto;
       min-height: 42rpx;
-      font-family: PingFang SC, PingFangSC-Medium, sans-serif;
+      font-family:
+        PingFang SC,
+        PingFangSC-Medium,
+        sans-serif;
       font-size: 40rpx;
       font-weight: normal;
       line-height: 44rpx;
@@ -493,7 +515,10 @@ onMounted(() => {
       height: auto;
       min-height: 25rpx;
       margin-top: 0;
-      font-family: PingFang SC, PingFangSC-Regular, sans-serif;
+      font-family:
+        PingFang SC,
+        PingFangSC-Regular,
+        sans-serif;
       font-size: 26rpx;
       font-weight: normal;
       line-height: 28rpx;
@@ -556,7 +581,10 @@ onMounted(() => {
     width: auto;
     max-width: none;
     min-height: 40rpx;
-    font-family: PingFang SC, PingFangSC-Medium, sans-serif;
+    font-family:
+      PingFang SC,
+      PingFangSC-Medium,
+      sans-serif;
     font-size: 43rpx;
     font-weight: normal;
     letter-spacing: 0;
@@ -570,7 +598,10 @@ onMounted(() => {
     width: auto;
     max-width: none;
     min-height: 24rpx;
-    font-family: PingFang SC, PingFangSC-Medium, sans-serif;
+    font-family:
+      PingFang SC,
+      PingFangSC-Medium,
+      sans-serif;
     font-size: 32rpx;
     font-weight: normal;
     letter-spacing: 0;
@@ -584,7 +615,10 @@ onMounted(() => {
     width: auto;
     max-width: none;
     min-height: 28rpx;
-    font-family: PingFang SC, PingFangSC-Medium, sans-serif;
+    font-family:
+      PingFang SC,
+      PingFangSC-Medium,
+      sans-serif;
     font-size: 27rpx;
     font-weight: normal;
     letter-spacing: 0;
@@ -598,7 +632,10 @@ onMounted(() => {
     width: auto;
     max-width: none;
     min-height: 22rpx;
-    font-family: PingFang SC, PingFangSC-Medium, sans-serif;
+    font-family:
+      PingFang SC,
+      PingFangSC-Medium,
+      sans-serif;
     font-size: 23rpx;
     font-weight: normal;
     letter-spacing: 0;
@@ -611,7 +648,10 @@ onMounted(() => {
   .audit-notice-hint-cn {
     width: auto;
     max-width: none;
-    font-family: PingFang SC, PingFangSC-Medium, sans-serif;
+    font-family:
+      PingFang SC,
+      PingFangSC-Medium,
+      sans-serif;
     font-size: 27rpx;
     font-weight: normal;
     letter-spacing: 0;
@@ -624,7 +664,10 @@ onMounted(() => {
   .audit-notice-hint-en {
     width: auto;
     max-width: none;
-    font-family: PingFang SC, PingFangSC-Medium, sans-serif;
+    font-family:
+      PingFang SC,
+      PingFangSC-Medium,
+      sans-serif;
     font-size: 23rpx;
     font-weight: normal;
     letter-spacing: 0;
@@ -639,7 +682,7 @@ onMounted(() => {
   }
 
   .agreement-section {
-    margin-bottom: 32rpx;
+    margin-bottom: 16rpx;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -678,11 +721,10 @@ onMounted(() => {
     }
 
     .agreement-text-box {
-      font-size: 24rpx;
-      line-height: 1.4;
+      font-size: 22rpx;
       margin-top: 4rpx;
       .white-text {
-        color: rgba(255, 255, 255, 0.6);
+        color: rgb(255, 255, 255);
       }
       .gold-text {
         color: #d4af37;
@@ -693,11 +735,10 @@ onMounted(() => {
 
   .agreement-text-en {
     text-align: center;
-    margin-top: 12rpx;
+    margin-top: 8rpx;
     font-size: 18rpx;
-    line-height: 1.3;
     .white-text {
-      color: rgba(255, 255, 255, 0.7);
+      color: rgb(255, 255, 255);
     }
     .gold-text {
       color: #d4af37;
@@ -708,18 +749,18 @@ onMounted(() => {
     .bottom-notice {
       text-align: center;
       text {
-        font-size: 20rpx;
-        color: rgba(255, 255, 255, 0.35);
+        font-size: 22rpx;
+        color: rgb(255, 255, 255);
         line-height: 1;
       }
     }
 
     .bottom-notice-en {
       text-align: center;
-      margin-top: -4rpx;
+      margin-top: -12rpx;
       text {
         font-size: 18rpx;
-        color: rgba(255, 255, 255, 0.3);
+        color: rgb(255, 255, 255);
         line-height: 1;
       }
     }
