@@ -15,338 +15,348 @@
           mode="widthFix"
         />
         <view class="main-page-body">
-      <!-- 平台标题（叠在全页背景上，不再单独拼半张顶图） -->
-      <view class="header-section">
-        <view class="platform-title">
-          <text class="title-cn">朝阳企业服务平台</text>
-          <text class="title-en">Chaoyang Enterprise Service Platform</text>
-        </view>
-      </view>
-
-    <!-- 企业信息卡片 -->
-    <view class="enterprise-card">
-      <view class="enterprise-info">
-        <text class="enterprise-name">{{
-          state.ccompanyinfo.name || "企业配额总览"
-        }}</text>
-        <view class="enterprise-tag">
-          <image
-            v-if="companyLevelLabel"
-            class="enterprise-tag-icon"
-            :src="companyLevelLabel"
-            mode="aspectFit"
-          ></image>
-        </view>
-      </view>
-      <view class="h-divider">
-        <image
-          class="h-divider-img"
-          src="https://mvpme82.cloud/data/b1220cbf-a4a6-4e04-8ede-1dca13b04767_1774526057860.png"
-          mode="scaleToFill"
-        />
-      </view>
-
-      <!-- 配额配置概览 -->
-      <view class="quota-overview">
-        <text class="quota-title">配额配置情况与当前使用进度</text>
-        <view class="overview-grid">
-          <view class="overview-item">
-            <image
-              class="overview-item-bg"
-              src="https://mvpme82.cloud/data/556123f6-ea66-4cb5-9614-bdb1a0c8a975_1774525986214.png"
-              mode="scaleToFill"
-            />
-            <view class="overview-item-body">
-              <text class="overview-label">益企•安居</text>
-              <!-- 该位置根据anjuQuotaItems数组里面的对象，如果有对象的type===deduction,则显示标签‘优惠房源’，如果有对象的type===discount，则再显示一个‘补贴房源’的标签，如果两个类型都有则都显示，纵向排列居中。如果anjuQuotaItems数组长度为0，则显示未配置权益 -->
-              <text class="overview-value">{{
-                state.anjucredits?.anjuContentArray
-                  ? state.anjucredits.anjuContentArray
-                      .map((item) =>
-                        item.type === "discount" ? `补贴房源` : `优惠房源`,
-                      )
-                      .join("\n")
-                  : "待配置权益"
-              }}</text>
+          <!-- 平台标题（叠在全页背景上，不再单独拼半张顶图） -->
+          <view class="header-section">
+            <view class="platform-title">
+              <text class="title-cn">朝阳企业服务平台</text>
+              <text class="title-en">Chaoyang Enterprise Service Platform</text>
             </view>
           </view>
-          <view class="overview-item">
-            <image
-              class="overview-item-bg"
-              src="https://mvpme82.cloud/data/556123f6-ea66-4cb5-9614-bdb1a0c8a975_1774525986214.png"
-              mode="scaleToFill"
-            />
-            <view class="overview-item-body">
-              <text class="overview-label">益企•悦享</text>
-              <text class="overview-value">{{
-                formatPointsWrape(yuexiangQuota.available)
+
+          <!-- 企业信息卡片 -->
+          <view class="enterprise-card">
+            <view class="enterprise-info">
+              <text class="enterprise-name">{{
+                state.ccompanyinfo.name || "企业配额总览"
               }}</text>
-            </view>
-          </view>
-          <view class="overview-item">
-            <image
-              class="overview-item-bg"
-              src="https://mvpme82.cloud/data/556123f6-ea66-4cb5-9614-bdb1a0c8a975_1774525986214.png"
-              mode="scaleToFill"
-            />
-            <view class="overview-item-body">
-              <text class="overview-label">益企•康护</text>
-              <text class="overview-value">{{
-                // 如果state.kanghucredits不存在，则返回待配置；如果存在，按照state.kanghucredits.grade的值，为1：钻石级；2：铂金级；3：黄金级；4：白银级。加一个换行符，然后是 支持state.kanghucredits.buyamount人
-                state.kanghucredits
-                  ? `高管医疗\n支持${state.kanghucredits.patchcount || 0}人`
-                  : "待配置权益"
-              }}</text>
-            </view>
-          </view>
-        </view>
-      </view>
-    </view>
-
-    <!-- 益企·安居模块 -->
-    <view class="module module-anju">
-      <image
-        class="module-anju-bg"
-        src="https://mvpme82.cloud/data/22bd4d89-bed2-4013-97db-da31a8eae3b6_1774526009494.png"
-        mode="scaleToFill"
-      ></image>
-
-      <view class="module-header">
-        <view class="module-header-left">
-          <text class="module-title">益企·安居</text>
-          <view class="module-status-tag module-status-anju">
-            <text class="module-status-tag-text">{{ anjuStatusText }}</text>
-          </view>
-        </view>
-        <view
-          class="module-detail-btn module-detail-anju"
-          @tap="goProductList(0)"
-        >
-          <text class="module-detail-btn-text">查看详情</text>
-        </view>
-      </view>
-      <text class="module-subtitle">住房保障助企安居无忧</text>
-      <view class="h-divider module-anju-divider">
-        <image
-          class="h-divider-img"
-          src="https://mvpme82.cloud/data/b1220cbf-a4a6-4e04-8ede-1dca13b04767_1774526057860.png"
-          mode="scaleToFill"
-        />
-      </view>
-
-      <!-- 优惠房源/补贴房源（勿与 v-for 同节点写 v-if，易在真机出现滚动/层叠异常） -->
-      <template v-if="anjuQuotaItems.length">
-        <view
-          v-for="item in anjuQuotaItems"
-          :key="item.key"
-          class="section"
-        >
-          <view class="section-header">
-            <text class="section-title">{{ item.title }}</text>
-            <text class="section-tip">{{ item.highlight }}</text>
-          </view>
-          <view class="data-row-anju">
-            <image
-              class="data-row-anju-bg"
-              src="https://mvpme82.cloud/data/cb9b5570-3e00-478d-84f3-6cfbad5ad3a8_1774526033903.png"
-              mode="scaleToFill"
-            />
-            <view class="data-row-anju-body">
-              <view class="data-item">
-                <text class="data-label">支持人数</text>
-                <text class="data-value">{{ item.count }}</text>
+              <view class="enterprise-tag">
+                <image
+                  v-if="companyLevelLabel"
+                  class="enterprise-tag-icon"
+                  :src="companyLevelLabel"
+                  mode="aspectFit"
+                ></image>
               </view>
-              <view class="data-item">
-                <text class="data-label">已使用</text>
-                <text class="data-value used">{{ item.used }}</text>
-              </view>
-              <view class="data-item">
-                <text class="data-label">可使用</text>
-                <text class="data-value available">{{ item.available }}</text>
+            </view>
+            <view class="h-divider">
+              <image
+                class="h-divider-img"
+                src="https://mvpme82.cloud/data/b1220cbf-a4a6-4e04-8ede-1dca13b04767_1774526057860.png"
+                mode="scaleToFill"
+              />
+            </view>
+
+            <!-- 配额配置概览 -->
+            <view class="quota-overview">
+              <text class="quota-title">配额配置情况与当前使用进度</text>
+              <view class="overview-grid">
+                <view class="overview-item">
+                  <image
+                    class="overview-item-bg"
+                    src="https://mvpme82.cloud/data/556123f6-ea66-4cb5-9614-bdb1a0c8a975_1774525986214.png"
+                    mode="scaleToFill"
+                  />
+                  <view class="overview-item-body">
+                    <text class="overview-label">益企•安居</text>
+                    <!-- 该位置根据anjuQuotaItems数组里面的对象，如果有对象的type===deduction,则显示标签‘优惠房源’，如果有对象的type===discount，则再显示一个‘补贴房源’的标签，如果两个类型都有则都显示，纵向排列居中。如果anjuQuotaItems数组长度为0，则显示未配置权益 -->
+                    <text class="overview-value">{{
+                      state.anjucredits?.anjuContentArray
+                        ? state.anjucredits.anjuContentArray
+                            .map((item) =>
+                              item.type === "discount"
+                                ? `补贴房源`
+                                : `优惠房源`,
+                            )
+                            .join("\n")
+                        : "待配置权益"
+                    }}</text>
+                  </view>
+                </view>
+                <view class="overview-item">
+                  <image
+                    class="overview-item-bg"
+                    src="https://mvpme82.cloud/data/556123f6-ea66-4cb5-9614-bdb1a0c8a975_1774525986214.png"
+                    mode="scaleToFill"
+                  />
+                  <view class="overview-item-body">
+                    <text class="overview-label">益企•悦享</text>
+                    <text class="overview-value">{{
+                      formatPointsWrape(yuexiangQuota.available)
+                    }}</text>
+                  </view>
+                </view>
+                <view class="overview-item">
+                  <image
+                    class="overview-item-bg"
+                    src="https://mvpme82.cloud/data/556123f6-ea66-4cb5-9614-bdb1a0c8a975_1774525986214.png"
+                    mode="scaleToFill"
+                  />
+                  <view class="overview-item-body">
+                    <text class="overview-label">益企•康护</text>
+                    <text class="overview-value">{{
+                      // 如果state.kanghucredits不存在，则返回待配置；如果存在，按照state.kanghucredits.grade的值，为1：钻石级；2：铂金级；3：黄金级；4：白银级。加一个换行符，然后是 支持state.kanghucredits.buyamount人
+                      state.kanghucredits
+                        ? `高管医疗\n支持${state.kanghucredits.patchcount || 0}人`
+                        : "待配置权益"
+                    }}</text>
+                  </view>
+                </view>
               </view>
             </view>
           </view>
-        </view>
-      </template>
-      <view v-else class="quota-empty-text">暂无安居配额配置</view>
-    </view>
 
-    <!-- 益企·悦享模块 -->
-    <view class="module module-yuexiang">
-      <image
-        class="module-yuexiang-bg"
-        src="https://mvpme82.cloud/data/36bf8077-3706-4aaf-b92c-9c921a6e5fae_1774526084326.png"
-        mode="scaleToFill"
-      ></image>
+          <!-- 益企·安居模块 -->
+          <view class="module module-anju">
+            <image
+              class="module-anju-bg"
+              src="https://mvpme82.cloud/data/22bd4d89-bed2-4013-97db-da31a8eae3b6_1774526009494.png"
+              mode="scaleToFill"
+            ></image>
 
-      <view class="module-header">
-        <view class="module-header-left">
-          <text class="module-title">益企·悦享</text>
-          <view class="module-status-tag module-status-yuexiang">
-            <text class="module-status-tag-text">{{
-              yuexiangQuota.statusText
-            }}</text>
-          </view>
-        </view>
-        <view
-          class="module-detail-btn module-detail-yuexiang"
-          @tap="goProductList(1)"
-        >
-          <text class="module-detail-btn-text">查看详情</text>
-        </view>
-      </view>
-      <text class="module-subtitle">专属积分悦享朝阳商务资源</text>
-      <view class="h-divider">
-        <image
-          class="h-divider-img"
-          src="https://mvpme82.cloud/data/b1220cbf-a4a6-4e04-8ede-1dca13b04767_1774526057860.png"
-          mode="scaleToFill"
-        />
-      </view>
-
-      <view class="section section-yuexiang-quota">
-        <text class="section-title">额度总览</text>
-        <view class="yuexiang-quota-grid">
-          <view class="yuexiang-quota-cell">
-            <image
-              class="yuexiang-quota-cell-bg"
-              src="https://mvpme82.cloud/data/638bffb3-0c50-4453-afed-c398bc3101fb_1774526114899.png"
-              mode="scaleToFill"
-            />
-            <view class="yuexiang-quota-cell-body">
-              <text class="data-label">总额度</text>
-              <view class="yuexiang-quota-line"></view>
-              <text class="data-value">{{
-                formatAmountWan(yuexiangQuota.total)
-              }}</text>
-            </view>
-          </view>
-          <view class="yuexiang-quota-cell">
-            <image
-              class="yuexiang-quota-cell-bg"
-              src="https://mvpme82.cloud/data/638bffb3-0c50-4453-afed-c398bc3101fb_1774526114899.png"
-              mode="scaleToFill"
-            />
-            <view class="yuexiang-quota-cell-body">
-              <text class="data-label">已使用</text>
-              <view class="yuexiang-quota-line"></view>
-              <text class="data-value used">{{
-                formatAmountWan(yuexiangQuota.used)
-              }}</text>
-            </view>
-          </view>
-          <view class="yuexiang-quota-cell">
-            <image
-              class="yuexiang-quota-cell-bg"
-              src="https://mvpme82.cloud/data/638bffb3-0c50-4453-afed-c398bc3101fb_1774526114899.png"
-              mode="scaleToFill"
-            />
-            <view class="yuexiang-quota-cell-body">
-              <text class="data-label">剩余可用</text>
-              <view class="yuexiang-quota-line"></view>
-              <text class="data-value">{{
-                formatAmountWan(yuexiangQuota.available)
-              }}</text>
-            </view>
-          </view>
-        </view>
-      </view>
-    </view>
-
-    <!-- 益企·康护模块 -->
-    <view class="module module-kanghu">
-      <image
-        class="module-kanghu-bg"
-        src="https://mvpme82.cloud/data/68682655-24db-4559-a737-e10597a4573e_1774526152885.png"
-        mode="scaleToFill"
-      ></image>
-
-      <view class="module-header">
-        <view class="module-header-left">
-          <text class="module-title">益企·康护</text>
-          <view class="module-status-tag module-status-kanghu">
-            <text class="module-status-tag-text">{{
-              state.kanghucredits.status === "USED" ? "已使用" : "未使用"
-            }}</text>
-          </view>
-        </view>
-        <view
-          class="module-detail-btn module-detail-kanghu"
-          @tap="goServiceHallTab(3)"
-        >
-          <text class="module-detail-btn-text">查看详情</text>
-        </view>
-      </view>
-      <text class="module-subtitle">可选套餐全心护航健康</text>
-      <view class="h-divider">
-        <image
-          class="h-divider-img"
-          src="https://mvpme82.cloud/data/b1220cbf-a4a6-4e04-8ede-1dca13b04767_1774526057860.png"
-          mode="scaleToFill"
-        />
-      </view>
-
-      <view class="section section-kanghu-package">
-        <text class="section-title">服务套餐</text>
-        <view class="yuexiang-quota-grid">
-          <view class="yuexiang-quota-cell">
-            <image
-              class="yuexiang-quota-cell-bg"
-              src="https://mvpme82.cloud/data/00c65016-c201-4197-8d7b-20f361251316_1774526184329.png"
-              mode="scaleToFill"
-            />
-            <view class="yuexiang-quota-cell-body">
-              <text class="data-label">单人额度</text>
-              <view class="yuexiang-quota-line"></view>
-              <text class="data-value">{{
-                state.kanghucredits.singleprice
-                  ? formatAmountWan(state.kanghucredits.singleprice)
-                  : "待采购"
-              }}</text>
-            </view>
-          </view>
-          <view class="yuexiang-quota-cell">
-            <image
-              class="yuexiang-quota-cell-bg"
-              src="https://mvpme82.cloud/data/00c65016-c201-4197-8d7b-20f361251316_1774526184329.png"
-              mode="scaleToFill"
-            />
-            <view class="yuexiang-quota-cell-body">
-              <text class="data-label">支持人数</text>
-              <view class="yuexiang-quota-line"></view>
-              <text class="data-value">{{
-                state.kanghucredits.patchcount == null ||
-                state.kanghucredits.patchcount === ""
-                  ? "待配置"
-                  : formatAmountWan(state.kanghucredits.patchcount)
-              }}</text>
-            </view>
-          </view>
-          <view class="yuexiang-quota-cell">
-            <image
-              class="yuexiang-quota-cell-bg"
-              src="https://mvpme82.cloud/data/00c65016-c201-4197-8d7b-20f361251316_1774526184329.png"
-              mode="scaleToFill"
-            />
-            <view class="yuexiang-quota-cell-body">
-              <text class="data-label">使用状态</text>
-              <view class="yuexiang-quota-line"></view>
-              <text
-                class="kanghu-status-value"
-                :class="
-                  state.kanghucredits.status === 'USED'
-                    ? 'kanghu-status-used'
-                    : 'kanghu-status-unused'
-                "
+            <view class="module-header">
+              <view class="module-header-left">
+                <text class="module-title">益企·安居</text>
+                <view class="module-status-tag module-status-anju">
+                  <text class="module-status-tag-text">{{
+                    anjuStatusText
+                  }}</text>
+                </view>
+              </view>
+              <view
+                class="module-detail-btn module-detail-anju"
+                @tap="goProductList(0)"
               >
-                {{ state.kanghucredits.status === "USED" ? "已使用" : "未使用" }}
-              </text>
+                <text class="module-detail-btn-text">查看详情</text>
+              </view>
+            </view>
+            <text class="module-subtitle">住房保障助企安居无忧</text>
+            <view class="h-divider">
+              <image
+                class="h-divider-img"
+                src="https://mvpme82.cloud/data/b1220cbf-a4a6-4e04-8ede-1dca13b04767_1774526057860.png"
+                mode="scaleToFill"
+              />
+            </view>
+
+            <!-- 优惠房源/补贴房源（勿与 v-for 同节点写 v-if，易在真机出现滚动/层叠异常） -->
+            <template v-if="anjuQuotaItems.length">
+              <view
+                v-for="item in anjuQuotaItems"
+                :key="item.key"
+                class="section"
+              >
+                <view class="section-header">
+                  <text class="section-title">{{ item.title }}</text>
+                  <text class="section-tip">{{ item.highlight }}</text>
+                </view>
+                <view class="data-row-anju">
+                  <image
+                    class="data-row-anju-bg"
+                    src="https://mvpme82.cloud/data/cb9b5570-3e00-478d-84f3-6cfbad5ad3a8_1774526033903.png"
+                    mode="scaleToFill"
+                  />
+                  <view class="data-row-anju-body">
+                    <view class="data-item">
+                      <text class="data-label">支持人数</text>
+                      <text class="data-value">{{ item.count }}</text>
+                    </view>
+                    <view class="data-item">
+                      <text class="data-label">已使用</text>
+                      <text class="data-value used">{{ item.used }}</text>
+                    </view>
+                    <view class="data-item">
+                      <text class="data-label">可使用</text>
+                      <text class="data-value available">{{
+                        item.available
+                      }}</text>
+                    </view>
+                  </view>
+                </view>
+              </view>
+            </template>
+            <view v-else class="quota-empty-text">暂无安居配额配置</view>
+          </view>
+
+          <!-- 益企·悦享模块 -->
+          <view class="module module-yuexiang">
+            <image
+              class="module-yuexiang-bg"
+              src="https://mvpme82.cloud/data/36bf8077-3706-4aaf-b92c-9c921a6e5fae_1774526084326.png"
+              mode="scaleToFill"
+            ></image>
+
+            <view class="module-header">
+              <view class="module-header-left">
+                <text class="module-title">益企·悦享</text>
+                <view class="module-status-tag module-status-yuexiang">
+                  <text class="module-status-tag-text">{{
+                    yuexiangQuota.statusText
+                  }}</text>
+                </view>
+              </view>
+              <view
+                class="module-detail-btn module-detail-yuexiang"
+                @tap="goProductList(1)"
+              >
+                <text class="module-detail-btn-text">查看详情</text>
+              </view>
+            </view>
+            <text class="module-subtitle">专属积分悦享朝阳商务资源</text>
+            <view class="h-divider">
+              <image
+                class="h-divider-img"
+                src="https://mvpme82.cloud/data/b1220cbf-a4a6-4e04-8ede-1dca13b04767_1774526057860.png"
+                mode="scaleToFill"
+              />
+            </view>
+
+            <view class="section section-yuexiang-quota">
+              <text class="section-title">额度总览</text>
+              <view class="yuexiang-quota-grid">
+                <view class="yuexiang-quota-cell">
+                  <image
+                    class="yuexiang-quota-cell-bg"
+                    src="https://mvpme82.cloud/data/638bffb3-0c50-4453-afed-c398bc3101fb_1774526114899.png"
+                    mode="scaleToFill"
+                  />
+                  <view class="yuexiang-quota-cell-body">
+                    <text class="data-label">总额度</text>
+                    <view class="yuexiang-quota-line"></view>
+                    <text class="data-value">{{
+                      formatAmountWan(yuexiangQuota.total)
+                    }}</text>
+                  </view>
+                </view>
+                <view class="yuexiang-quota-cell">
+                  <image
+                    class="yuexiang-quota-cell-bg"
+                    src="https://mvpme82.cloud/data/638bffb3-0c50-4453-afed-c398bc3101fb_1774526114899.png"
+                    mode="scaleToFill"
+                  />
+                  <view class="yuexiang-quota-cell-body">
+                    <text class="data-label">已使用</text>
+                    <view class="yuexiang-quota-line"></view>
+                    <text class="data-value used">{{
+                      formatAmountWan(yuexiangQuota.used)
+                    }}</text>
+                  </view>
+                </view>
+                <view class="yuexiang-quota-cell">
+                  <image
+                    class="yuexiang-quota-cell-bg"
+                    src="https://mvpme82.cloud/data/638bffb3-0c50-4453-afed-c398bc3101fb_1774526114899.png"
+                    mode="scaleToFill"
+                  />
+                  <view class="yuexiang-quota-cell-body">
+                    <text class="data-label">剩余可用</text>
+                    <view class="yuexiang-quota-line"></view>
+                    <text class="data-value">{{
+                      formatAmountWan(yuexiangQuota.available)
+                    }}</text>
+                  </view>
+                </view>
+              </view>
+            </view>
+          </view>
+
+          <!-- 益企·康护模块 -->
+          <view class="module module-kanghu">
+            <image
+              class="module-kanghu-bg"
+              src="https://mvpme82.cloud/data/68682655-24db-4559-a737-e10597a4573e_1774526152885.png"
+              mode="scaleToFill"
+            ></image>
+
+            <view class="module-header">
+              <view class="module-header-left">
+                <text class="module-title">益企·康护</text>
+                <view class="module-status-tag module-status-kanghu">
+                  <text class="module-status-tag-text">{{
+                    state.kanghucredits.status === "USED" ? "已使用" : "未使用"
+                  }}</text>
+                </view>
+              </view>
+              <view
+                class="module-detail-btn module-detail-kanghu"
+                @tap="goServiceHallTab(3)"
+              >
+                <text class="module-detail-btn-text">查看详情</text>
+              </view>
+            </view>
+            <text class="module-subtitle">可选套餐全心护航健康</text>
+            <view class="h-divider">
+              <image
+                class="h-divider-img"
+                src="https://mvpme82.cloud/data/b1220cbf-a4a6-4e04-8ede-1dca13b04767_1774526057860.png"
+                mode="scaleToFill"
+              />
+            </view>
+
+            <view class="section section-kanghu-package">
+              <text class="section-title">服务套餐</text>
+              <view class="yuexiang-quota-grid">
+                <view class="yuexiang-quota-cell">
+                  <image
+                    class="yuexiang-quota-cell-bg"
+                    src="https://mvpme82.cloud/data/00c65016-c201-4197-8d7b-20f361251316_1774526184329.png"
+                    mode="scaleToFill"
+                  />
+                  <view class="yuexiang-quota-cell-body">
+                    <text class="data-label">单人额度</text>
+                    <view class="yuexiang-quota-line"></view>
+                    <text class="data-value">{{
+                      state.kanghucredits.singleprice
+                        ? formatAmountWan(state.kanghucredits.singleprice)
+                        : "待采购"
+                    }}</text>
+                  </view>
+                </view>
+                <view class="yuexiang-quota-cell">
+                  <image
+                    class="yuexiang-quota-cell-bg"
+                    src="https://mvpme82.cloud/data/00c65016-c201-4197-8d7b-20f361251316_1774526184329.png"
+                    mode="scaleToFill"
+                  />
+                  <view class="yuexiang-quota-cell-body">
+                    <text class="data-label">支持人数</text>
+                    <view class="yuexiang-quota-line"></view>
+                    <text class="data-value">{{
+                      state.kanghucredits.patchcount == null ||
+                      state.kanghucredits.patchcount === ""
+                        ? "待配置"
+                        : formatAmountWan(state.kanghucredits.patchcount)
+                    }}</text>
+                  </view>
+                </view>
+                <view class="yuexiang-quota-cell">
+                  <image
+                    class="yuexiang-quota-cell-bg"
+                    src="https://mvpme82.cloud/data/00c65016-c201-4197-8d7b-20f361251316_1774526184329.png"
+                    mode="scaleToFill"
+                  />
+                  <view class="yuexiang-quota-cell-body">
+                    <text class="data-label">使用状态</text>
+                    <view class="yuexiang-quota-line"></view>
+                    <text
+                      class="kanghu-status-value"
+                      :class="
+                        state.kanghucredits.status === 'USED'
+                          ? 'kanghu-status-used'
+                          : 'kanghu-status-unused'
+                      "
+                    >
+                      {{
+                        state.kanghucredits.status === "USED"
+                          ? "已使用"
+                          : "未使用"
+                      }}
+                    </text>
+                  </view>
+                </view>
+              </view>
             </view>
           </view>
         </view>
-      </view>
-    </view>
-    </view>
       </view>
     </scroll-view>
   </view>
@@ -454,7 +464,9 @@ const formatPointsWrape = (value) => {
 const formatAmountWan = (value) => {
   const num = toNumber(value);
   if (!Number.isFinite(num)) {
-    return value === undefined || value === null || value === "" ? "0" : String(value);
+    return value === undefined || value === null || value === ""
+      ? "0"
+      : String(value);
   }
   const abs = Math.abs(num);
   if (abs < 10000) {
@@ -872,7 +884,7 @@ page {
 .h-divider {
   margin: 20rpx 0;
   width: 100%;
-  height: 1rpx;
+  height: 2rpx;
   overflow: hidden;
   box-sizing: border-box;
 }
@@ -896,13 +908,17 @@ page {
 }
 .title-cn {
   display: block;
-  width: 398rpx;
+  width: 100%;
   max-width: 100%;
   min-height: 47rpx;
   margin-left: auto;
   margin-right: auto;
   box-sizing: border-box;
-  font-family: PingFang SC, PingFangSC-Light, -apple-system, BlinkMacSystemFont,
+  font-family:
+    PingFang SC,
+    PingFangSC-Light,
+    -apple-system,
+    BlinkMacSystemFont,
     sans-serif;
   font-size: 50rpx;
   font-weight: normal;
@@ -918,7 +934,11 @@ page {
   margin: 13rpx auto 0;
   box-sizing: border-box;
   white-space: nowrap;
-  font-family: PingFang SC, PingFangSC-Light, -apple-system, BlinkMacSystemFont,
+  font-family:
+    PingFang SC,
+    PingFangSC-Light,
+    -apple-system,
+    BlinkMacSystemFont,
     sans-serif;
   font-size: 23rpx;
   font-weight: normal;
@@ -1176,13 +1196,7 @@ page {
       rgba(20, 45, 78, 0.35) 0%,
       rgba(20, 45, 78, 0.25) 100%
     ),
-    linear-gradient(
-      159deg,
-      #afcde9 0%,
-      #3763b3 50%,
-      #2453ab 58%,
-      #afcef2 100%
-    );
+    linear-gradient(159deg, #afcde9 0%, #3763b3 50%, #2453ab 58%, #afcef2 100%);
 }
 .module-detail-yuexiang {
   background-image:
@@ -1191,13 +1205,7 @@ page {
       rgba(40, 25, 58, 0.4) 0%,
       rgba(40, 25, 58, 0.28) 100%
     ),
-    linear-gradient(
-      177deg,
-      #d7b9cc 0%,
-      #7f6683 29%,
-      #26123a 58%,
-      #d8b6bb 100%
-    );
+    linear-gradient(177deg, #d7b9cc 0%, #7f6683 29%, #26123a 58%, #d8b6bb 100%);
 }
 .module-detail-kanghu {
   background-image:
@@ -1206,13 +1214,7 @@ page {
       rgba(15, 55, 60, 0.38) 0%,
       rgba(15, 55, 60, 0.26) 100%
     ),
-    linear-gradient(
-      176deg,
-      #c1e9ef 0%,
-      #70a9ae 29%,
-      #1e686d 58%,
-      #b7e0e5 100%
-    );
+    linear-gradient(176deg, #c1e9ef 0%, #70a9ae 29%, #1e686d 58%, #b7e0e5 100%);
 }
 .module-subtitle {
   font-size: 28rpx;
@@ -1372,7 +1374,7 @@ page {
 
 .module-anju .module-header,
 .module-anju .module-subtitle,
-.module-anju .module-anju-divider,
+.module-anju .h-divider,
 .module-anju .section,
 .module-anju .quota-empty-text {
   position: relative;
@@ -1529,7 +1531,9 @@ page {
   color: #ffdf9f;
 }
 /* 未使用：设计稿字号/行高/色值 */
-.module-kanghu .yuexiang-quota-cell-body .kanghu-status-value.kanghu-status-unused {
+.module-kanghu
+  .yuexiang-quota-cell-body
+  .kanghu-status-value.kanghu-status-unused {
   width: 93rpx;
   max-width: 100%;
   min-height: 32rpx;
