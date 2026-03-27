@@ -667,23 +667,24 @@ const handleSwipeDelete = () => {
   background: linear-gradient(0deg, #1b4163 0%, #76aadf 100%);
 }
 
+/* 外框 24×26rpx 按稿；符号略放大、加粗以便真机清晰 */
 .qty-btn-text {
   position: relative;
   z-index: 1;
-  font-size: 16rpx;
-  font-weight: 300;
+  font-size: 20rpx;
+  font-weight: 600;
   color: #ffffff;
-  /* 与内区可视高度 24rpx（26−2）一致，避免符号贴底 */
   line-height: 24rpx;
   height: 24rpx;
   text-align: center;
 }
 
+/* 数字区设计稿 33×26rpx */
 .qty-input-outer {
   position: relative;
   z-index: 0;
-  min-width: 24rpx;
-  width: 44rpx;
+  width: 33rpx;
+  min-width: 33rpx;
   height: 26rpx;
   border-radius: 5rpx;
   box-sizing: border-box;
@@ -722,12 +723,13 @@ const handleSwipeDelete = () => {
   width: 100%;
   height: 24rpx;
   min-height: 24rpx;
-  padding: 0 4rpx;
+  padding: 0 2rpx;
   margin: 0;
   box-sizing: border-box;
   border: none;
   border-radius: 4rpx;
   font-size: 16rpx;
+  font-weight: 600;
   line-height: 24rpx;
   text-align: center;
   color: #ffffff;
