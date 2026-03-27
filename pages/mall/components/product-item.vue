@@ -1,19 +1,23 @@
 <template>
-  <!-- 益企·安居产品列表：深色卡片 + 双标记 + 双按钮 -->
+  <!-- 益企·安居 / 益企·悦享：同一深色卡片壳；悦享中间区仍为原标题+供应商+计价文案（非房源网格） -->
   <view
-    v-if="variant === 'anju'"
+    v-if="variant === 'anju' || variant === 'yuexiang'"
     class="anju-card-outer"
+    :class="{ 'anju-card-outer--yuexiang': variant === 'yuexiang' }"
     @click="toProductDetail"
   >
     <image
       class="anju-card-bg"
-      :src="anjuCardBgSrc"
+      :src="listDarkCardBgSrc"
       mode="scaleToFill"
     />
     <view class="anju-card-inner">
       <view class="anju-thumb-wrap">
         <!-- 外框：模拟 border-image 渐变边（小程序不用 border-image） -->
-        <view class="anju-thumb-border">
+        <view
+          class="anju-thumb-border"
+          :class="{ 'anju-thumb-border--yuexiang': variant === 'yuexiang' }"
+        >
           <view class="anju-thumb-inner">
             <image
               class="anju-thumb"
@@ -31,7 +35,7 @@
         <view class="anju-sub">{{
           product.bcompanyname || "未知供应商"
         }}</view>
-        <view class="anju-grid">
+        <view v-if="variant === 'anju'" class="anju-grid">
           <view class="anju-grid-row">
             <text class="anju-grid-cell anju-grid-cell-nowrap"
               >房源类型：{{ housingTypeLabel }}</text
@@ -54,8 +58,14 @@
             >
           </view>
         </view>
-        <view class="anju-footer-row">
-          <view class="anju-tags">
+        <view v-else class="anju-yuexiang-price-wrap">
+          <text class="anju-yuexiang-price">{{ getProductPrice() }}</text>
+        </view>
+        <view
+          class="anju-footer-row"
+          :class="{ 'anju-footer-row--actions-only': variant === 'yuexiang' }"
+        >
+          <view v-if="variant === 'anju'" class="anju-tags">
             <view class="anju-tag-discount-wrap">
               <image
                 class="anju-tag-discount-bg"
@@ -77,12 +87,27 @@
             <view class="anju-btn-detail-wrap" @click="toProductDetail">
               <image
                 class="anju-btn-detail-bg"
-                :src="anjuDetailBtnBgSrc"
+                :src="listDetailBtnBgSrc"
                 mode="scaleToFill"
               />
               <view class="anju-btn-detail-label">查看详情</view>
             </view>
-            <view class="anju-btn anju-btn-primary" @click="toProductDetail"
+            <view
+              v-if="variant === 'yuexiang'"
+              class="anju-btn-primary-wrap"
+              @click="toProductDetail"
+            >
+              <image
+                class="anju-btn-primary-bg"
+                :src="yuexiangApplyBtnBgSrc"
+                mode="scaleToFill"
+              />
+              <view class="anju-btn-primary-label">立即申请</view>
+            </view>
+            <view
+              v-else
+              class="anju-btn anju-btn-primary"
+              @click="toProductDetail"
               >立即申请</view
             >
           </view>
@@ -129,7 +154,7 @@ const props = defineProps({
     required: true,
     default: () => ({}),
   },
-  /** default | anju — 仅安居列表用深色稿 */
+  /** default | anju（房源字段网格）| yuexiang（深色壳 + 原价/折扣/套餐计分等原文案） */
   variant: {
     type: String,
     default: "default",
@@ -142,9 +167,29 @@ const emit = defineEmits(["toDetail", "addCart"]);
 const anjuCardBgSrc =
   "https://mvpme82.cloud/data/012873f5-90cc-444e-a41a-64aa74767595_1774545749708.png";
 
+/** 益企·悦享列表卡片整图底 */
+const yuexiangCardBgSrc =
+  "https://mvpme82.cloud/data/c15b39b0-903a-4e72-9940-b6c2e46378b0_1774589983213.png";
+
+const listDarkCardBgSrc = computed(() =>
+  props.variant === "yuexiang" ? yuexiangCardBgSrc : anjuCardBgSrc,
+);
+
 /** 益企·安居列表「查看详情」按钮底图 */
 const anjuDetailBtnBgSrc =
   "https://mvpme82.cloud/data/87edb7e3-00ac-4f48-9c2c-2589f9f802ac_1774546014161.png";
+
+/** 益企·悦享列表「查看详情」按钮底图 */
+const yuexiangDetailBtnBgSrc =
+  "https://mvpme82.cloud/data/a1f67fa9-9360-4a0e-9053-a82c06290caa_1774590142491.png";
+
+const listDetailBtnBgSrc = computed(() =>
+  props.variant === "yuexiang" ? yuexiangDetailBtnBgSrc : anjuDetailBtnBgSrc,
+);
+
+/** 益企·悦享列表「立即申请」按钮底图 */
+const yuexiangApplyBtnBgSrc =
+  "https://mvpme82.cloud/data/6db32a65-d908-40b4-9271-dfdbaa2d6103_1774590232920.png";
 
 /** 益企·安居列表「折扣抵用」标签底图 */
 const anjuTagDiscountBgSrc =
@@ -264,6 +309,18 @@ const toProductDetail = () => {
   border-radius: 40rpx;
 }
 
+/* 益企·悦享：688×217 */
+.anju-card-outer--yuexiang {
+  width: 688rpx;
+  height: 217rpx;
+}
+
+/* 悦享：底 30rpx、右 24rpx（至「立即申请」右缘） */
+.anju-card-outer--yuexiang .anju-card-inner {
+  padding-bottom: 30rpx;
+  padding-right: 24rpx;
+}
+
 .anju-card-bg {
   position: absolute;
   left: 0;
@@ -307,6 +364,16 @@ const toProductDetail = () => {
     #5e97d2 0%,
     #2c5f8f 49%,
     #6a9ccf 100%
+  );
+}
+
+/* 悦享稿 .24：3rpx 等效描边用 padding+渐变（小程序 border-image 不可靠）；内层仍为 #1b4163→#76aadf */
+.anju-thumb-border--yuexiang {
+  background: linear-gradient(
+    178deg,
+    #957c84 0%,
+    #593750 49%,
+    #c79ba9 100%
   );
 }
 
@@ -400,6 +467,24 @@ const toProductDetail = () => {
   text-overflow: ellipsis;
 }
 
+/* 悦享：沿用 getProductPrice()（如 9折·折后810.00分、套餐计分） */
+.anju-yuexiang-price-wrap {
+  margin-top: 8rpx;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  align-items: flex-start;
+  overflow: hidden;
+}
+
+.anju-yuexiang-price {
+  font-size: 28rpx;
+  font-weight: 500;
+  color: #e53935;
+  line-height: 1.35;
+  word-break: break-all;
+}
+
 .anju-footer-row {
   display: flex;
   flex-direction: row;
@@ -408,6 +493,10 @@ const toProductDetail = () => {
   margin-top: auto;
   padding-top: 6rpx;
   flex-shrink: 0;
+}
+
+.anju-footer-row--actions-only {
+  justify-content: flex-end;
 }
 
 .anju-tags {
@@ -534,6 +623,41 @@ const toProductDetail = () => {
   font-size: 20rpx;
   line-height: 1;
   color: rgba(255, 255, 255, 0.92);
+  box-sizing: border-box;
+}
+
+.anju-btn-primary-wrap {
+  position: relative;
+  width: 112rpx;
+  height: 35rpx;
+  flex-shrink: 0;
+  overflow: hidden;
+  border-radius: 18rpx;
+  box-sizing: border-box;
+}
+
+.anju-btn-primary-bg {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  display: block;
+  pointer-events: none;
+}
+
+.anju-btn-primary-label {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20rpx;
+  line-height: 1;
+  color: rgba(255, 255, 255, 0.95);
   box-sizing: border-box;
 }
 

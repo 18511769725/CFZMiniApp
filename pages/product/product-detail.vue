@@ -3,7 +3,7 @@
     class="product-detail-page"
     :class="{
       'is-kanghu-long-detail': isKanghuLongImageDetail,
-      'is-anju-detail': isAnjuDetail,
+      'is-anju-detail': isDarkProductDetail,
     }"
     :style="{ paddingTop: pdNavTotalPx + 'px' }"
   >
@@ -41,8 +41,8 @@
       />
     </scroll-view>
 
-    <!-- 益企·安居：深色稿 + 渐变框卡片 + 金色选中套餐 -->
-    <template v-else-if="isAnjuDetail">
+    <!-- 益企·安居 / 益企·悦享：同一深色稿 + 套餐卡片 + 底栏（悦享底按钮为加入购物车） -->
+    <template v-else-if="isDarkProductDetail">
       <scroll-view class="product-info-scroll anju-detail-scroll" scroll-y>
         <view class="anju-hero-wrap">
           <swiper
@@ -83,39 +83,61 @@
                 :src="anjuTagScoreBgSrc"
                 mode="scaleToFill"
               />
-              <text class="anju-tag-score-label">套餐积分</text>
+              <text class="anju-tag-score-label">套餐计分</text>
             </view>
           </view>
 
           <view
             v-if="showPackageArea"
             class="anju-card anju-card-shell anju-card-shell--package"
+            :style="anjuPackageCardShellStyle"
           >
-            <view class="anju-card-inner">
+            <view class="anju-card-panel-layered">
+              <image
+                class="anju-card-panel-bg-img"
+                :src="anjuPackagePanelImageSrc"
+                mode="widthFix"
+              />
+              <view class="anju-card-inner">
               <view class="anju-section-head">
                 <view class="anju-section-bar" />
                 <text class="anju-section-title">套餐选项</text>
               </view>
-              <view
-                class="anju-package-item"
-                v-for="(item, index) in packageList"
-                :key="index"
-                :class="{
-                  'anju-package-item--active': selectedPackageIndex === index,
-                }"
-                @click="selectPackage(index)"
+              <scroll-view
+                class="anju-package-list-scroll"
+                scroll-y
+                :show-scrollbar="true"
+                :enable-flex="true"
               >
-                <text
-                  class="anju-package-title"
-                  @longpress.stop="showTitleTooltip(item.title, $event)"
-                  @touchend="hideTitleTooltip"
-                  @touchcancel="hideTitleTooltip"
-                  >{{ item.title || "未命名套餐" }}</text
-                >
-                <text class="anju-package-score"
-                  >{{ formatPrice(item.value || 0) }}分</text
-                >
-              </view>
+                <view class="anju-package-list-inner">
+                  <view
+                    class="anju-package-item"
+                    v-for="(item, index) in packageList"
+                    :key="index"
+                    :class="{
+                      'anju-package-item--active':
+                        selectedPackageIndex === index,
+                    }"
+                    :style="
+                      selectedPackageIndex === index
+                        ? anjuPackageItemActiveShellStyle
+                        : undefined
+                    "
+                    @click="selectPackage(index)"
+                  >
+                    <text
+                      class="anju-package-title"
+                      @longpress.stop="showTitleTooltip(item.title, $event)"
+                      @touchend="hideTitleTooltip"
+                      @touchcancel="hideTitleTooltip"
+                      >{{ item.title || "未命名套餐" }}</text
+                    >
+                    <text class="anju-package-score"
+                      >{{ formatPrice(item.value || 0) }}分</text
+                    >
+                  </view>
+                </view>
+              </scroll-view>
               <view
                 v-if="titleTooltip.visible"
                 class="title-tooltip-popup"
@@ -123,13 +145,20 @@
               >
                 {{ titleTooltip.text }}
               </view>
+              </view>
             </view>
           </view>
 
           <view
             class="anju-card anju-card-shell anju-card-shell--detail anju-detail-card"
           >
-            <view class="anju-card-inner">
+            <view class="anju-card-panel-layered">
+              <image
+                class="anju-card-panel-bg-img"
+                :src="anjuCardPanelBgUrl"
+                mode="widthFix"
+              />
+              <view class="anju-card-inner">
               <view class="anju-section-head">
                 <view class="anju-section-bar" />
                 <text class="anju-section-title">套餐详情</text>
@@ -166,6 +195,7 @@
                   mode="widthFix"
                 />
               </view>
+            </view>
             </view>
           </view>
         </view>
@@ -257,29 +287,19 @@
       </scroll-view>
     </template>
 
-    <!-- 3. 底部吸底：.34 底栏（渐变+opacity 仅作用在 bg 层）+ .33 胶囊按钮 -->
+    <!-- 3. 底部吸底：安居「发起订单」/ 悦享「加入购物车」，样式与安居一致 -->
     <view
       class="bottom-cart-bar bottom-cart-bar--submit-order"
-      v-if="state.productDetailData.categorya === 0"
+      v-if="showDarkProductDetailBottomBar"
     >
       <view class="bottom-cart-bar-bg" />
       <view class="bottom-cart-bar-inner">
         <view class="bottom-btn-shell">
-          <button class="bottom-add-cart-btn" @click="handleAskForTenantInfo">
-            发起订单
-          </button>
-        </view>
-      </view>
-    </view>
-    <view
-      class="bottom-cart-bar"
-      v-if="state.productDetailData.categorya === 1"
-    >
-      <view class="bottom-cart-bar-bg" />
-      <view class="bottom-cart-bar-inner">
-        <view class="bottom-btn-shell">
-          <button class="bottom-add-cart-btn" @click="handleAddCart">
-            加入购物车
+          <button
+            class="bottom-add-cart-btn"
+            @click="onDarkProductDetailBottomClick"
+          >
+            {{ darkProductDetailBottomBtnText }}
           </button>
         </view>
       </view>
@@ -315,9 +335,25 @@ const state = reactive({
 
 const defaultImg = "/static/images/default-product.png";
 
-/** 益企·安居详情「套餐积分」角标底图 */
+/** 益企·安居详情「套餐计分」角标底图 */
 const anjuTagScoreBgSrc =
   "https://mvpme82.cloud/data/bc83f63f-9912-4e20-bf11-b55418300b8d_1774548007693.png";
+
+/** 益企·安居「套餐详情」与套餐选项（≥3 条）卡片背景 */
+const anjuCardPanelBgUrl =
+  "https://mvpme82.cloud/data/8ad7b664-5d57-4408-b678-e51a453f4b3d_1774587523826.png";
+
+/** 套餐选项 ≤2 条时的矮背景 */
+const anjuPackagePanelBgUrlShort =
+  "https://mvpme82.cloud/data/ef8e4eaf-a7e2-4eda-ac0d-2502f51334ea_1774588545579.png";
+
+/** 益企·安居套餐选项「选中」行背景 */
+const anjuPackageItemActiveBgUrl =
+  "https://mvpme82.cloud/data/ab54544e-3a1b-4d19-b948-3d3a582efe91_1774587645700.png";
+
+const anjuPackageItemActiveShellStyle = {
+  "--anju-package-active-bg": `url("${anjuPackageItemActiveBgUrl}")`,
+};
 
 /** 从康护列表跳转时带入的 imageurl（getproductdetailsforminiapp 常不带此字段） */
 const kanghuListImageUrlFromRoute = ref("");
@@ -373,8 +409,8 @@ const kanghuLongImageUrl = computed(() => {
   return fromDetail || fromRoute || defaultImg;
 });
 
-/** 益企·安居详情页（与列表深色稿一致） */
-const isAnjuDetail = computed(() => {
+/** 益企·安居(0) / 益企·悦享(1)：与列表一致的深色详情布局 */
+const isDarkProductDetail = computed(() => {
   if (isKanghuLongImageDetail.value) return false;
   const d = state.productDetailData;
   if (
@@ -383,17 +419,48 @@ const isAnjuDetail = computed(() => {
     d.categorya !== null &&
     d.categorya !== ""
   ) {
-    return Number(d.categorya) === 0;
+    const ca = Number(d.categorya);
+    return ca === 0 || ca === 1;
   }
-  return categoryaFromRoute.value === 0;
+  const r = categoryaFromRoute.value;
+  return r === 0 || r === 1;
 });
+
+/** 详情一级分类：接口返回优先，否则用路由入参（首屏布局） */
+const detailCategorya = computed(() => {
+  const d = state.productDetailData;
+  if (
+    d &&
+    d.categorya !== undefined &&
+    d.categorya !== null &&
+    d.categorya !== ""
+  ) {
+    const ca = Number(d.categorya);
+    return Number.isNaN(ca) ? null : ca;
+  }
+  return categoryaFromRoute.value;
+});
+
+const showDarkProductDetailBottomBar = computed(() => {
+  const ca = detailCategorya.value;
+  return ca === 0 || ca === 1;
+});
+
+const darkProductDetailBottomBtnText = computed(() =>
+  detailCategorya.value === 0 ? "发起订单" : "加入购物车",
+);
+
+const onDarkProductDetailBottomClick = () => {
+  if (detailCategorya.value === 0) handleAskForTenantInfo();
+  else handleAddCart();
+};
 
 /** 深色顶栏仅康护长图；益企·安居顶栏为白底黑字 */
 const pdNavIsDark = computed(() => isKanghuLongImageDetail.value);
 
 const pdNavBgColor = computed(() => {
   if (isKanghuLongImageDetail.value) return "#283341";
-  if (isAnjuDetail.value) return "#ffffff";
+  if (isDarkProductDetail.value) return "#ffffff";
   return "#F8F8F8";
 });
 
@@ -408,7 +475,8 @@ const pdNavTitleStyle = computed(() =>
 );
 
 const pdNavTitleText = computed(() => {
-  if (isAnjuDetail.value || isKanghuLongImageDetail.value) return "项目详情";
+  if (isDarkProductDetail.value || isKanghuLongImageDetail.value)
+    return "项目详情";
   return "";
 });
 
@@ -471,7 +539,7 @@ onUnload(() => {
   // #endif
 });
 
-/** 套餐计价时标题旁「套餐积分」角标 */
+/** 套餐计价时标题旁「套餐计分」角标 */
 const showAnjuScoreBadge = computed(() => {
   const pt = parseInt(state.productDetailData.pricetype, 10) || 0;
   return pt === 2;
@@ -496,6 +564,34 @@ const swiperImageList = ref([]);
 const detailImageList = ref([]);
 // 套餐列表
 const packageList = ref([]);
+
+const ANJU_PKG_ROW_RPX = 63;
+const ANJU_PKG_GAP_RPX = 16;
+/** 套餐选项区最多可视 6 条再滚动（安居 / 悦享共用深色详情） */
+const ANJU_PKG_SCROLL_MAX_RPX =
+  6 * ANJU_PKG_ROW_RPX + 5 * ANJU_PKG_GAP_RPX;
+
+/** 套餐选项卡：列表区高度；底图用 image widthFix 保持原始比例 */
+const anjuPackageCardShellStyle = computed(() => {
+  const n = packageList.value?.length ?? 0;
+  const compact = n <= 2;
+  let listHRpx = ANJU_PKG_SCROLL_MAX_RPX;
+  if (n <= 0) {
+    listHRpx = 0;
+  } else if (compact) {
+    listHRpx =
+      n * ANJU_PKG_ROW_RPX + Math.max(0, n - 1) * ANJU_PKG_GAP_RPX;
+  }
+  return {
+    "--anju-package-list-scroll-h": `${listHRpx}rpx`,
+  };
+});
+
+const anjuPackagePanelImageSrc = computed(() => {
+  const n = packageList.value?.length ?? 0;
+  return n <= 2 ? anjuPackagePanelBgUrlShort : anjuCardPanelBgUrl;
+});
+
 // 选中的套餐索引
 const selectedPackageIndex = ref(-1);
 // 是否显示套餐区域（pricetype=2时为true）
@@ -694,7 +790,10 @@ const loadProductDetail = (productId) => {
             // 触发价格逻辑，控制套餐区域显示
             getProductPrice();
             const ca = Number(state.productDetailData.categorya);
-            if (ca === 0 && packageList.value.length > 0) {
+            if (
+              (ca === 0 || ca === 1) &&
+              packageList.value.length > 0
+            ) {
               selectedPackageIndex.value = 0;
             }
           } else {
@@ -1175,6 +1274,20 @@ onLoad((options) => {
   opacity: 0.15;
 }
 
+.bottom-cart-bar--submit-order .bottom-add-cart-btn {
+  font-size: 34rpx;
+  font-weight: normal;
+  font-stretch: normal;
+  letter-spacing: 0rpx;
+  color: #061730;
+}
+
+/* 发起订单底栏：顶距靠 padding-top 23rpx，不用纵向居中 */
+.bottom-cart-bar--submit-order .bottom-cart-bar-inner {
+  align-items: flex-start;
+  justify-content: center;
+}
+
 /* 设计稿矩形 34：按钮距四边 上23 / 下29 / 左42 / 右43（23+71+29=123rpx）；底侧叠加安全区 */
 .bottom-cart-bar-inner {
   position: relative;
@@ -1241,7 +1354,7 @@ onLoad((options) => {
   line-height: 1.6; /* 行高，提升可读性 */
 }
 
-/* ========== 益企·安居项目详情（categorya=0）深色稿 ========== */
+/* ========== 益企·安居 / 益企·悦享 项目详情（categorya=0 / 1）深色稿 ========== */
 .is-anju-detail {
   background-color: #020713;
 }
@@ -1286,7 +1399,7 @@ onLoad((options) => {
   box-sizing: border-box;
 }
 
-/* 标题行 + 套餐积分角标（底图 + 叠字） */
+/* 标题行 + 套餐计分角标（底图 + 叠字） */
 .anju-title-row {
   display: flex;
   flex-direction: row;
@@ -1380,37 +1493,86 @@ onLoad((options) => {
   );
 }
 
-/* 套餐选项：稿 .7 — 669×255、圆角 41、整区 opacity 0.74（与套餐详情一致） */
-.anju-card-shell--package {
+/* 底图 image + 内容同格叠放，行高取 max(图, 内容)。基类 .anju-card-shell 的渐变与 padding 在此必须清掉 */
+.anju-card-panel-layered {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: min-content;
+  width: 100%;
+}
+
+.anju-card-panel-bg-img {
+  grid-area: 1 / 1;
+  width: 100%;
+  display: block;
+  vertical-align: top;
+}
+
+.anju-card-shell.anju-card-shell--package {
   width: 669rpx;
   max-width: 669rpx;
-  min-height: 255rpx;
+  padding: 0;
   border-radius: 41rpx;
-  opacity: 0.74;
+  overflow: hidden;
+  background: rgb(11, 26, 49);
 }
 
 .anju-card-shell--package .anju-card-inner {
-  border-radius: 39rpx;
-  min-height: 251rpx;
-  background: rgb(11, 26, 49);
+  grid-area: 1 / 1;
+  z-index: 1;
+  position: relative;
+  align-self: stretch;
+  justify-self: stretch;
+  box-sizing: border-box;
+  border-radius: 41rpx;
+  background: transparent;
+  /* 竖条距左 32rpx，与套餐详情一致 */
+  padding: 22rpx 20rpx 24rpx 32rpx;
 }
 
-/* 套餐详情：稿 .7-2 — 669×587、整区 opacity 0.74（与稿 border-image 块一致） */
-.anju-card-shell--detail {
+/* 列表区高度由外壳上的 --anju-package-list-scroll-h 控制（≥3 条为 6 行可视高度），避免绑在 scroll-view 上 */
+.anju-package-list-scroll {
+  width: 100%;
+  height: var(--anju-package-list-scroll-h, 458rpx);
+  box-sizing: border-box;
+}
+
+.anju-package-list-inner {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.anju-card-shell.anju-card-shell--detail {
   width: 669rpx;
   max-width: 669rpx;
-  min-height: 587rpx;
+  padding: 0;
   border-radius: 41rpx;
-  opacity: 0.74;
+  overflow: hidden;
+  background: rgb(11, 26, 49);
 }
 
 .anju-card-shell--detail .anju-card-inner {
-  border-radius: 39rpx;
-  min-height: 583rpx;
-  padding: 33rpx 31rpx 29rpx 57rpx;
+  grid-area: 1 / 1;
+  z-index: 1;
+  position: relative;
+  align-self: stretch;
+  justify-self: stretch;
   box-sizing: border-box;
-  /* 外层已 0.74，内层用实色避免与 rgba 叠乘过透 */
-  background: rgb(11, 26, 49);
+  border-radius: 41rpx;
+  /* 顶 33rpx；左 32rpx 到竖条；列表另缩进与标题字左对齐 */
+  padding: 33rpx 31rpx 29rpx 32rpx;
+  background: transparent;
+}
+
+/* 竖条 6rpx + 与标题间隔 19rpx → 正文与标题字左缘对齐：32+6+19=57 */
+.anju-card-shell--detail .anju-detail-body {
+  padding-left: 25rpx;
+  box-sizing: border-box;
+}
+
+/* 「套餐详情」标题与下方详情列表间距 35rpx（套餐选项仍用 .anju-section-head 默认 18rpx） */
+.anju-card-shell--detail .anju-section-head {
+  margin-bottom: 35rpx;
 }
 
 .anju-card-inner {
@@ -1430,7 +1592,7 @@ onLoad((options) => {
 .anju-section-bar {
   width: 6rpx;
   height: 28rpx;
-  margin-right: 12rpx;
+  margin-right: 19rpx;
   border-radius: 3rpx;
   background: linear-gradient(180deg, #80c3f6 0%, #2c6ebc 100%);
   flex-shrink: 0;
@@ -1464,8 +1626,13 @@ onLoad((options) => {
 }
 
 .anju-package-item--active {
-  border: solid 1rpx #e3c695;
-  background: linear-gradient(90deg, #fcefd4 0%, #e8c99a 45%, #dab26b 100%);
+  border: none;
+  overflow: hidden;
+  background-color: transparent;
+  background-image: var(--anju-package-active-bg);
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
 }
 
 .anju-package-title {
@@ -1504,11 +1671,11 @@ onLoad((options) => {
   box-sizing: border-box;
 }
 
-/* 稿：点 7×7；点与字 18rpx；区域 581×461 */
+/* 点 7×7；点与字 18rpx；少内容时压高度，多内容最高 461rpx 区内滚动 */
 .anju-detail-list-spec {
   width: 581rpx;
   max-width: 100%;
-  height: 461rpx;
+  max-height: 461rpx;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
@@ -1543,6 +1710,7 @@ onLoad((options) => {
   display: block;
   flex: 1;
   min-width: 0;
+  font-size: 22rpx;
   line-height: 1.55;
   word-break: break-all;
 }

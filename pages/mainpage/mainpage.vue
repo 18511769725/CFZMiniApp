@@ -262,7 +262,7 @@
         </view>
         <view
           class="module-detail-btn module-detail-kanghu"
-          @tap="goProductList(2)"
+          @tap="goServiceHallTab(3)"
         >
           <text class="module-detail-btn-text">查看详情</text>
         </view>
@@ -438,7 +438,7 @@ const formatPointsWrape = (value) => {
   return `${toNumber(value)}\n积分`;
 };
 
-/** 额度等数字：≥1 万用「x.x万」缩短，避免小格内溢出 */
+/** 额度等数字：≥1 万用「x.x万分」缩短（积分单位），避免小格内溢出 */
 const formatAmountWan = (value) => {
   const num = toNumber(value);
   if (!Number.isFinite(num)) {
@@ -452,7 +452,7 @@ const formatAmountWan = (value) => {
   }
   const wan = num / 10000;
   const dec = parseFloat((Math.round(wan * 10) / 10).toFixed(1));
-  return `${dec}万`;
+  return `${dec}万分`;
 };
 
 const digitMap = ["零", "一", "二", "三", "四", "五", "六", "七", "八", "九"];
@@ -599,6 +599,20 @@ const goProductList = (categorya, categoryb = 0) => {
   uni.navigateTo({
     url: `/pages/mall/productlist?categorya=${ca}&categoryb=${cb}`,
   });
+};
+
+/** 服务大厅为 tabBar 页，switchTab 无法带参；mall 在 onShow 读取后清除 */
+const MALL_PENDING_TAB_KEY = "mall_pending_tab_id";
+
+const goServiceHallTab = (tabId) => {
+  const id = Number(tabId);
+  if (id !== 1 && id !== 2 && id !== 3) return;
+  try {
+    uni.setStorageSync(MALL_PENDING_TAB_KEY, id);
+  } catch (e) {
+    /* ignore */
+  }
+  uni.switchTab({ url: "/pages/mall/mall" });
 };
 
 const getccompanyinfo = (cuserid) => {
@@ -831,14 +845,14 @@ onLoad(() => {
   vertical-align: top;
 }
 
-/* 标题区：设计稿 距顶 120rpx、左右 176rpx；副标题与企业卡间距 148rpx */
+/* 标题区：主副标题距上、距下企业卡均为 115rpx；左右 176rpx */
 .header-section {
-  padding: 120rpx 176rpx 0;
+  padding: 115rpx 176rpx 0;
   box-sizing: border-box;
 }
 .platform-title {
   text-align: center;
-  margin: 0 0 148rpx;
+  margin: 0 0 115rpx;
   position: relative;
 }
 .title-cn {
@@ -1043,17 +1057,15 @@ onLoad(() => {
   position: relative;
   overflow: hidden;
 }
-/* 设计稿：同一行 — 左「标题+状态角标」、右「查看详情」，垂直居中 */
+/* 设计稿：左「标题+状态角标」、右「查看详情」。用 Grid 固定右侧 137rpx 列，避免 flex+space-between 因左侧占位差异导致三处按钮左缘不齐 */
 .module-header {
-  display: flex;
-  flex-direction: row;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 137rpx;
   align-items: center;
-  justify-content: space-between;
-  gap: 16rpx;
+  column-gap: 16rpx;
   margin-bottom: 12rpx;
 }
 .module-header-left {
-  flex: 1;
   min-width: 0;
   display: flex;
   flex-direction: row;
@@ -1099,12 +1111,13 @@ onLoad(() => {
 }
 /* 小程序对 border-image 渐变支持不稳定，用双层 background 模拟描边 */
 .module-detail-btn {
-  flex-shrink: 0;
   width: 137rpx;
+  max-width: 100%;
   height: 44rpx;
+  justify-self: stretch;
   box-sizing: border-box;
   border: 1rpx solid transparent;
-  border-radius: 10rpx;
+  border-radius: 15rpx;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1440,12 +1453,12 @@ onLoad(() => {
     PingFangSC-Semibold,
     -apple-system,
     sans-serif;
-  font-size: 40rpx;
+  font-size: 32rpx;
   font-weight: 600;
   font-stretch: normal;
-  line-height: 35rpx;
+  line-height: 38rpx;
   letter-spacing: 0rpx;
-  min-height: 30rpx;
+  min-height: 32rpx;
   color: #ffffff;
   text-align: center;
   white-space: nowrap;
@@ -1455,7 +1468,7 @@ onLoad(() => {
   color: #ffffff;
 }
 
-/* 康护 · 使用状态（文字非数字，略小于额度数字） */
+/* 康护 · 使用状态：与额度/套餐数字同为 32rpx */
 .module-kanghu .yuexiang-quota-cell-body .kanghu-status-value {
   display: block;
   width: 141rpx;
@@ -1469,7 +1482,7 @@ onLoad(() => {
     sans-serif;
   font-size: 32rpx;
   font-weight: 600;
-  line-height: 1.2;
+  line-height: 38rpx;
   text-align: center;
   white-space: nowrap;
 }
@@ -1480,11 +1493,11 @@ onLoad(() => {
 .module-kanghu .yuexiang-quota-cell-body .kanghu-status-value.kanghu-status-unused {
   width: 93rpx;
   max-width: 100%;
-  min-height: 31rpx;
+  min-height: 32rpx;
   font-size: 32rpx;
   font-weight: 600;
   font-stretch: normal;
-  line-height: 35rpx;
+  line-height: 38rpx;
   letter-spacing: 0rpx;
   color: #59f3ff;
 }

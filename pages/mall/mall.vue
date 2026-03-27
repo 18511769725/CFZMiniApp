@@ -44,9 +44,12 @@
 
 <script setup>
 import { ref } from "vue";
+import { onShow } from "@dcloudio/uni-app";
 import AnJuComponent from "./components/AnJuComponent.vue";
 import YueXiangComponent from "./components/YueXiangComponent.vue";
 import KangHuComponent from "./components/KangHuComponent.vue";
+
+const MALL_PENDING_TAB_KEY = "mall_pending_tab_id";
 
 // 标签页数据
 const tabs = ref([
@@ -62,6 +65,19 @@ const activeTabId = ref(1);
 const switchTab = (tabId) => {
   activeTabId.value = tabId;
 };
+
+onShow(() => {
+  try {
+    const raw = uni.getStorageSync(MALL_PENDING_TAB_KEY);
+    const id = Number(raw);
+    if (id === 1 || id === 2 || id === 3) {
+      activeTabId.value = id;
+      uni.removeStorageSync(MALL_PENDING_TAB_KEY);
+    }
+  } catch (e) {
+    /* ignore */
+  }
+});
 </script>
 
 <style scoped lang="scss">

@@ -1,7 +1,7 @@
 <template>
   <view
     class="product-list-page"
-    :class="{ 'product-list-page--anju': isAnjuList }"
+    :class="{ 'product-list-page--anju': useAnjuStyleProductList }"
   >
     <!-- 下拉刷新容器 -->
     <scroll-view scroll-y class="scroll-container">
@@ -43,8 +43,17 @@ const state = reactive({
   categoryb: 0, // 二级分类ID
 });
 
-const isAnjuList = computed(() => Number(state.categorya) === 0);
-const listVariant = computed(() => (isAnjuList.value ? "anju" : "default"));
+/** 益企·安居(0) 与 益企·悦享(1) 共用同一套深色列表卡片；康护等其它分类仍用默认行 */
+const useAnjuStyleProductList = computed(() => {
+  const a = Number(state.categorya);
+  return a === 0 || a === 1;
+});
+const listVariant = computed(() => {
+  const a = Number(state.categorya);
+  if (a === 0) return "anju";
+  if (a === 1) return "yuexiang";
+  return "default";
+});
 
 /** 与 pages.json / globalStyle 一致：默认白底导航栏、黑字标题「产品列表」 */
 const applyNavigationStyle = () => {
@@ -270,7 +279,7 @@ onShow(() => {
   margin-bottom: 20rpx;
 }
 
-/* 益企·安居：页底与大厅统一 #020713 */
+/* 益企·安居 / 益企·悦享：页底与安居大厅统一 #020713 */
 .product-list-page--anju {
   background-color: #020713;
 }

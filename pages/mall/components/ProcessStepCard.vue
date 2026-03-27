@@ -1,10 +1,11 @@
 <template>
   <view class="process-step-card" :class="{ 'is-compact-flow': compactFlow }">
     <!-- 背景图片 -->
+    <!-- aspectFill 会裁切上下边，设计稿底图自带描边须完整露出，用 aspectFit -->
     <image
       :src="backgroundImage"
       class="card-background"
-      mode="aspectFill"
+      mode="aspectFit"
     ></image>
 
     <view class="card-content-wrapper">
@@ -83,7 +84,7 @@ const isImgPath = (value) => {
   width: 210rpx;
   position: relative;
   overflow: hidden;
-  border-radius: 20rpx;
+  /* 圆角与描边以底图为准，容器不再叠一层 border-radius / border */
   height: 210rpx;
   display: flex;
   align-items: stretch;
@@ -142,11 +143,11 @@ const isImgPath = (value) => {
     flex-shrink: 0;
   }
 
-  // 序号
+  // 序号（统一相对左侧内容右移 7rpx）
   .step-number-badge {
     width: 40rpx;
     height: 40rpx;
-    margin-left: 6rpx;
+    margin-left: 13rpx;
 
     text {
       font-size: 28rpx;
@@ -208,13 +209,15 @@ const isImgPath = (value) => {
     height: 161rpx;
     margin-right: 12rpx;
 
+    /* 设计稿：icon 距卡片顶 15rpx */
     .card-content-wrapper {
-      padding: 10rpx 0 8rpx;
+      padding: 15rpx 0 8rpx;
     }
 
     .card-content-left {
       width: 115rpx;
-      gap: 8rpx;
+      /* 设计稿：标题距 icon 底 16rpx */
+      gap: 16rpx;
     }
 
     .card-content-right {
@@ -233,21 +236,24 @@ const isImgPath = (value) => {
     .step-number-badge {
       width: 32rpx;
       height: 32rpx;
-      margin-left: 4rpx;
+      margin-left: 11rpx;
 
       text {
         font-size: 22rpx;
       }
     }
 
+    /* 申请流程：标题 17rpx，副标题 12rpx，二者间距 15rpx */
     .card-text .card-title {
-      font-size: 20rpx;
-      margin-bottom: 4rpx;
+      font-size: 17rpx;
+      line-height: 1.25;
+      margin-bottom: 15rpx;
       -webkit-line-clamp: 2;
     }
 
     .card-text .card-subtitle {
-      font-size: 15rpx;
+      font-size: 12rpx;
+      line-height: 1.35;
       -webkit-line-clamp: 3;
     }
   }

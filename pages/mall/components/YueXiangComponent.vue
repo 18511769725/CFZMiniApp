@@ -121,16 +121,18 @@
                 class="feed-service-card"
                 @tap="
                   uni.navigateTo({
-                    url: `/pages/product/product-detail?id=${product.id}`,
+                    url: `/pages/product/product-detail?id=${product.id}&categorya=1`,
                   })
                 "
               >
                 <view class="feed-service-img-frame">
-                  <image
-                    :src="product.imageurl"
-                    class="feed-service-image"
-                    mode="aspectFill"
-                  />
+                  <view class="feed-service-img-inner">
+                    <image
+                      :src="product.imageurl"
+                      class="feed-service-image"
+                      mode="aspectFill"
+                    />
+                  </view>
                 </view>
                 <view class="feed-service-text-col">
                   <view class="feed-service-name">{{
@@ -661,19 +663,19 @@ onMounted(() => {
   }
 
   .feed-tab-active-text {
-    font-size: 26rpx;
+    font-size: 31rpx;
     font-weight: 600;
     color: #ffffff;
     line-height: 1.2;
     white-space: nowrap;
   }
 
-  /* 与益企·安居一致：未选中字号与选中同为 26rpx */
+  /* 与益企·安居一致：四个 Tab 均为 31rpx */
   .feed-tab-inactive {
     max-width: 150rpx;
     min-height: 32rpx;
     font-family: PingFang SC, PingFangSC-Regular, sans-serif;
-    font-size: 26rpx;
+    font-size: 31rpx;
     font-weight: normal;
     line-height: 1.2;
     color: #ffffff;
@@ -754,13 +756,22 @@ onMounted(() => {
     overflow: hidden;
   }
 
+  .feed-service-img-inner {
+    width: 100%;
+    height: 100%;
+    border-radius: 13rpx;
+    overflow: hidden;
+    line-height: 0;
+    font-size: 0;
+    background: rgba(0, 0, 0, 0.15);
+  }
+
   .feed-service-image {
-    width: 200rpx;
-    height: 130rpx;
+    width: 100%;
+    height: 100%;
     display: block;
     vertical-align: top;
     border-radius: 13rpx;
-    background: rgba(0, 0, 0, 0.15);
     overflow: hidden;
   }
 
@@ -780,7 +791,7 @@ onMounted(() => {
     font-size: 22rpx;
     font-weight: normal;
     font-stretch: normal;
-    line-height: 35rpx;
+    line-height: 28rpx;
     letter-spacing: 2rpx;
     color: #ffffff;
     text-align: center;
@@ -796,7 +807,7 @@ onMounted(() => {
     font-size: 16rpx;
     font-weight: normal;
     font-stretch: normal;
-    line-height: 35rpx;
+    line-height: 22rpx;
     letter-spacing: 1rpx;
     color: #b4b4b4;
     text-align: center;
