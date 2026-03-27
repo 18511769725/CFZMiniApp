@@ -243,17 +243,31 @@ const isImgPath = (value) => {
       }
     }
 
+    /* 避免 break-word 把第一行撑满后第二行只剩一字（三个 Tab 申请流程共用） */
+    .card-text {
+      word-break: normal;
+    }
+
     /* 申请流程：标题 17rpx，副标题 12rpx，二者间距 15rpx */
     .card-text .card-title {
       font-size: 17rpx;
       line-height: 1.25;
       margin-bottom: 15rpx;
+      word-break: break-word;
+      overflow-wrap: break-word;
       -webkit-line-clamp: 2;
     }
 
+    /* 副标题收窄到约每行 5～6 个汉字，两行时第二行多为 4～5 字；92rpx 在真机仍偏宽易成 8+1 */
     .card-text .card-subtitle {
       font-size: 12rpx;
-      line-height: 1.35;
+      line-height: 1.45;
+      max-width: 72rpx;
+      margin-left: auto;
+      margin-right: auto;
+      text-align: center;
+      word-break: normal;
+      overflow-wrap: break-word;
       -webkit-line-clamp: 3;
     }
   }

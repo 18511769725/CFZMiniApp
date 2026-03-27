@@ -1,11 +1,20 @@
 <template>
   <view class="main-page">
-    <image
-      class="page-full-bg"
-      src="https://mvpme82.cloud/data/d2b79840-d731-4e07-b52c-c10aa594067e_1774537067801.png"
-      mode="widthFix"
-    />
-    <view class="main-page-body">
+    <!-- 使用 scroll-view 承接纵向滚动，减轻原生页在 Tab 页底部「要多划几下才动」的问题 -->
+    <scroll-view
+      scroll-y
+      class="main-page-scroll"
+      :enable-flex="true"
+      :show-scrollbar="false"
+      enhanced
+    >
+      <view class="main-scroll-inner">
+        <image
+          class="page-full-bg"
+          src="https://mvpme82.cloud/data/d2b79840-d731-4e07-b52c-c10aa594067e_1774537067801.png"
+          mode="widthFix"
+        />
+        <view class="main-page-body">
       <!-- 平台标题（叠在全页背景上，不再单独拼半张顶图） -->
       <view class="header-section">
         <view class="platform-title">
@@ -125,39 +134,40 @@
         />
       </view>
 
-      <!-- 优惠房源/补贴房源 -->
-      <view
-        class="section"
-        v-if="anjuQuotaItems.length"
-        v-for="item in anjuQuotaItems"
-        :key="item.key"
-      >
-        <view class="section-header">
-          <text class="section-title">{{ item.title }}</text>
-          <text class="section-tip">{{ item.highlight }}</text>
-        </view>
-        <view class="data-row-anju">
-          <image
-            class="data-row-anju-bg"
-            src="https://mvpme82.cloud/data/cb9b5570-3e00-478d-84f3-6cfbad5ad3a8_1774526033903.png"
-            mode="scaleToFill"
-          />
-          <view class="data-row-anju-body">
-            <view class="data-item">
-              <text class="data-label">支持人数</text>
-              <text class="data-value">{{ item.count }}</text>
-            </view>
-            <view class="data-item">
-              <text class="data-label">已使用</text>
-              <text class="data-value used">{{ item.used }}</text>
-            </view>
-            <view class="data-item">
-              <text class="data-label">可使用</text>
-              <text class="data-value available">{{ item.available }}</text>
+      <!-- 优惠房源/补贴房源（勿与 v-for 同节点写 v-if，易在真机出现滚动/层叠异常） -->
+      <template v-if="anjuQuotaItems.length">
+        <view
+          v-for="item in anjuQuotaItems"
+          :key="item.key"
+          class="section"
+        >
+          <view class="section-header">
+            <text class="section-title">{{ item.title }}</text>
+            <text class="section-tip">{{ item.highlight }}</text>
+          </view>
+          <view class="data-row-anju">
+            <image
+              class="data-row-anju-bg"
+              src="https://mvpme82.cloud/data/cb9b5570-3e00-478d-84f3-6cfbad5ad3a8_1774526033903.png"
+              mode="scaleToFill"
+            />
+            <view class="data-row-anju-body">
+              <view class="data-item">
+                <text class="data-label">支持人数</text>
+                <text class="data-value">{{ item.count }}</text>
+              </view>
+              <view class="data-item">
+                <text class="data-label">已使用</text>
+                <text class="data-value used">{{ item.used }}</text>
+              </view>
+              <view class="data-item">
+                <text class="data-label">可使用</text>
+                <text class="data-value available">{{ item.available }}</text>
+              </view>
             </view>
           </view>
         </view>
-      </view>
+      </template>
       <view v-else class="quota-empty-text">暂无安居配额配置</view>
     </view>
 
@@ -337,6 +347,8 @@
       </view>
     </view>
     </view>
+      </view>
+    </scroll-view>
   </view>
 </template>
 
@@ -800,16 +812,41 @@ onLoad(() => {
 </script>
 
 <style>
-.main-page {
-  position: relative;
+page {
+  height: 100%;
   background-color: #020713;
-  min-height: 100vh;
-  color: #fff;
-  padding-bottom: 30rpx;
-  overflow-x: hidden;
 }
 
-/* 全页背景：widthFix 按资源比例缩放宽度，避免 aspectFill+默认 320×240 导致看不见或只剩纯色底 */
+.main-page {
+  position: relative;
+  height: 100%;
+  min-height: 100vh;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  background-color: #020713;
+  color: #fff;
+  overflow: hidden;
+}
+
+/* 固定高度由 flex 分配，避免原生页滚动在底部手势不跟手 */
+.main-page-scroll {
+  flex: 1;
+  height: 0;
+  min-height: 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.main-scroll-inner {
+  position: relative;
+  min-height: 100%;
+  padding-bottom: calc(30rpx + constant(safe-area-inset-bottom));
+  padding-bottom: calc(30rpx + env(safe-area-inset-bottom));
+  box-sizing: border-box;
+}
+
+/* 全页背景：widthFix；不参与点击，避免挡滚动 */
 .page-full-bg {
   position: absolute;
   top: 0;
@@ -827,6 +864,8 @@ onLoad(() => {
 .main-page-body {
   position: relative;
   z-index: 1;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 /* 横向分割线：统一使用切图 8.png（小程序用 image） */

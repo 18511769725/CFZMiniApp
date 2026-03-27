@@ -5,7 +5,7 @@
       <image
         class="anju-housing-banner-img"
         src="https://mvpme82.cloud/data/a385d669-b84d-4f61-ae1b-3e5b8fa6b040_1774526386651.png"
-        mode="aspectFill"
+        mode="scaleToFill"
       />
     </view>
 
