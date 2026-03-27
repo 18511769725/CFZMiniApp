@@ -6,11 +6,7 @@
     :class="{ 'anju-card-outer--yuexiang': variant === 'yuexiang' }"
     @click="toProductDetail"
   >
-    <image
-      class="anju-card-bg"
-      :src="listDarkCardBgSrc"
-      mode="scaleToFill"
-    />
+    <image class="anju-card-bg" :src="listDarkCardBgSrc" mode="scaleToFill" />
     <view class="anju-card-inner">
       <view class="anju-thumb-wrap">
         <!-- 外框：模拟 border-image 渐变边（小程序不用 border-image） -->
@@ -32,9 +28,7 @@
         <view class="anju-title">{{
           product.producttitle || "未命名商品"
         }}</view>
-        <view class="anju-sub">{{
-          product.bcompanyname || "未知供应商"
-        }}</view>
+        <view class="anju-sub">{{ product.bcompanyname || "未知供应商" }}</view>
         <view v-if="variant === 'anju'" class="anju-grid">
           <view class="anju-grid-row">
             <text class="anju-grid-cell anju-grid-cell-nowrap"
@@ -121,11 +115,7 @@
   </view>
 
   <!-- 默认：左图右文（悦享等分类） -->
-  <view
-    v-else
-    class="product-item-container"
-    @click="toProductDetail"
-  >
+  <view v-else class="product-item-container" @click="toProductDetail">
     <view class="product-img-wrapper">
       <image
         class="product-img"
@@ -298,9 +288,7 @@ const benefitLabel = computed(() => {
 
 const useMethodLabel = computed(() => {
   return (
-    props.product.usemethod ||
-    props.product.usagemethod ||
-    "资格预审+签约备案"
+    props.product.usemethod || props.product.usagemethod || "资格预审+签约备案"
   );
 });
 
@@ -372,22 +360,12 @@ const toProductDetail = () => {
   padding: 3rpx;
   border-radius: 18rpx;
   overflow: hidden;
-  background: linear-gradient(
-    178deg,
-    #5e97d2 0%,
-    #2c5f8f 49%,
-    #6a9ccf 100%
-  );
+  background: linear-gradient(178deg, #5e97d2 0%, #2c5f8f 49%, #6a9ccf 100%);
 }
 
 /* 悦享稿 .24：3rpx 等效描边用 padding+渐变（小程序 border-image 不可靠）；内层仍为 #1b4163→#76aadf */
 .anju-thumb-border--yuexiang {
-  background: linear-gradient(
-    178deg,
-    #957c84 0%,
-    #593750 49%,
-    #c79ba9 100%
-  );
+  background: linear-gradient(178deg, #957c84 0%, #593750 49%, #c79ba9 100%);
 }
 
 .anju-thumb-inner {
@@ -413,11 +391,16 @@ const toProductDetail = () => {
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  margin-top: 8rpx;
 }
 
 /* 设计稿：标题 34rpx PingFangSC-Semibold #fff */
 .anju-title {
-  font-family: "PingFang SC", -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family:
+    "PingFang SC",
+    -apple-system,
+    BlinkMacSystemFont,
+    sans-serif;
   font-size: 34rpx;
   font-weight: 600;
   color: #ffffff;
@@ -433,7 +416,11 @@ const toProductDetail = () => {
 /* 设计稿：地址/副标题 22rpx PingFangSC-Regular #b8dced */
 .anju-sub {
   margin-top: 6rpx;
-  font-family: "PingFang SC", -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family:
+    "PingFang SC",
+    -apple-system,
+    BlinkMacSystemFont,
+    sans-serif;
   font-size: 22rpx;
   font-weight: 400;
   color: #b8dced;
@@ -466,7 +453,11 @@ const toProductDetail = () => {
 /* 设计稿：详情区 17rpx / 行高 23rpx PingFangSC-Regular #fff */
 .anju-grid-cell {
   flex: 1;
-  font-family: "PingFang SC", -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family:
+    "PingFang SC",
+    -apple-system,
+    BlinkMacSystemFont,
+    sans-serif;
   font-size: 17rpx;
   font-weight: 400;
   color: #ffffff;
@@ -511,6 +502,7 @@ const toProductDetail = () => {
   margin-top: auto;
   padding-top: 6rpx;
   flex-shrink: 0;
+  margin-bottom: 12rpx;
 }
 
 .anju-footer-row--actions-only {
@@ -602,10 +594,12 @@ const toProductDetail = () => {
 .anju-btn {
   width: 112rpx;
   height: 35rpx;
-  border-radius: 18rpx;
+  border-radius: 12rpx;
   font-size: 20rpx;
-  line-height: 35rpx;
-  text-align: center;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   box-sizing: border-box;
 }
 
@@ -615,7 +609,7 @@ const toProductDetail = () => {
   height: 35rpx;
   flex-shrink: 0;
   overflow: hidden;
-  border-radius: 18rpx;
+  border-radius: 12rpx;
   box-sizing: border-box;
 }
 
