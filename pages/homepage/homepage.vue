@@ -40,7 +40,7 @@
             </view>
             <view class="divider-h" />
             <view class="company-info-grid">
-              <view class="ci-line">
+              <view class="ci-line company-field-row">
                 <view class="ci-item">
                   <view class="ci-label-wrap">
                     <image
@@ -48,9 +48,11 @@
                       :src="companyFieldLabelBgSrc"
                       mode="scaleToFill"
                     />
-                    <view class="ci-label"><text>企业联系人</text></view>
+                    <view class="ci-label">
+                      <text class="text-style-2">企业联系人</text>
+                    </view>
                   </view>
-                  <text class="ci-val ci-val--style1">{{
+                  <text class="ci-val text-style-1">{{
                     state.ccompanyinfo.approvername ||
                     state.userinfo.name ||
                     "-"
@@ -63,9 +65,11 @@
                       :src="companyFieldLabelBgSrc"
                       mode="scaleToFill"
                     />
-                    <view class="ci-label"><text>手机号码</text></view>
+                    <view class="ci-label">
+                      <text class="text-style-2">手机号码</text>
+                    </view>
                   </view>
-                  <text class="ci-val ci-val--style2">{{
+                  <text class="ci-val text-style-1">{{
                     state.userinfo.phone || "-"
                   }}</text>
                 </view>
@@ -108,7 +112,9 @@
           />
           <view class="account-detail">
             <text class="account-name">{{ state.userinfo.name || "—" }}</text>
-            <text class="account-role">{{ state.userinfo.title || "—" }}</text>
+            <text class="account-role text-style-1">{{
+              state.userinfo.title || "—"
+            }}</text>
             <view class="account-contact-row">
               <view class="account-contact-item">
                 <image
@@ -116,7 +122,9 @@
                   src="/static/personal/phone.png"
                   mode="aspectFit"
                 />
-                <text>{{ state.userinfo.phone || "—" }}</text>
+                <text class="account-contact-text">{{
+                  state.userinfo.phone || "—"
+                }}</text>
               </view>
               <view class="account-contact-item">
                 <image
@@ -124,7 +132,9 @@
                   src="/static/personal/email.png"
                   mode="aspectFit"
                 />
-                <text>{{ state.userinfo.email || "—" }}</text>
+                <text class="account-contact-text">{{
+                  state.userinfo.email || "—"
+                }}</text>
               </view>
             </view>
           </view>
@@ -719,6 +729,36 @@ page {
   width: 100%;
 }
 
+/* 企业联系人 + 手机：不采用稿里标注的固定宽（569rpx），避免挤压右侧号码 */
+.company-field-row {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  font-family: PingFangSC-Light, "PingFang SC", -apple-system, sans-serif;
+  font-size: 21rpx;
+  font-weight: normal;
+  font-stretch: normal;
+  letter-spacing: 0rpx;
+  color: #ffffff;
+}
+
+.company-field-row .text-style-1 {
+  font-family: PingFangSC-Medium, "PingFang SC", -apple-system, sans-serif;
+  font-size: 24rpx;
+  font-weight: normal;
+  letter-spacing: 0rpx;
+  color: #ffffff;
+}
+
+.company-field-row .text-style-2 {
+  font-family: PingFangSC-Light, "PingFang SC", -apple-system, sans-serif;
+  font-size: 21rpx;
+  font-weight: normal;
+  font-stretch: normal;
+  letter-spacing: 1rpx;
+  color: #ffffff;
+}
+
 .ci-item {
   width: 50%;
   margin-bottom: 12rpx;
@@ -730,13 +770,16 @@ page {
   width: 100%;
 }
 
+/* 标签底图随文案变宽；不按稿固定 115×31，避免「企业联系人」等五字挤换行 */
 .ci-label-wrap {
   position: relative;
-  width: 115rpx;
-  height: 31rpx;
+  width: auto;
+  min-height: 31rpx;
+  padding: 0 10rpx;
   box-sizing: border-box;
   flex-shrink: 0;
   overflow: hidden;
+  border-radius: 8rpx;
 }
 
 .ci-label-bg {
@@ -753,8 +796,6 @@ page {
 .ci-label {
   position: relative;
   z-index: 1;
-  width: 100%;
-  height: 100%;
   box-sizing: border-box;
   display: flex;
   align-items: center;
@@ -762,16 +803,16 @@ page {
   background: transparent;
   font-size: 20rpx;
   color: #ffffff;
-  line-height: 1;
-  padding: 0 4rpx;
+  line-height: 1.2;
+  padding: 4rpx 2rpx;
+  white-space: nowrap;
 }
 
 .ci-val {
-  max-width: 569rpx;
-  min-height: 23rpx;
   margin-left: 12rpx;
   flex: 1;
   min-width: 0;
+  max-width: 100%;
   font-family: PingFang SC, PingFangSC-Light, sans-serif;
   font-size: 21rpx;
   font-weight: normal;
@@ -869,45 +910,86 @@ page {
   gap: 0;
 }
 
+/* 姓名：沿用稿字号/行高，不设设计稿标注框宽高，避免长名被裁 */
 .account-name {
-  font-family: PingFang SC, PingFangSC-Medium, sans-serif;
+  display: block;
+  max-width: 100%;
+  box-sizing: border-box;
+  font-family: PingFangSC-Medium, "PingFang SC", -apple-system, sans-serif;
   font-size: 34rpx;
   font-weight: normal;
+  font-stretch: normal;
   line-height: 51rpx;
-  letter-spacing: 0;
+  letter-spacing: 0rpx;
   color: #ffffff;
+  word-break: break-word;
 }
 
-.account-role {
-  font-family: PingFang SC, PingFangSC-Regular, sans-serif;
+/* 稿：职位 PingFangSC-Regular 22rpx */
+.account-role.text-style-1 {
+  display: block;
+  font-family: PingFangSC-Regular, "PingFang SC", -apple-system, sans-serif;
   font-size: 22rpx;
   font-weight: normal;
-  line-height: 32rpx;
-  letter-spacing: 0;
+  font-stretch: normal;
+  letter-spacing: 0rpx;
   color: #ffffff;
 }
 
+/* 手机 + 邮箱同一行；两段各 flex 平分，过长用省略号，避免在 @ 处断行 */
 .account-contact-row {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: row;
+  flex-wrap: nowrap;
   align-items: center;
-  gap: 10rpx 32rpx;
+  gap: 16rpx;
   margin-top: 6rpx;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 .account-contact-item {
   display: flex;
+  flex-direction: row;
   align-items: center;
   gap: 10rpx;
-  font-size: 22rpx;
-  color: rgba(255, 255, 255, 0.92);
-  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
-.account-contact-item text {
+/* 号码短：不占半行；邮箱占剩余空间，减少截断 */
+.account-contact-item:first-child {
+  flex: 0 1 auto;
+  max-width: 48%;
+}
+
+.account-contact-item:last-child {
   flex: 1;
   min-width: 0;
-  word-break: break-all;
+}
+
+.account-contact-text {
+  box-sizing: border-box;
+  font-family: PingFangSC-Medium, "PingFang SC", -apple-system, sans-serif;
+  font-size: 23rpx;
+  font-weight: normal;
+  font-stretch: normal;
+  line-height: 34rpx;
+  letter-spacing: 0rpx;
+  color: #ffffff;
+  white-space: nowrap;
+}
+
+.account-contact-item:first-child .account-contact-text {
+  flex: 0 1 auto;
+}
+
+.account-contact-item:last-child .account-contact-text {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .account-contact-icon {
@@ -1048,15 +1130,17 @@ page {
   text-align: center;
   padding: 0 8rpx;
   border-radius: 27rpx;
-  font-size: 26rpx;
-  color: rgba(255, 255, 255, 0.9);
-  font-weight: 500;
+  font-family: PingFangSC-Medium, "PingFang SC", -apple-system, sans-serif;
+  font-size: 29rpx;
+  font-weight: normal;
+  font-stretch: normal;
+  letter-spacing: 0rpx;
+  color: #ffffff;
 }
 
 .tab-item.active {
   background: linear-gradient(0deg, #dab26b 0%, #fcefd4 100%);
-  color: #1a2a3d;
-  font-weight: 600;
+  color: #061730;
 }
 
 .order-card-list {

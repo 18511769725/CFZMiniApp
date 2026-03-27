@@ -74,35 +74,35 @@
                     所选套餐：{{ getPackageTitle() }}
                   </view>
 
-                  <!-- 商品价格（含购买数量计算） -->
-                  <view class="cargo-price">{{ getCargoPrice() }}</view>
-
-                  <!-- 兑换数量：自绘步进器（小程序下父组件样式无法穿透 uni-number-box 内部） -->
-                  <view class="cargo-amount-wrapper" v-if="!isDisabled">
-                    <view class="amount-label">兑换数量：</view>
-                    <view class="qty-stepper">
-                      <view class="qty-cell qty-btn" @click="stepMinus">
-                        <view class="qty-cell-fill">
-                          <text class="qty-btn-text">−</text>
+                  <!-- 套餐总分 + 兑换数量：稿同一行，左右分布 -->
+                  <view class="cargo-price-qty-row">
+                    <view class="cargo-price">{{ getCargoPrice() }}</view>
+                    <view class="cargo-amount-wrapper" v-if="!isDisabled">
+                      <view class="amount-label">兑换数量：</view>
+                      <view class="qty-stepper">
+                        <view class="qty-cell qty-btn" @click="stepMinus">
+                          <view class="qty-cell-fill">
+                            <text class="qty-btn-text">−</text>
+                          </view>
                         </view>
-                      </view>
-                      <view class="qty-cell qty-input-outer">
-                        <input
-                          class="qty-input-inner"
-                          type="number"
-                          :value="String(currentAmount)"
-                          @blur="onQtyInputBlur"
-                        />
-                      </view>
-                      <view class="qty-cell qty-btn" @click="stepPlus">
-                        <view class="qty-cell-fill">
-                          <text class="qty-btn-text">+</text>
+                        <view class="qty-cell qty-input-outer">
+                          <input
+                            class="qty-input-inner"
+                            type="number"
+                            :value="String(currentAmount)"
+                            @blur="onQtyInputBlur"
+                          />
+                        </view>
+                        <view class="qty-cell qty-btn" @click="stepPlus">
+                          <view class="qty-cell-fill">
+                            <text class="qty-btn-text">+</text>
+                          </view>
                         </view>
                       </view>
                     </view>
-                  </view>
-                  <view class="cargo-amount-disabled" v-else>
-                    兑换数量：{{ cargo.buyamount || 1 }}
+                    <view class="cargo-amount-disabled" v-else>
+                      兑换数量：{{ cargo.buyamount || 1 }}
+                    </view>
                   </view>
                 </view>
               </view>
@@ -433,8 +433,8 @@ const handleSwipeDelete = () => {
   height: 100%;
   min-height: 0;
   overflow: hidden;
-  /* 最后一行距卡片底边 27rpx */
-  padding: 12rpx 14rpx 27rpx 12rpx;
+  /* 封面距卡片上边 20rpx、左边 22rpx；底边留白仍 27rpx */
+  padding: 20rpx 14rpx 27rpx 22rpx;
   border-radius: 23rpx;
   box-sizing: border-box;
   background: transparent;
@@ -466,12 +466,15 @@ const handleSwipeDelete = () => {
   align-self: center;
 }
 
+/* 稿 .3-2：36×37、1rpx 金渐变描边。设计稿 border-image 与圆角在小程序不可靠，用 padding 模拟 1rpx 边 */
 .cargo-check-outer {
   width: 36rpx;
   height: 37rpx;
   padding: 1rpx;
   border-radius: 50%;
   box-sizing: border-box;
+  flex-shrink: 0;
+  overflow: hidden;
   background: linear-gradient(0deg, #faebcc 0%, #ddb877 100%);
 }
 
@@ -528,17 +531,17 @@ const handleSwipeDelete = () => {
   overflow: hidden;
 }
 
-/* 稿 .34 标题 */
+/* 商品名称行 */
 .cargo-title {
   font-family:
-    PingFang SC,
     PingFangSC-Semibold,
+    "PingFang SC",
     -apple-system,
     sans-serif;
   font-size: 35rpx;
   font-weight: normal;
   font-stretch: normal;
-  letter-spacing: 0;
+  letter-spacing: 0rpx;
   color: #ffffff;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -548,20 +551,48 @@ const handleSwipeDelete = () => {
 }
 
 .cargo-supplier {
-  font-size: 24rpx;
-  color: rgba(200, 220, 240, 0.65);
+  font-family: PingFangSC-Regular, "PingFang SC", -apple-system, sans-serif;
+  font-size: 23rpx;
+  font-weight: normal;
+  font-stretch: normal;
+  letter-spacing: 0rpx;
+  color: #b8dced;
 }
 
 .cargo-package {
-  font-size: 24rpx;
-  color: rgba(200, 220, 240, 0.7);
+  font-family: PingFangSC-Regular, "PingFang SC", -apple-system, sans-serif;
+  font-size: 21rpx;
+  font-weight: normal;
+  font-stretch: normal;
+  line-height: 23rpx;
+  letter-spacing: 0rpx;
+  color: #ffffff;
+}
+
+.cargo-price-qty-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: nowrap;
+  gap: 12rpx;
+  margin-top: 4rpx;
+  min-width: 0;
+  width: 100%;
 }
 
 .cargo-price {
-  font-size: 26rpx;
-  font-weight: 600;
-  color: #e8c87c;
-  margin-top: 4rpx;
+  flex: 1;
+  min-width: 0;
+  font-family: PingFangSC-Medium, "PingFang SC", -apple-system, sans-serif;
+  font-size: 25rpx;
+  font-weight: normal;
+  font-stretch: normal;
+  letter-spacing: 0rpx;
+  color: #e9d591;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .cargo-amount-wrapper {
@@ -569,19 +600,30 @@ const handleSwipeDelete = () => {
   flex-direction: row;
   align-items: center;
   flex-wrap: nowrap;
-  margin-top: 4rpx;
+  flex-shrink: 0;
 }
 
 .amount-label {
-  font-size: 24rpx;
-  color: rgba(255, 255, 255, 0.55);
   margin-right: 12rpx;
+  font-family: PingFangSC-Regular, "PingFang SC", -apple-system, sans-serif;
+  font-size: 18rpx;
+  font-weight: normal;
+  font-stretch: normal;
+  line-height: 23rpx;
+  letter-spacing: 0rpx;
+  color: #ffffff;
 }
 
 .cargo-amount-disabled {
-  font-size: 24rpx;
-  color: rgba(255, 255, 255, 0.45);
-  margin-top: 8rpx;
+  flex-shrink: 0;
+  font-family: PingFangSC-Regular, "PingFang SC", -apple-system, sans-serif;
+  font-size: 18rpx;
+  font-weight: normal;
+  font-stretch: normal;
+  line-height: 23rpx;
+  letter-spacing: 0rpx;
+  color: #ffffff;
+  white-space: nowrap;
 }
 
 /* 稿 .32-2：24×26 单元；蓝底渐变 + 金描边；0.4 用 rgba，不用整元素 opacity */
