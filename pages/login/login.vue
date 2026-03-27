@@ -1,5 +1,6 @@
 <template>
   <view class="login-container">
+    <!-- 登录全屏底图统一走 CDN，请勿改回 /static 本地路径，避免同事环境不一致 -->
     <image
       class="bg-image"
       src="https://mvpme82.cloud/data/fc40e6c4-e178-4c26-9837-b79c108a52da_1774528166249.png"

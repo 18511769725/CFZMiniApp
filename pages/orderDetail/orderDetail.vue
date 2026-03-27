@@ -155,7 +155,7 @@
       </view>
     </view>
 
-    <!-- 订单商品内容 -->
+    <!-- 订单商品内容：外框与其它信息卡一致，内框（图+标题+明细）单独背景 -->
     <view class="info-card-wrap">
       <view class="info-card-inner">
       <view class="card-title">订单商品明细</view>
@@ -178,21 +178,28 @@
           <!-- 商品信息 -->
           <view class="product-info">
             <text class="product-name">{{ product.producttitle }}</text>
-            <view class="product-price">
-              <text class="label">单价：</text>
-              <text class="value">{{ product.singleprice }}积分</text>
-            </view>
-            <view class="product-count">
-              <text class="label">数量：</text>
-              <text class="value">{{ product.buyamount }}</text>
-            </view>
-            <view class="product-subtotal">
-              <text class="label">小计：</text>
-              <text class="value">{{ product.singleamount }}积分</text>
-            </view>
-            <view class="product-price" v-if="product.categoryaid === 0">
-              <text class="label">说明：</text>
-              <text class="value">{{ product.packagetitle }}</text>
+            <view class="product-metric-grid">
+              <text class="product-metric-key">单价：</text>
+              <view class="product-metric-val">
+                <text class="product-metric-base"
+                  >{{ product.singleprice }}积分</text
+                >
+              </view>
+              <text class="product-metric-key">数量：</text>
+              <view class="product-metric-val">
+                <text class="product-metric-base">{{ product.buyamount }}</text>
+              </view>
+              <text class="product-metric-key">小计：</text>
+              <view class="product-metric-val product-metric-val--inline">
+                <text class="product-metric-base">{{ product.singleamount }}</text>
+                <text class="product-metric-jifen">积分</text>
+              </view>
+              <template v-if="product.categoryaid === 0">
+                <text class="product-metric-key">说明：</text>
+                <text class="product-metric-base product-metric-desc">{{
+                  product.packagetitle
+                }}</text>
+              </template>
             </view>
           </view>
           </view>
@@ -663,6 +670,10 @@ const approvalorder = () => {
 </script>
 
 <style scoped lang="scss">
+$order-card-bg: "https://mvpme82.cloud/data/1955628e-c81e-4475-80d6-85b769cfdac7_1774583803536.png";
+/* 单条商品内框：缩略图 + 商品名 + 单价数量小计说明 */
+$order-product-row-bg: "https://mvpme82.cloud/data/a480b220-ffb8-4240-b1e9-ade6f859f7fb_1774584644088.png";
+
 /* 页面底色 */
 .detail-container {
   min-height: 100vh;
@@ -708,27 +719,25 @@ const approvalorder = () => {
   }
 }
 
-/* 内部信息卡：171° 渐变描边 2rpx，约 688 宽（设计稿） */
+/* 内部信息卡：统一使用设计稿切片背景 */
 .info-card-wrap {
   width: 100%;
   max-width: 688rpx;
   margin: 0 auto 24rpx;
-  padding: 2rpx;
-  border-radius: 34rpx;
   box-sizing: border-box;
-  background: linear-gradient(
-    171deg,
-    #80c3f6 0%,
-    #244368 48%,
-    #9ccdf0 100%
-  );
+  border-radius: 34rpx;
+  overflow: hidden;
 }
 
 .info-card-inner {
-  border-radius: 32rpx;
+  border-radius: 34rpx;
   padding: 28rpx 24rpx 30rpx;
   box-sizing: border-box;
-  background: rgba(24, 43, 72, 0.4);
+  overflow: hidden;
+  background-image: url(#{$order-card-bg});
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  background-position: center center;
 }
 
 .card-title {
@@ -740,15 +749,19 @@ const approvalorder = () => {
   border-bottom: 1rpx solid rgba(156, 205, 240, 0.22);
 }
 
+/* 内容区正文：设计稿 .138-1234，PingFangSC-Regular 28rpx #fff（行高不用 164rpx 以免多行叠行） */
 .info-item {
   display: flex;
   align-items: flex-start;
   padding: 12rpx 0;
+  font-family: "PingFang SC", PingFangSC-Regular, -apple-system, sans-serif;
   font-size: 28rpx;
-  line-height: 1.45;
+  font-weight: normal;
+  line-height: 1.64;
+  letter-spacing: 0;
 
   .label {
-    color: rgba(156, 205, 240, 0.92);
+    color: #ffffff;
     width: 200rpx;
     flex-shrink: 0;
   }
@@ -765,11 +778,11 @@ const approvalorder = () => {
 
   .label {
     width: 160rpx;
-    font-size: 26rpx;
+    font-size: 28rpx;
   }
 
   .value {
-    font-size: 26rpx;
+    font-size: 28rpx;
   }
 }
 
@@ -785,24 +798,16 @@ const approvalorder = () => {
   min-width: 0;
 }
 
-/* 状态高亮（待审批等） */
-.status-pending {
-  color: #ff8a6a !important;
-}
-.status-negotiate {
-  color: #7ec8ff !important;
-}
-.status-signed {
-  color: #6ee7d8 !important;
-}
-.status-finished {
-  color: #8fd99f !important;
-}
+/* 内容区状态与正文同色（白） */
+.status-pending,
+.status-negotiate,
+.status-signed,
+.status-finished,
 .status-terminated {
-  color: #f56c6c !important;
+  color: #ffffff !important;
 }
 
-/* 订单商品：634×216 区域渐变描边 */
+/* 订单商品：外框同 info-card；内框（图+标题+明细）铺专用底图 */
 .product-list {
   width: 100%;
 }
@@ -811,16 +816,9 @@ const approvalorder = () => {
   width: 100%;
   max-width: 634rpx;
   margin: 0 auto 20rpx;
-  padding: 1rpx;
   border-radius: 24rpx;
   box-sizing: border-box;
-  background: linear-gradient(
-    171deg,
-    #ffd9ba 0%,
-    #244368 48%,
-    #7c755c 74%,
-    #d3a64f 100%
-  );
+  overflow: hidden;
 }
 
 .product-card-inner {
@@ -829,9 +827,13 @@ const approvalorder = () => {
   align-items: flex-start;
   min-height: 200rpx;
   padding: 20rpx;
-  border-radius: 22rpx;
+  border-radius: 24rpx;
   box-sizing: border-box;
-  background: rgba(27, 48, 78, 0.74);
+  overflow: hidden;
+  background-image: url(#{$order-product-row-bg});
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  background-position: center center;
 }
 
 .product-img {
@@ -840,8 +842,9 @@ const approvalorder = () => {
   flex-shrink: 0;
   margin-right: 20rpx;
   padding: 1rpx;
-  border-radius: 8rpx;
+  border-radius: 18rpx;
   box-sizing: border-box;
+  overflow: hidden;
   background: linear-gradient(
     178deg,
     #5e97d2 0%,
@@ -853,7 +856,7 @@ const approvalorder = () => {
 .product-img-frame {
   width: 100%;
   height: 100%;
-  border-radius: 6rpx;
+  border-radius: 17rpx;
   overflow: hidden;
   background: linear-gradient(0deg, #1b4163 0%, #76aaff 100%);
 
@@ -872,38 +875,72 @@ const approvalorder = () => {
 }
 
 .product-name {
+  font-family: "PingFang SC", PingFangSC-Regular, -apple-system, sans-serif;
   font-size: 28rpx;
-  font-weight: 600;
+  font-weight: normal;
   color: #ffffff;
   margin-bottom: 12rpx;
-  line-height: 1.35;
+  line-height: 1.64;
+  letter-spacing: 0;
 }
 
-.product-price,
-.product-count,
-.product-subtotal {
+/* 商品明细：Grid 第一列 max-content，与数值列仅 20rpx 间距，避免定宽 120rpx 留空 */
+.product-metric-grid {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  column-gap: 20rpx;
+  row-gap: 6rpx;
+  align-items: start;
+  width: 100%;
+  max-width: 100%;
+}
+
+.product-metric-key {
+  font-family: "PingFang SC", PingFangSC-Regular, -apple-system, sans-serif;
+  font-size: 21rpx;
+  font-weight: normal;
+  line-height: 28rpx;
+  letter-spacing: 0;
+  color: #ffffff;
+  white-space: nowrap;
+}
+
+.product-metric-val {
+  flex: 1;
+  min-width: 0;
   display: flex;
+  flex-direction: row;
   flex-wrap: wrap;
-  font-size: 24rpx;
-  margin-bottom: 6rpx;
-  line-height: 1.4;
-
-  .label {
-    color: rgba(156, 205, 240, 0.88);
-    width: auto;
-    min-width: 72rpx;
-    flex-shrink: 0;
-  }
-
-  .value {
-    color: rgba(255, 255, 255, 0.95);
-    flex: 1;
-  }
+  align-items: center;
 }
 
-.product-subtotal .value {
-  color: #e36a46;
-  font-weight: 600;
+.product-metric-val--inline {
+  flex-wrap: nowrap;
+  align-items: baseline;
+}
+
+.product-metric-base {
+  font-family: "PingFang SC", PingFangSC-Regular, -apple-system, sans-serif;
+  font-size: 21rpx;
+  font-weight: normal;
+  line-height: 28rpx;
+  letter-spacing: 0;
+  color: #ffffff;
+}
+
+/* 仅小计行的「积分」 */
+.product-metric-jifen {
+  font-family: "PingFang SC", PingFangSC-Regular, -apple-system, sans-serif;
+  font-size: 21rpx;
+  font-weight: normal;
+  line-height: 28rpx;
+  letter-spacing: 0;
+  color: #f6d69f;
+}
+
+.product-metric-desc {
+  min-width: 0;
+  word-break: break-all;
 }
 
 /* 底部 .34：750×123 浅金渐变 @0.15 + 1rpx 描边；按钮 .33：665×71 #f45d5d */
