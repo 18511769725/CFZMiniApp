@@ -12,7 +12,7 @@
       <!-- 卡片内容 -->
       <view class="card-content-left">
         <!-- 图标 -->
-        <view class="icon-wrapper">
+        <view class="icon-wrapper" :style="iconWrapperStyle">
           <image
             v-if="isImgPath(icon)"
             :src="icon"
@@ -39,6 +39,8 @@
 </template>
 
 <script setup>
+import { computed } from "vue";
+
 const props = defineProps({
   stepNumber: {
     type: [String, Number],
@@ -65,6 +67,22 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  /** 个别切图留白少、同尺寸下显大时缩小，如 0.86 */
+  iconScale: {
+    type: Number,
+    default: 1,
+  },
+});
+
+const iconWrapperStyle = computed(() => {
+  const s = props.iconScale;
+  if (typeof s !== "number" || s <= 0 || (s >= 0.999 && s <= 1.001)) {
+    return {};
+  }
+  return {
+    transform: `scale(${s})`,
+    transformOrigin: "center center",
+  };
 });
 
 // 判断是否为图片路径
@@ -111,25 +129,27 @@ const isImgPath = (value) => {
     align-items: stretch;
     justify-content: center;
     box-sizing: border-box;
-    padding: 16rpx 0 12rpx;
+    padding: 15rpx 0 11rpx;
     // 背景透明，无颜色遮罩
     background: rgba(0, 0, 0, 0);
 
     .card-content-left {
-      width: 150rpx;
+      width: 144rpx;
       min-height: 0;
       display: flex;
       flex-direction: column;
       justify-content: flex-start;
       align-items: center;
-      gap: 12rpx;
+      gap: 11rpx;
       text-align: center;
     }
 
     .card-content-right {
-      width: 50rpx;
+      width: 56rpx;
+      flex-shrink: 0;
       display: flex;
       flex-direction: column;
+      align-items: center;
       justify-content: center;
       // 背景透明，无颜色遮罩
       background: rgba(0, 0, 0, 0);
@@ -143,16 +163,21 @@ const isImgPath = (value) => {
     flex-shrink: 0;
   }
 
-  // 序号（统一相对左侧内容右移 7rpx）
+  // 序号：置于右侧箭头区内，flex 居中（避免 margin 挤出列宽盖住邻卡）
   .step-number-badge {
     width: 40rpx;
     height: 40rpx;
-    margin-left: 13rpx;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
 
     text {
       font-size: 28rpx;
       font-weight: 700;
       color: #f4f5f6;
+      line-height: 1;
+      text-align: center;
     }
   }
 
@@ -179,11 +204,11 @@ const isImgPath = (value) => {
     overflow: hidden;
 
     .card-title {
-      font-size: 24rpx;
+      font-size: 26rpx;
       font-weight: 600;
       color: #fff;
       line-height: 1.25;
-      margin-bottom: 8rpx;
+      margin-bottom: 7rpx;
       word-break: break-word;
       flex-shrink: 0;
       overflow: hidden;
@@ -193,7 +218,7 @@ const isImgPath = (value) => {
     }
 
     .card-subtitle {
-      font-size: 18rpx;
+      font-size: 20rpx;
       color: rgba(255, 255, 255);
       line-height: 1.35;
       word-break: break-word;
@@ -211,17 +236,17 @@ const isImgPath = (value) => {
 
     /* 设计稿：icon 距卡片顶 15rpx */
     .card-content-wrapper {
-      padding: 15rpx 0 8rpx;
+      padding: 14rpx 0 7rpx;
     }
 
     .card-content-left {
-      width: 115rpx;
-      /* 设计稿：标题距 icon 底 16rpx */
-      gap: 16rpx;
+      width: 109rpx;
+      /* 字号略增后略收间距，避免顶底裁切 */
+      gap: 13rpx;
     }
 
     .card-content-right {
-      width: 38rpx;
+      width: 46rpx;
     }
 
     .card-icon {
@@ -236,7 +261,6 @@ const isImgPath = (value) => {
     .step-number-badge {
       width: 32rpx;
       height: 32rpx;
-      margin-left: 11rpx;
 
       text {
         font-size: 22rpx;
@@ -248,21 +272,21 @@ const isImgPath = (value) => {
       word-break: normal;
     }
 
-    /* 申请流程：标题 17rpx，副标题 12rpx，二者间距 15rpx */
+    /* 申请流程：标题/副标题较设计稿各 +2rpx，间距略收以保持 161 高内不乱版 */
     .card-text .card-title {
-      font-size: 17rpx;
+      font-size: 19rpx;
       line-height: 1.25;
-      margin-bottom: 15rpx;
+      margin-bottom: 12rpx;
       word-break: break-word;
       overflow-wrap: break-word;
       -webkit-line-clamp: 2;
     }
 
-    /* 副标题收窄到约每行 5～6 个汉字，两行时第二行多为 4～5 字；92rpx 在真机仍偏宽易成 8+1 */
+    /* 副标题宽约 102rpx：14rpx 字号下约每行 6～7 个汉字，仍落在左侧 109rpx 栏内不压序号区 */
     .card-text .card-subtitle {
-      font-size: 12rpx;
-      line-height: 1.45;
-      max-width: 72rpx;
+      font-size: 14rpx;
+      line-height: 1.42;
+      max-width: 102rpx;
       margin-left: auto;
       margin-right: auto;
       text-align: center;

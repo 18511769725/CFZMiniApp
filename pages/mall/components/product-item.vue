@@ -59,7 +59,11 @@
           </view>
         </view>
         <view v-else class="anju-yuexiang-price-wrap">
-          <text class="anju-yuexiang-price">{{ getProductPrice() }}</text>
+          <text
+            class="anju-yuexiang-price"
+            :class="{ 'anju-yuexiang-price--gold': isYuexiangGoldPrice }"
+            >{{ getProductPrice() }}</text
+          >
         </view>
         <view
           class="anju-footer-row"
@@ -219,6 +223,15 @@ const formatPrice = (price) => {
   if (typeof price !== "number" || isNaN(price)) return "0.00";
   return price.toFixed(2);
 };
+
+/**
+ * 悦享列表计价行：0 折扣、1 优惠扣减、2 套餐计分 — 与详情 .anju-tag-score-label 同色；
+ * 其它（如商谈面议）沿用默认强调色。
+ */
+const isYuexiangGoldPrice = computed(() => {
+  const pt = parseInt(props.product.pricetype, 10) || 0;
+  return pt === 0 || pt === 1 || pt === 2;
+});
 
 const getProductPrice = () => {
   const { pricetype, pricefactor, originalprice } = props.product;
@@ -483,6 +496,11 @@ const toProductDetail = () => {
   color: #e53935;
   line-height: 1.35;
   word-break: break-all;
+}
+
+/* 与 pages/product/product-detail.vue .anju-tag-score-label 同色 */
+.anju-yuexiang-price--gold {
+  color: #e9d591;
 }
 
 .anju-footer-row {

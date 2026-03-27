@@ -38,6 +38,7 @@
               :compact-flow="true"
               :step-number="String(index + 1).padStart(2, '0')"
               :icon="step.icon"
+              :icon-scale="step.iconScale ?? 1"
               :title="step.title"
               :subtitle="step.subtitle"
               :background-image="step.backgroundImage"
@@ -166,6 +167,8 @@ const steps = ref([
     subtitle: "工作、社保、住房信息核验",
     icon: "/static/pages/mall/process_yiju_2.png",
     backgroundImage: "/static/pages/mall/processitembg.png",
+    /* 该切图构图更满，同 44rpx 下显大，略缩以与其它步一致 */
+    iconScale: 0.86,
   },
   {
     title: "复核备案",
