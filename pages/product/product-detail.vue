@@ -1404,7 +1404,7 @@ onLoad((options) => {
   color: #ffffff;
 }
 
-/* 未选中：607×63、圆角 14、描边 #e3c695 */
+/* 未选中：607×63、圆角 14、描边 #e3c695 2rpx */
 .anju-package-item {
   display: flex;
   flex-direction: row;
@@ -1417,7 +1417,7 @@ onLoad((options) => {
   padding: 0 20rpx;
   box-sizing: border-box;
   border-radius: 14rpx;
-  border: solid 1rpx #e3c695;
+  border: solid 2rpx #e3c695;
   background: rgba(20, 42, 74, 0.95);
 }
 
