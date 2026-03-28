@@ -644,7 +644,7 @@ const toProductDetail = () => {
   height: 35rpx;
   flex-shrink: 0;
   overflow: hidden;
-  border-radius: 18rpx;
+  border-radius: 12rpx;
   box-sizing: border-box;
 }
 

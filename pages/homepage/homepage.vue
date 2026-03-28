@@ -94,7 +94,9 @@
         </view>
       </view>
 
-      <view class="section-title section-title--account module-enter enter-delay-1">
+      <view
+        class="section-title section-title--account module-enter enter-delay-1"
+      >
         <view class="section-title-bar" />
         <text>当前账户信息</text>
       </view>
@@ -651,7 +653,11 @@ page {
   width: 357rpx;
   max-width: 100%;
   height: 28rpx;
-  font-family: PingFangSC-Regular, PingFang SC, -apple-system, sans-serif;
+  font-family:
+    PingFangSC-Regular,
+    PingFang SC,
+    -apple-system,
+    sans-serif;
   font-size: 30rpx;
   font-weight: normal;
   font-stretch: normal;
@@ -668,7 +674,11 @@ page {
   width: 473rpx;
   max-width: 100%;
   height: 23rpx;
-  font-family: PingFangSC-Light, PingFang SC, -apple-system, sans-serif;
+  font-family:
+    PingFangSC-Light,
+    PingFang SC,
+    -apple-system,
+    sans-serif;
   font-size: 24rpx;
   font-weight: normal;
   font-stretch: normal;
@@ -725,7 +735,11 @@ page {
   width: 100%;
   max-width: 100%;
   box-sizing: border-box;
-  font-family: PingFangSC-Light, "PingFang SC", -apple-system, sans-serif;
+  font-family:
+    PingFangSC-Light,
+    "PingFang SC",
+    -apple-system,
+    sans-serif;
   font-size: 21rpx;
   font-weight: normal;
   font-stretch: normal;
@@ -734,7 +748,11 @@ page {
 }
 
 .company-field-row .text-style-1 {
-  font-family: PingFangSC-Medium, "PingFang SC", -apple-system, sans-serif;
+  font-family:
+    PingFangSC-Medium,
+    "PingFang SC",
+    -apple-system,
+    sans-serif;
   font-size: 24rpx;
   font-weight: normal;
   letter-spacing: 0rpx;
@@ -742,7 +760,11 @@ page {
 }
 
 .company-field-row .text-style-2 {
-  font-family: PingFangSC-Light, "PingFang SC", -apple-system, sans-serif;
+  font-family:
+    PingFangSC-Light,
+    "PingFang SC",
+    -apple-system,
+    sans-serif;
   font-size: 21rpx;
   font-weight: normal;
   font-stretch: normal;
@@ -804,7 +826,10 @@ page {
   flex: 1;
   min-width: 0;
   max-width: 100%;
-  font-family: PingFang SC, PingFangSC-Light, sans-serif;
+  font-family:
+    PingFang SC,
+    PingFangSC-Light,
+    sans-serif;
   font-size: 21rpx;
   font-weight: normal;
   letter-spacing: 0;
@@ -812,12 +837,18 @@ page {
 }
 
 .ci-val.ci-val--style1 {
-  font-family: PingFang SC, PingFangSC-Medium, sans-serif;
+  font-family:
+    PingFang SC,
+    PingFangSC-Medium,
+    sans-serif;
   font-size: 24rpx;
 }
 
 .ci-val.ci-val--style2 {
-  font-family: PingFang SC, PingFangSC-Light, sans-serif;
+  font-family:
+    PingFang SC,
+    PingFangSC-Light,
+    sans-serif;
   font-size: 21rpx;
   letter-spacing: 1rpx;
 }
@@ -906,7 +937,11 @@ page {
   display: block;
   max-width: 100%;
   box-sizing: border-box;
-  font-family: PingFangSC-Medium, "PingFang SC", -apple-system, sans-serif;
+  font-family:
+    PingFangSC-Medium,
+    "PingFang SC",
+    -apple-system,
+    sans-serif;
   font-size: 34rpx;
   font-weight: normal;
   font-stretch: normal;
@@ -919,7 +954,11 @@ page {
 /* 稿：职位 PingFangSC-Regular 22rpx */
 .account-role.text-style-1 {
   display: block;
-  font-family: PingFangSC-Regular, "PingFang SC", -apple-system, sans-serif;
+  font-family:
+    PingFangSC-Regular,
+    "PingFang SC",
+    -apple-system,
+    sans-serif;
   font-size: 22rpx;
   font-weight: normal;
   font-stretch: normal;
@@ -962,7 +1001,11 @@ page {
 
 .account-contact-text {
   box-sizing: border-box;
-  font-family: PingFangSC-Medium, "PingFang SC", -apple-system, sans-serif;
+  font-family:
+    PingFangSC-Medium,
+    "PingFang SC",
+    -apple-system,
+    sans-serif;
   font-size: 23rpx;
   font-weight: normal;
   font-stretch: normal;
@@ -1121,7 +1164,11 @@ page {
   text-align: center;
   padding: 0 8rpx;
   border-radius: 27rpx;
-  font-family: PingFangSC-Medium, "PingFang SC", -apple-system, sans-serif;
+  font-family:
+    PingFangSC-Medium,
+    "PingFang SC",
+    -apple-system,
+    sans-serif;
   font-size: 29rpx;
   font-weight: normal;
   font-stretch: normal;
@@ -1179,21 +1226,16 @@ page {
   height: 137rpx;
   padding: 3rpx;
   box-sizing: border-box;
-  border-radius: 18rpx;
+  border-radius: 12rpx;
   overflow: hidden;
   flex-shrink: 0;
-  background: linear-gradient(
-    178deg,
-    #5e97d2 0%,
-    #2c5f8f 49%,
-    #6a9ccf 100%
-  );
+  background: linear-gradient(178deg, #5e97d2 0%, #2c5f8f 49%, #6a9ccf 100%);
 }
 
 .order-thumb-inner {
   width: 100%;
   height: 100%;
-  border-radius: 15rpx;
+  border-radius: 12rpx;
   overflow: hidden;
   background: linear-gradient(180deg, #1b4163 0%, #76aadf 100%);
 }
@@ -1225,7 +1267,11 @@ page {
 /* 个人中心·服务清单订单信息：PingFang 正文；三行占位 3×30 + 2×2 = 94rpx */
 .order-row-line {
   display: block;
-  font-family: PingFangSC-Regular, "PingFang SC", -apple-system, sans-serif;
+  font-family:
+    PingFangSC-Regular,
+    "PingFang SC",
+    -apple-system,
+    sans-serif;
   font-size: 19rpx;
   font-weight: normal;
   font-stretch: normal;
@@ -1249,17 +1295,13 @@ page {
   border-radius: 15rpx;
   border: 1rpx solid transparent;
   /* 内层与 .order-panel-inner 同色，仅留出 1rpx 渐变描边（全透明会透出下层渐变） */
-  background-image: linear-gradient(
-      rgba(6, 20, 40, 0.94),
-      rgba(6, 20, 40, 0.94)
-    ),
+  background-image:
     linear-gradient(
-      159deg,
-      #afcde9 0%,
-      #3763b3 50%,
-      #2453ab 58%,
-      #afcef2 100%
-    );
+      180deg,
+      rgba(20, 45, 78, 0.35) 0%,
+      rgba(20, 45, 78, 0.25) 100%
+    ),
+    linear-gradient(159deg, #afcde9 0%, #3763b3 50%, #2453ab 58%, #afcef2 100%);
   background-origin: padding-box, border-box;
   -webkit-background-clip: padding-box, border-box;
   background-clip: padding-box, border-box;
