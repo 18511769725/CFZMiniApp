@@ -707,7 +707,7 @@ $order-product-row-bg: "https://mvpme82.cloud/data/a480b220-ffb8-4240-b1e9-ade6f
   height: 0;
   min-height: 0;
   padding: 15rpx 15rpx 24rpx;
-  padding-bottom: calc(160rpx + env(safe-area-inset-bottom));
+  padding-bottom: 24rpx;
   box-sizing: border-box;
 }
 
@@ -1012,14 +1012,13 @@ $order-product-row-bg: "https://mvpme82.cloud/data/a480b220-ffb8-4240-b1e9-ade6f
 
 /* 底部 .34：750×123 浅金渐变 @0.15 + 1rpx 描边；按钮 .33：665×71 #f45d5d */
 .bottom-actions {
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 100;
+  position: relative;
+  z-index: 1;
+  flex-shrink: 0;
+  width: 100%;
   min-height: 123rpx;
   padding: 26rpx 42rpx;
-  padding-bottom: calc(26rpx + env(safe-area-inset-bottom));
+  // padding-bottom: calc(26rpx + env(safe-area-inset-bottom));
   box-sizing: border-box;
   display: flex;
   flex-direction: row;
