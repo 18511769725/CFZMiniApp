@@ -7,9 +7,9 @@
           <text class="header-title">订单详情</text>
         </view>
 
-        <!-- 采购方企业信息 -->
+        <!-- 采购方企业信息（专用底图，避免通用切片过大裁切圆角） -->
         <view class="info-card-wrap">
-          <view class="info-card-inner">
+          <view class="info-card-inner info-card-inner--buyer-enterprise">
             <view class="card-title">采购方企业信息</view>
             <view class="info-item">
               <text class="label">企业名称：</text>
@@ -167,7 +167,7 @@
 
         <!-- 订单商品内容：外框与其它信息卡一致，内框（图+标题+明细）单独背景 -->
         <view class="info-card-wrap">
-          <view class="info-card-inner">
+          <view class="info-card-inner info-card-inner--order-products">
             <view class="card-title">订单商品明细</view>
             <view class="product-list">
               <view
@@ -686,6 +686,8 @@ const approvalorder = () => {
 
 <style scoped lang="scss">
 $order-card-bg: "https://mvpme82.cloud/data/1955628e-c81e-4475-80d6-85b769cfdac7_1774583803536.png";
+/* 采购方企业信息：替换为适配圆角卡片的切片，避免原图过大四角被裁 */
+$order-card-bg-buyer-enterprise: "https://mvpme82.cloud/data/3a804cca-062a-4c33-9407-fccd7e3477c4_1774666873982.png";
 /* 单条商品内框：缩略图 + 商品名 + 单价数量小计说明 */
 $order-product-row-bg: "https://mvpme82.cloud/data/a480b220-ffb8-4240-b1e9-ade6f859f7fb_1774584644088.png";
 
@@ -713,9 +715,12 @@ $order-product-row-bg: "https://mvpme82.cloud/data/a480b220-ffb8-4240-b1e9-ade6f
 .panel-7 {
   width: 720rpx;
   max-width: 100%;
-  min-height: 1655rpx;
-  margin: 0 auto;
-  padding: 24rpx 16rpx 40rpx;
+  /* 勿设过大 min-height，否则内容下方会被面板背景拉出一长条空白 */
+  min-height: 0;
+  /* 面板底边到外层层底（深色底可见区）间距 27rpx */
+  margin: 0 auto 27rpx;
+  /* 最后一张信息卡底 → 面板内底边 27rpx：末卡去 margin，底内边距用 27 */
+  padding: 24rpx 16rpx 27rpx;
   box-sizing: border-box;
   border-radius: 34rpx;
   overflow: hidden;
@@ -747,9 +752,14 @@ $order-product-row-bg: "https://mvpme82.cloud/data/a480b220-ffb8-4240-b1e9-ade6f
   overflow: hidden;
 }
 
+.panel-7 > .info-card-wrap:last-child {
+  margin-bottom: 0;
+}
+
 .info-card-inner {
   border-radius: 34rpx;
-  padding: 28rpx 24rpx 30rpx;
+  /* 标题区：距顶 26rpx、距左 30rpx；末行文字距卡底边线 33rpx */
+  padding: 26rpx 30rpx 33rpx;
   box-sizing: border-box;
   overflow: hidden;
   background-image: url(#{$order-card-bg});
@@ -758,20 +768,34 @@ $order-product-row-bg: "https://mvpme82.cloud/data/a480b220-ffb8-4240-b1e9-ade6f
   background-position: center center;
 }
 
+.info-card-inner--buyer-enterprise {
+  background-image: url(#{$order-card-bg-buyer-enterprise});
+}
+
+/* 订单商品块：与其它信息卡一致，末行距卡底 33rpx（末条 product-card 无下边距） */
+.info-card-inner--order-products {
+  padding-bottom: 33rpx;
+}
+
+.product-list > .product-card:last-child {
+  margin-bottom: 0;
+}
+
 .card-title {
   font-size: 30rpx;
   font-weight: 600;
   color: #e3ae68;
-  padding-bottom: 16rpx;
+  /* 标题底到横线：设计 17rpx（各块 card-title 共用） */
+  padding-bottom: 17rpx;
   margin-bottom: 20rpx;
   border-bottom: 1rpx solid rgba(156, 205, 240, 0.22);
 }
 
-/* 内容区正文：设计稿 .138-1234，PingFangSC-Regular 28rpx #fff（行高不用 164rpx 以免多行叠行） */
+/* 内容区正文：28rpx；三行示例总高 140rpx → 行高 40 + 行间 10×2 = 140 */
 .info-item {
   display: flex;
   align-items: flex-start;
-  padding: 12rpx 0;
+  padding: 0;
   font-family:
     "PingFang SC",
     PingFangSC-Regular,
@@ -779,7 +803,7 @@ $order-product-row-bg: "https://mvpme82.cloud/data/a480b220-ffb8-4240-b1e9-ade6f
     sans-serif;
   font-size: 28rpx;
   font-weight: normal;
-  line-height: 1.64;
+  line-height: 40rpx;
   letter-spacing: 0;
 
   .label {
@@ -795,8 +819,14 @@ $order-product-row-bg: "https://mvpme82.cloud/data/a480b220-ffb8-4240-b1e9-ade6f
   }
 }
 
+/* 卡内相邻字段行间距 10rpx（与上式配合：3×40+2×10=140） */
+.info-card-inner > .info-item:not(:last-child) {
+  margin-bottom: 10rpx;
+}
+
 .info-item--compact {
-  padding: 10rpx 0;
+  padding: 0;
+  line-height: 40rpx;
 
   .label {
     width: 160rpx;
@@ -806,6 +836,10 @@ $order-product-row-bg: "https://mvpme82.cloud/data/a480b220-ffb8-4240-b1e9-ade6f
   .value {
     font-size: 28rpx;
   }
+}
+
+.payment-col > .info-item--compact:not(:last-child) {
+  margin-bottom: 10rpx;
 }
 
 .payment-grid {
@@ -847,7 +881,7 @@ $order-product-row-bg: "https://mvpme82.cloud/data/a480b220-ffb8-4240-b1e9-ade6f
   display: flex;
   flex-direction: row;
   align-items: flex-start;
-  min-height: 200rpx;
+  /* 不设 min-height，避免内容不足时底部被撑出大块空白（原 200rpx 易显远大于 27rpx 留白） */
   padding: 20rpx;
   border-radius: 24rpx;
   box-sizing: border-box;
@@ -993,7 +1027,7 @@ $order-product-row-bg: "https://mvpme82.cloud/data/a480b220-ffb8-4240-b1e9-ade6f
   align-items: center;
   flex-wrap: wrap;
   gap: 16rpx;
-  background-color: #020713;
+  background-color: #061730;
   border-top: 1rpx solid rgba(0, 0, 0, 0.45);
   overflow: hidden;
 }
