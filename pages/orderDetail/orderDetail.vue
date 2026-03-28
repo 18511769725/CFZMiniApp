@@ -693,7 +693,7 @@ $order-product-row-bg: "https://mvpme82.cloud/data/a480b220-ffb8-4240-b1e9-ade6f
 .detail-container {
   height: 100vh;
   min-height: 100vh;
-  background-color: #020713;
+  background-color: #061730;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;

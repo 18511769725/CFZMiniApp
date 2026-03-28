@@ -85,7 +85,7 @@ onShow(() => {
   display: flex;
   flex-direction: column;
   height: 100vh;
-  background-color: #020713;
+  background-color: #061730;
   color: #fff;
 
   .mall-header {
@@ -159,7 +159,11 @@ onShow(() => {
       color: #ffffff;
       font-size: 31rpx;
       font-weight: normal;
-      font-family: PingFang SC, -apple-system, BlinkMacSystemFont, sans-serif;
+      font-family:
+        PingFang SC,
+        -apple-system,
+        BlinkMacSystemFont,
+        sans-serif;
       letter-spacing: 0;
       white-space: nowrap;
       transition: opacity 0.3s ease;

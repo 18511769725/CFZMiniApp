@@ -285,7 +285,7 @@ onShow(() => {
 }
 
 .product-list-page--anju .scroll-container {
-  background-color: #020713;
+  background-color: #061730;
 }
 
 .product-list-page--anju .product-list {

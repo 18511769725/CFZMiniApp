@@ -564,7 +564,7 @@ page {
   min-height: 100vh;
   width: 100%;
   box-sizing: border-box;
-  background-color: #020713;
+  background-color: #061730;
   color: #fff;
   padding: 0;
   padding-bottom: env(safe-area-inset-bottom);

@@ -435,7 +435,7 @@ onShow(() => {
   height: 100vh;
   display: flex;
   flex-direction: column;
-  background-color: #020713;
+  background-color: #061730;
   box-sizing: border-box;
 }
 
@@ -445,7 +445,7 @@ onShow(() => {
   min-height: 0;
   width: 100%;
   box-sizing: border-box;
-  background-color: #020713;
+  background-color: #061730;
   /* 仅预留自定义底栏高度；tab 页勿再加 safe-area，否则会与原生 tabBar 之间出现黑缝 */
   padding-bottom: 108rpx;
 }
@@ -482,7 +482,7 @@ onShow(() => {
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  background-color: rgba(48, 83, 156, 0.14);
+  background-color: #061730;
 }
 
 /* 吸底：贴紧原生 tabBar 上沿；底栏安全区由系统 tabBar 承担，此处再加 inset 会挤出可视缝隙 */

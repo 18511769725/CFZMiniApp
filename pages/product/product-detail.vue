@@ -36,11 +36,7 @@
               v-for="(imgItem, index) in swiperImageList"
               :key="index"
             >
-              <image
-                class="anju-swiper-img"
-                :src="imgItem"
-                mode="aspectFill"
-              />
+              <image class="anju-swiper-img" :src="imgItem" mode="aspectFill" />
             </swiper-item>
           </swiper>
         </view>
@@ -77,52 +73,52 @@
                 mode="widthFix"
               />
               <view class="anju-card-inner">
-              <view class="anju-section-head">
-                <view class="anju-section-bar" />
-                <text class="anju-section-title">套餐选项</text>
-              </view>
-              <scroll-view
-                class="anju-package-list-scroll"
-                scroll-y
-                :show-scrollbar="true"
-                :enable-flex="true"
-              >
-                <view class="anju-package-list-inner">
-                  <view
-                    class="anju-package-item"
-                    v-for="(item, index) in packageList"
-                    :key="index"
-                    :class="{
-                      'anju-package-item--active':
-                        selectedPackageIndex === index,
-                    }"
-                    :style="
-                      selectedPackageIndex === index
-                        ? anjuPackageItemActiveShellStyle
-                        : undefined
-                    "
-                    @click="selectPackage(index)"
-                  >
-                    <text
-                      class="anju-package-title"
-                      @longpress.stop="showTitleTooltip(item.title, $event)"
-                      @touchend="hideTitleTooltip"
-                      @touchcancel="hideTitleTooltip"
-                      >{{ item.title || "未命名套餐" }}</text
-                    >
-                    <text class="anju-package-score"
-                      >{{ formatPrice(item.value || 0) }}分</text
-                    >
-                  </view>
+                <view class="anju-section-head">
+                  <view class="anju-section-bar" />
+                  <text class="anju-section-title">套餐选项</text>
                 </view>
-              </scroll-view>
-              <view
-                v-if="titleTooltip.visible"
-                class="title-tooltip-popup"
-                :style="titleTooltip.style"
-              >
-                {{ titleTooltip.text }}
-              </view>
+                <scroll-view
+                  class="anju-package-list-scroll"
+                  scroll-y
+                  :show-scrollbar="true"
+                  :enable-flex="true"
+                >
+                  <view class="anju-package-list-inner">
+                    <view
+                      class="anju-package-item"
+                      v-for="(item, index) in packageList"
+                      :key="index"
+                      :class="{
+                        'anju-package-item--active':
+                          selectedPackageIndex === index,
+                      }"
+                      :style="
+                        selectedPackageIndex === index
+                          ? anjuPackageItemActiveShellStyle
+                          : undefined
+                      "
+                      @click="selectPackage(index)"
+                    >
+                      <text
+                        class="anju-package-title"
+                        @longpress.stop="showTitleTooltip(item.title, $event)"
+                        @touchend="hideTitleTooltip"
+                        @touchcancel="hideTitleTooltip"
+                        >{{ item.title || "未命名套餐" }}</text
+                      >
+                      <text class="anju-package-score"
+                        >{{ formatPrice(item.value || 0) }}分</text
+                      >
+                    </view>
+                  </view>
+                </scroll-view>
+                <view
+                  v-if="titleTooltip.visible"
+                  class="title-tooltip-popup"
+                  :style="titleTooltip.style"
+                >
+                  {{ titleTooltip.text }}
+                </view>
               </view>
             </view>
           </view>
@@ -137,43 +133,43 @@
                 mode="widthFix"
               />
               <view class="anju-card-inner">
-              <view class="anju-section-head">
-                <view class="anju-section-bar" />
-                <text class="anju-section-title">套餐详情</text>
-              </view>
-              <view class="anju-detail-body">
-                <view class="anju-detail-list-spec">
-                  <view
-                    v-for="(line, i) in anjuDetailLines"
-                    :key="i"
-                    class="anju-detail-row"
-                  >
-                    <view class="anju-detail-bullet" />
-                    <text class="anju-detail-text">{{ line }}</text>
+                <view class="anju-section-head">
+                  <view class="anju-section-bar" />
+                  <text class="anju-section-title">套餐详情</text>
+                </view>
+                <view class="anju-detail-body">
+                  <view class="anju-detail-list-spec">
+                    <view
+                      v-for="(line, i) in anjuDetailLines"
+                      :key="i"
+                      class="anju-detail-row"
+                    >
+                      <view class="anju-detail-bullet" />
+                      <text class="anju-detail-text">{{ line }}</text>
+                    </view>
+                    <view
+                      v-if="
+                        anjuDetailLines.length === 0 &&
+                        detailImageList.length === 0
+                      "
+                      class="anju-detail-empty"
+                      >暂无详情</view
+                    >
                   </view>
-                  <view
-                    v-if="
-                      anjuDetailLines.length === 0 &&
-                      detailImageList.length === 0
-                    "
-                    class="anju-detail-empty"
-                    >暂无详情</view
-                  >
+                </view>
+                <view
+                  v-if="detailImageList.length > 0"
+                  class="anju-detail-images"
+                >
+                  <image
+                    v-for="(imgItem, index) in detailImageList"
+                    :key="index"
+                    class="anju-detail-img"
+                    :src="imgItem"
+                    mode="widthFix"
+                  />
                 </view>
               </view>
-              <view
-                v-if="detailImageList.length > 0"
-                class="anju-detail-images"
-              >
-                <image
-                  v-for="(imgItem, index) in detailImageList"
-                  :key="index"
-                  class="anju-detail-img"
-                  :src="imgItem"
-                  mode="widthFix"
-                />
-              </view>
-            </view>
             </view>
           </view>
         </view>
@@ -430,8 +426,7 @@ const packageList = ref([]);
 const ANJU_PKG_ROW_RPX = 63;
 const ANJU_PKG_GAP_RPX = 16;
 /** 套餐选项区最多可视 6 条再滚动（安居 / 悦享共用深色详情） */
-const ANJU_PKG_SCROLL_MAX_RPX =
-  6 * ANJU_PKG_ROW_RPX + 5 * ANJU_PKG_GAP_RPX;
+const ANJU_PKG_SCROLL_MAX_RPX = 6 * ANJU_PKG_ROW_RPX + 5 * ANJU_PKG_GAP_RPX;
 
 /** 套餐选项卡：列表区高度；底图用 image widthFix 保持原始比例 */
 const anjuPackageCardShellStyle = computed(() => {
@@ -441,8 +436,7 @@ const anjuPackageCardShellStyle = computed(() => {
   if (n <= 0) {
     listHRpx = 0;
   } else if (compact) {
-    listHRpx =
-      n * ANJU_PKG_ROW_RPX + Math.max(0, n - 1) * ANJU_PKG_GAP_RPX;
+    listHRpx = n * ANJU_PKG_ROW_RPX + Math.max(0, n - 1) * ANJU_PKG_GAP_RPX;
   }
   return {
     "--anju-package-list-scroll-h": `${listHRpx}rpx`,
@@ -652,10 +646,7 @@ const loadProductDetail = (productId) => {
             // 触发价格逻辑，控制套餐区域显示
             getProductPrice();
             const ca = Number(state.productDetailData.categorya);
-            if (
-              (ca === 0 || ca === 1) &&
-              packageList.value.length > 0
-            ) {
+            if ((ca === 0 || ca === 1) && packageList.value.length > 0) {
               selectedPackageIndex.value = 0;
             }
           } else {
@@ -859,7 +850,6 @@ onLoad((options) => {
     },
   });
 });
-
 </script>
 
 <style scoped>
@@ -874,7 +864,7 @@ onLoad((options) => {
 
 /* 康护长图详情：与底栏同色，避免 scroll 底部留白、padding 区呈白缝 */
 .product-detail-page.is-kanghu-long-detail {
-  background-color: #283341;
+  background-color: #061730;
 }
 
 /* 1. 顶部走马灯样式 */
@@ -1134,7 +1124,11 @@ onLoad((options) => {
   color: #061730;
   font-size: 34rpx;
   font-weight: 500;
-  font-family: PingFang SC, -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family:
+    PingFang SC,
+    -apple-system,
+    BlinkMacSystemFont,
+    sans-serif;
 }
 
 .bottom-add-cart-btn::after {
@@ -1155,7 +1149,7 @@ onLoad((options) => {
 
 /* ========== 益企·安居 / 益企·悦享 项目详情（categorya=0 / 1）深色稿 ========== */
 .is-anju-detail {
-  background-color: #020713;
+  background-color: #061730;
 }
 
 .is-anju-detail .bottom-cart-bar {
@@ -1163,11 +1157,11 @@ onLoad((options) => {
 }
 
 .is-anju-detail .bottom-cart-bar-bg {
-  background-color: #020713;
+  background-color: #061730;
 }
 
 .anju-detail-scroll {
-  background-color: #020713;
+  background-color: #061730;
   padding-bottom: 160rpx;
 }
 
@@ -1215,7 +1209,11 @@ onLoad((options) => {
 
 .anju-name {
   display: block;
-  font-family: "PingFang SC", -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family:
+    "PingFang SC",
+    -apple-system,
+    BlinkMacSystemFont,
+    sans-serif;
   font-size: 41rpx;
   font-weight: 600;
   color: #ffffff;
@@ -1226,7 +1224,11 @@ onLoad((options) => {
 .anju-company {
   display: block;
   margin-top: 12rpx;
-  font-family: PingFangSC-Regular, "PingFang SC", -apple-system, sans-serif;
+  font-family:
+    PingFangSC-Regular,
+    "PingFang SC",
+    -apple-system,
+    sans-serif;
   font-size: 25rpx;
   font-weight: normal;
   font-stretch: normal;
@@ -1267,7 +1269,11 @@ onLoad((options) => {
   line-height: 40rpx;
   padding: 0 4rpx;
   box-sizing: border-box;
-  font-family: "PingFang SC", -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family:
+    "PingFang SC",
+    -apple-system,
+    BlinkMacSystemFont,
+    sans-serif;
   font-size: 25rpx;
   font-weight: 400;
   font-stretch: normal;
@@ -1284,12 +1290,7 @@ onLoad((options) => {
   padding: 2rpx;
   box-sizing: border-box;
   border-radius: 18rpx;
-  background: linear-gradient(
-    171deg,
-    #80c3f6 0%,
-    #244368 48%,
-    #9ccdf0 100%
-  );
+  background: linear-gradient(171deg, #80c3f6 0%, #244368 48%, #9ccdf0 100%);
 }
 
 /* 底图 image + 内容同格叠放，行高取 max(图, 内容)。基类 .anju-card-shell 的渐变与 padding 在此必须清掉 */
@@ -1452,7 +1453,11 @@ onLoad((options) => {
 
 .anju-package-score {
   flex-shrink: 0;
-  font-family: PingFangSC-Regular, "PingFang SC", -apple-system, sans-serif;
+  font-family:
+    PingFangSC-Regular,
+    "PingFang SC",
+    -apple-system,
+    sans-serif;
   font-size: 25rpx;
   font-weight: normal;
   font-stretch: normal;
@@ -1480,7 +1485,11 @@ onLoad((options) => {
   flex-direction: column;
   gap: 28rpx;
   overflow-y: auto;
-  font-family: PingFangSC-Regular, "PingFang SC", -apple-system, sans-serif;
+  font-family:
+    PingFangSC-Regular,
+    "PingFang SC",
+    -apple-system,
+    sans-serif;
   font-size: 22rpx;
   font-weight: normal;
   font-stretch: normal;
