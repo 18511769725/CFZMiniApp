@@ -271,15 +271,33 @@
         </view>
       </view>
 
-      <view
-        class="logout-btn-wrap module-enter enter-delay-3"
-        @tap="handleLogout"
-      >
-        <image
-          class="logout-btn-img"
-          :src="logoutBtnBgSrc"
-          mode="scaleToFill"
-        />
+      <view class="action-btn-area module-enter enter-delay-3">
+        <view
+          v-if="String(state.userinfo?.isadmin) === '1'"
+          class="action-btn"
+          @tap="handleAddUser"
+        >
+          <image
+            class="action-btn-icon"
+            src="/static/personal/adduser.png"
+            mode="aspectFit"
+          />
+          <text class="action-btn-label">添加用户</text>
+        </view>
+        <view
+          class="action-btn"
+          :class="{
+            'action-btn--full': String(state.userinfo?.isadmin) !== '1',
+          }"
+          @tap="handleLogout"
+        >
+          <image
+            class="action-btn-icon"
+            src="/static/personal/quit.png"
+            mode="aspectFit"
+          />
+          <text class="action-btn-label">退出登录</text>
+        </view>
       </view>
     </view>
   </view>
@@ -427,6 +445,10 @@ const companyLevelLabel = computed(() => {
 const handleLogout = () => {
   uni.removeStorageSync("userSessionChaoqitong");
   uni.reLaunch({ url: "/pages/login/login" });
+};
+
+const handleAddUser = () => {
+  uni.navigateTo({ url: "/pages/addUser/addUser" });
 };
 const getOrderList = () => {
   uni.request({
@@ -1332,22 +1354,45 @@ page {
   color: rgba(255, 255, 255, 0.4);
 }
 
-.logout-btn-wrap {
+.action-btn-area {
   margin-top: 36rpx;
-  width: 693rpx;
-  max-width: 100%;
-  height: 78rpx;
-  margin-left: auto;
-  margin-right: auto;
-  box-sizing: border-box;
-  line-height: 0;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  gap: 32rpx;
+  padding-bottom: 24rpx;
 }
 
-.logout-btn-img {
-  width: 100%;
-  height: 100%;
-  display: block;
-  vertical-align: top;
+.action-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1rpx solid rgba(255, 255, 255, 0.18);
+  border-radius: 20rpx;
+  padding: 28rpx 48rpx;
+  min-width: 200rpx;
+  gap: 14rpx;
+}
+
+.action-btn--full {
+  width: 480rpx;
+  flex-direction: row;
+  gap: 20rpx;
+  padding: 28rpx 0;
+  justify-content: center;
+}
+
+.action-btn-icon {
+  width: 64rpx;
+  height: 64rpx;
+}
+
+.action-btn-label {
+  font-size: 26rpx;
+  color: rgba(255, 255, 255, 0.85);
+  letter-spacing: 2rpx;
 }
 
 .module-enter {

@@ -235,7 +235,7 @@ const getProductPrice = () => {
       return `${discount}折 · 折后${discountPrice}分`;
     }
     case 1:
-      return `优惠扣减 ${formatPrice(pricefactor || 0)}分`;
+      return `优惠计分 ${formatPrice(pricefactor || 0)}分`;
     case 2:
       return "套餐计分";
     default:

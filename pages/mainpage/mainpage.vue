@@ -364,7 +364,7 @@
 
 <script setup>
 import { reactive, computed } from "vue";
-import { onLoad } from "@dcloudio/uni-app";
+import { onLoad, onShow } from "@dcloudio/uni-app";
 const state = reactive({
   userinfo: {},
   ccompanyinfo: {},
@@ -820,6 +820,14 @@ onLoad(() => {
       uni.reLaunch({ url: "/pages/login/login" });
     },
   });
+});
+// 每次进入页面都刷新数据
+onShow(() => {
+  if (state.userinfo.ccompanyid) {
+    getccompanyinfo(state.userinfo.id);
+    getAnjuCreditStatus(state.userinfo.ccompanyid);
+    getKanghuCreditStatus(state.userinfo.ccompanyid);
+  }
 });
 </script>
 

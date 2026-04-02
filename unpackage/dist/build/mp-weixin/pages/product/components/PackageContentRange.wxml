@@ -1,0 +1,1 @@
+<view class="package-content-range-wrap data-v-d8cf68fe"><text class="package-content-range-title data-v-d8cf68fe">{{a}}</text><text wx:if="{{b}}" class="package-content-range-text data-v-d8cf68fe">房源计分：{{c}}分</text><text wx:else class="package-content-range-text data-v-d8cf68fe">记分区间：{{d}} ~ {{e}}分</text></view>

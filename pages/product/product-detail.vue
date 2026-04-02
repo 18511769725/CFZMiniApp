@@ -51,15 +51,34 @@
                 state.productDetailData.bcompanyname || "未知供应商"
               }}</text>
             </view>
-            <view v-if="showAnjuScoreBadge" class="anju-tag-score-wrap">
+            <view class="anju-tag-score-wrap">
               <image
                 class="anju-tag-score-bg"
                 :src="anjuTagScoreBgSrc"
                 mode="scaleToFill"
               />
-              <text class="anju-tag-score-label">套餐计分</text>
+              <text
+                v-if="productdetailpricetype === 2"
+                class="anju-tag-score-label"
+                >套餐计分</text
+              >
+              <text
+                v-else-if="productdetailpricetype === 0"
+                class="anju-tag-score-label"
+                >比例折扣</text
+              >
+              <text
+                v-else-if="productdetailpricetype === 1"
+                class="anju-tag-score-label"
+                >优惠计分</text
+              >
             </view>
           </view>
+
+          <!-- 商品价格 -->
+          <view class="product-price" v-if="productdetailpricetype !== 2">{{
+            getProductPrice()
+          }}</view>
 
           <view
             v-if="showPackageArea"
@@ -73,9 +92,12 @@
                 mode="widthFix"
               />
               <view class="anju-card-inner">
-                <view class="anju-section-head">
+                <view class="anju-section-head anju-section-head--with-tip">
                   <view class="anju-section-bar" />
                   <text class="anju-section-title">套餐选项</text>
+                  <text class="anju-section-tip" v-if="detailCategorya === 0"
+                    >计分区间类户型预约订单按最低价发起，确定户型后按区间内实际价格核算</text
+                  >
                 </view>
                 <scroll-view
                   class="anju-package-list-scroll"
@@ -91,24 +113,30 @@
                       :class="{
                         'anju-package-item--active':
                           selectedPackageIndex === index,
+                        'anju-package-item--range': detailCategorya === 0,
                       }"
                       :style="
                         selectedPackageIndex === index
                           ? anjuPackageItemActiveShellStyle
                           : undefined
                       "
+                      @longpress.stop="showTitleTooltip(item.title, $event)"
+                      @touchend="hideTitleTooltip"
+                      @touchcancel="hideTitleTooltip"
                       @click="selectPackage(index)"
                     >
-                      <text
-                        class="anju-package-title"
-                        @longpress.stop="showTitleTooltip(item.title, $event)"
-                        @touchend="hideTitleTooltip"
-                        @touchcancel="hideTitleTooltip"
-                        >{{ item.title || "未命名套餐" }}</text
-                      >
-                      <text class="anju-package-score"
-                        >{{ formatPrice(item.value || 0) }}分</text
-                      >
+                      <PackageContentRange
+                        class="package-content-slot"
+                        v-if="detailCategorya === 0"
+                        :item="item"
+                        :format-price="formatPrice"
+                      />
+                      <PackageContentDefault
+                        class="package-content-slot"
+                        v-else
+                        :item="item"
+                        :format-price="formatPrice"
+                      />
                     </view>
                   </view>
                 </scroll-view>
@@ -298,6 +326,8 @@
 <script setup>
 import { ref, reactive, computed } from "vue";
 import { onLoad } from "@dcloudio/uni-app";
+import PackageContentDefault from "./components/PackageContentDefault.vue";
+import PackageContentRange from "./components/PackageContentRange.vue";
 
 /** 康护列表中「整张长图详情」的商品 id（与 getkanghuproductlist 一致） */
 const KANGHU_LONG_IMAGE_PRODUCT_IDS = new Set([19, 75]);
@@ -398,9 +428,9 @@ const onDarkProductDetailBottomClick = () => {
 };
 
 /** 套餐计价时标题旁「套餐计分」角标 */
-const showAnjuScoreBadge = computed(() => {
+const productdetailpricetype = computed(() => {
   const pt = parseInt(state.productDetailData.pricetype, 10) || 0;
-  return pt === 2;
+  return pt;
 });
 
 /** 套餐详情正文：按行拆分为带项目符号的列表 */
@@ -424,19 +454,27 @@ const detailImageList = ref([]);
 const packageList = ref([]);
 
 const ANJU_PKG_ROW_RPX = 63;
+const ANJU_PKG_RANGE_ROW_RPX = 92;
 const ANJU_PKG_GAP_RPX = 16;
+const anjuPackageRowRpx = computed(() =>
+  detailCategorya.value === 0 ? ANJU_PKG_RANGE_ROW_RPX : ANJU_PKG_ROW_RPX,
+);
+
 /** 套餐选项区最多可视 6 条再滚动（安居 / 悦享共用深色详情） */
-const ANJU_PKG_SCROLL_MAX_RPX = 6 * ANJU_PKG_ROW_RPX + 5 * ANJU_PKG_GAP_RPX;
+const anjuPkgScrollMaxRpx = computed(
+  () => 6 * anjuPackageRowRpx.value + 5 * ANJU_PKG_GAP_RPX,
+);
 
 /** 套餐选项卡：列表区高度；底图用 image widthFix 保持原始比例 */
 const anjuPackageCardShellStyle = computed(() => {
   const n = packageList.value?.length ?? 0;
   const compact = n <= 2;
-  let listHRpx = ANJU_PKG_SCROLL_MAX_RPX;
+  let listHRpx = anjuPkgScrollMaxRpx.value;
   if (n <= 0) {
     listHRpx = 0;
   } else if (compact) {
-    listHRpx = n * ANJU_PKG_ROW_RPX + Math.max(0, n - 1) * ANJU_PKG_GAP_RPX;
+    listHRpx =
+      n * anjuPackageRowRpx.value + Math.max(0, n - 1) * ANJU_PKG_GAP_RPX;
   }
   return {
     "--anju-package-list-scroll-h": `${listHRpx}rpx`,
@@ -529,6 +567,39 @@ const formatPrice = (price) => {
   return price.toFixed(2);
 };
 
+// 将小数折扣转换为中文表示（0.5→五折，0.55→五五折，0.88→八八折）
+const convertDiscountToChineseFormat = (discount) => {
+  const discountNum = parseFloat(discount);
+  if (!discountNum || discountNum <= 0 || discountNum >= 1) {
+    return "0折";
+  }
+
+  // 乘以 100 得到百分比，然后转换为中文数字表示
+  const percent = Math.round(discountNum * 100);
+  const tens = Math.floor(percent / 10); // 十位
+  const ones = percent % 10; // 个位
+
+  const digitMap = {
+    0: "零",
+    1: "一",
+    2: "二",
+    3: "三",
+    4: "四",
+    5: "五",
+    6: "六",
+    7: "七",
+    8: "八",
+    9: "九",
+  };
+
+  let result = digitMap[tens];
+  if (ones > 0) {
+    result += digitMap[ones];
+  }
+
+  return result + "折";
+};
+
 // 处理商品价格展示（与列表页逻辑一致）
 const getProductPrice = () => {
   console.info("state.productDetailData", state.productDetailData);
@@ -541,13 +612,13 @@ const getProductPrice = () => {
 
   switch (priceType) {
     case 0:
-      const discount = formatPrice(pricefactor || 0);
+      const discount = convertDiscountToChineseFormat(pricefactor);
       const discountPrice = formatPrice(
-        (originalprice || 0) * (pricefactor || 0),
+        (Number(originalprice) || 0) * (Number(pricefactor) || 0),
       );
-      return `${discount}折 · 折后${discountPrice}分`;
+      return `${discount} · 折后${discountPrice}分`;
     case 1:
-      const finalPrice = formatPrice(pricefactor || 0);
+      const finalPrice = formatPrice(Number(pricefactor) || 0);
       return `优惠计分 ${finalPrice}分`;
     case 2:
       return "套餐计分";
@@ -924,7 +995,7 @@ onLoad((options) => {
 /* 商品价格 */
 .product-price {
   font-size: 32rpx;
-  color: #e53935;
+  color: #ffd700;
   font-weight: 600;
   margin-bottom: 32rpx;
   padding-bottom: 24rpx;
@@ -1073,7 +1144,7 @@ onLoad((options) => {
 
 /* 发起订单底栏：顶距靠 padding-top 23rpx，不用纵向居中 */
 .bottom-cart-bar--submit-order .bottom-cart-bar-inner {
-  align-items: flex-start;
+  align-items: center;
   justify-content: center;
 }
 
@@ -1083,15 +1154,15 @@ onLoad((options) => {
   z-index: 1;
   box-sizing: border-box;
   width: 100%;
-  min-height: 123rpx;
+  min-height: 104rpx;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding-top: 23rpx;
+  padding-top: 14rpx;
   padding-right: 43rpx;
   padding-left: 42rpx;
-  padding-bottom: calc(29rpx + constant(safe-area-inset-bottom));
-  padding-bottom: calc(29rpx + env(safe-area-inset-bottom));
+  padding-bottom: calc(14rpx + constant(safe-area-inset-bottom));
+  padding-bottom: calc(14rpx + env(safe-area-inset-bottom));
 }
 
 /* .33 渐变描边：小程序中 border-image 与圆角互斥，用 1rpx padding + 渐变底模拟 */
@@ -1333,6 +1404,7 @@ onLoad((options) => {
 /* 列表区高度由外壳上的 --anju-package-list-scroll-h 控制（≥3 条为 6 行可视高度），避免绑在 scroll-view 上 */
 .anju-package-list-scroll {
   width: 100%;
+  max-height: 440rpx;
   height: var(--anju-package-list-scroll-h, 458rpx);
   box-sizing: border-box;
 }
@@ -1389,6 +1461,20 @@ onLoad((options) => {
   margin-bottom: 18rpx;
 }
 
+.anju-section-head--with-tip {
+  flex-wrap: wrap;
+  align-items: flex-start;
+}
+
+.anju-section-tip {
+  width: 100%;
+  margin-top: 8rpx;
+  margin-left: 25rpx;
+  font-size: 20rpx;
+  line-height: 1.45;
+  color: rgba(233, 213, 145, 0.72);
+}
+
 .anju-section-bar {
   width: 6rpx;
   height: 28rpx;
@@ -1421,6 +1507,21 @@ onLoad((options) => {
   background: rgba(20, 42, 74, 0.95);
 }
 
+.package-content-slot {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  flex: 1;
+}
+
+.anju-package-item--range {
+  height: auto;
+  min-height: 92rpx;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 12rpx 20rpx;
+}
+
 .anju-package-item:last-of-type {
   margin-bottom: 0;
 }
@@ -1435,37 +1536,10 @@ onLoad((options) => {
   background-position: center;
 }
 
-.anju-package-title {
-  flex: 1;
-  min-width: 0;
-  margin-right: 16rpx;
-  font-size: 25rpx;
-  line-height: 1.35;
-  color: rgba(255, 255, 255, 0.95);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.anju-package-item--active .anju-package-title {
-  color: #061730;
-}
-
-.anju-package-score {
-  flex-shrink: 0;
-  font-family:
-    PingFangSC-Regular,
-    "PingFang SC",
-    -apple-system,
-    sans-serif;
-  font-size: 25rpx;
-  font-weight: normal;
-  font-stretch: normal;
-  letter-spacing: 0rpx;
-  color: #e9d591;
-}
-
-.anju-package-item--active .anju-package-score {
+.anju-package-item--active :deep(.anju-package-title),
+.anju-package-item--active :deep(.anju-package-score),
+.anju-package-item--active :deep(.package-content-range-title),
+.anju-package-item--active :deep(.package-content-range-text) {
   color: #061730;
 }
 
