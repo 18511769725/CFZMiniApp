@@ -86,11 +86,11 @@
             :style="anjuPackageCardShellStyle"
           >
             <view class="anju-card-panel-layered">
-              <image
+              <!-- <image
                 class="anju-card-panel-bg-img"
                 :src="anjuPackagePanelImageSrc"
                 mode="widthFix"
-              />
+              /> -->
               <view class="anju-card-inner">
                 <view class="anju-section-head anju-section-head--with-tip">
                   <view class="anju-section-bar" />
@@ -155,15 +155,10 @@
             class="anju-card anju-card-shell anju-card-shell--detail anju-detail-card"
           >
             <view class="anju-card-panel-layered">
-              <image
-                class="anju-card-panel-bg-img"
-                :src="anjuCardPanelBgUrl"
-                mode="widthFix"
-              />
               <view class="anju-card-inner">
                 <view class="anju-section-head">
                   <view class="anju-section-bar" />
-                  <text class="anju-section-title">套餐详情</text>
+                  <text class="anju-section-title">产品详情</text>
                 </view>
                 <view class="anju-detail-body">
                   <view class="anju-detail-list-spec">
@@ -185,20 +180,17 @@
                     >
                   </view>
                 </view>
-                <view
-                  v-if="detailImageList.length > 0"
-                  class="anju-detail-images"
-                >
-                  <image
-                    v-for="(imgItem, index) in detailImageList"
-                    :key="index"
-                    class="anju-detail-img"
-                    :src="imgItem"
-                    mode="widthFix"
-                  />
-                </view>
               </view>
             </view>
+          </view>
+          <view v-if="detailImageList.length > 0" class="anju-detail-images">
+            <image
+              v-for="(imgItem, index) in detailImageList"
+              :key="index"
+              class="anju-detail-img"
+              :src="imgItem"
+              mode="widthFix"
+            />
           </view>
         </view>
       </scroll-view>
@@ -1370,6 +1362,10 @@ onLoad((options) => {
   grid-template-columns: minmax(0, 1fr);
   grid-template-rows: min-content;
   width: 100%;
+  box-sizing: border-box;
+  background-color: #152942;
+  border: #5683ad solid 4rpx;
+  border-radius: 41rpx;
 }
 
 .anju-card-panel-bg-img {

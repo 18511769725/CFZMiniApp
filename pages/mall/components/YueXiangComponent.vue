@@ -142,10 +142,7 @@
                     )
                   }}</view>
                   <view class="feed-service-loc">{{
-                    ellipsisFeedOneLine(
-                      product.bcompanyname,
-                      FEED_LOC_MAX_KEEP,
-                    )
+                    ellipsisFeedOneLine(product.bcompanyname, FEED_LOC_MAX_KEEP)
                   }}</view>
                 </view>
               </view>
@@ -214,8 +211,8 @@ const lunboCards = ref([
 const serviceCardsA = ref([
   {
     icon: "/static/pages/mall/yuexiang/bus.png",
-    title: "CBD美食巴士游",
-    subtitle: "移动盛宴穿梭CBD",
+    title: "朝阳美食巴士游",
+    subtitle: "移动盛宴穿梭朝阳",
     backgroundImage:
       "https://mvpme82.cloud/data/6f0231a2-8045-4ce6-b762-1fcbbe9777b1_1774320029683.jpg",
     categorya: 1,
@@ -556,7 +553,11 @@ onMounted(() => {
         flex-shrink: 0;
         width: auto;
         height: 34rpx;
-        font-family: PingFangSC-Medium, PingFang SC, -apple-system, sans-serif;
+        font-family:
+          PingFangSC-Medium,
+          PingFang SC,
+          -apple-system,
+          sans-serif;
         font-size: 36rpx;
         font-weight: normal;
         font-stretch: normal;
@@ -674,7 +675,10 @@ onMounted(() => {
   .feed-tab-inactive {
     max-width: 150rpx;
     min-height: 32rpx;
-    font-family: PingFang SC, PingFangSC-Regular, sans-serif;
+    font-family:
+      PingFang SC,
+      PingFangSC-Regular,
+      sans-serif;
     font-size: 31rpx;
     font-weight: normal;
     line-height: 1.2;
@@ -787,7 +791,10 @@ onMounted(() => {
   .feed-service-name {
     width: 100%;
     min-height: 20rpx;
-    font-family: PingFang SC, PingFangSC-Regular, sans-serif;
+    font-family:
+      PingFang SC,
+      PingFangSC-Regular,
+      sans-serif;
     font-size: 22rpx;
     font-weight: normal;
     font-stretch: normal;
@@ -804,7 +811,10 @@ onMounted(() => {
   .feed-service-loc {
     width: 100%;
     min-height: 15rpx;
-    font-family: PingFang SC, PingFangSC-Regular, sans-serif;
+    font-family:
+      PingFang SC,
+      PingFangSC-Regular,
+      sans-serif;
     font-size: 16rpx;
     font-weight: normal;
     font-stretch: normal;
