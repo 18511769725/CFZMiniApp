@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "选择账户",
+  "usingComponents": {
+    "pick-account-card": "./components/PickAccountCard"
+  }
+}

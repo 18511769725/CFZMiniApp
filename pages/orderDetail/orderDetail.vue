@@ -110,18 +110,14 @@
                   v-if="state.paymentPlan.subsidytype === 'discount'"
                 >
                   <text class="label">折扣比例：</text>
-                  <text class="value">{{
-                    state.paymentPlan.face_value || "-"
-                  }}</text>
+                  <text class="value">{{ state.paymentPlan.face_value }}</text>
                 </view>
                 <view
                   class="info-item info-item--compact"
                   v-else-if="state.paymentPlan.subsidytype === 'deduction'"
                 >
                   <text class="label">积分补贴：</text>
-                  <text class="value">{{
-                    state.paymentPlan.face_value || "-"
-                  }}</text>
+                  <text class="value">{{ state.paymentPlan.face_value }}</text>
                 </view>
                 <view class="info-item info-item--compact" v-else>
                   <text class="label">积分补贴：</text>
@@ -130,7 +126,7 @@
                 <view class="info-item info-item--compact">
                   <text class="label">平台补贴：</text>
                   <text class="value"
-                    >{{ state.paymentPlan.totalSubsidyAmount || "-" }}积分</text
+                    >{{ state.paymentPlan.totalSubsidyAmount }}积分</text
                   >
                 </view>
               </view>
@@ -147,7 +143,7 @@
                 >
                   <text class="label">折扣限额：</text>
                   <text class="value"
-                    >{{ state.paymentPlan.limitamount || "-" }}积分</text
+                    >{{ state.paymentPlan.limitamount }}积分</text
                   >
                 </view>
                 <view class="info-item info-item--compact" v-else>
@@ -157,7 +153,7 @@
                 <view class="info-item info-item--compact">
                   <text class="label">租户自付：</text>
                   <text class="value"
-                    >{{ state.paymentPlan.userPayAmount || "-" }}积分</text
+                    >{{ state.paymentPlan.userPayAmount }}积分</text
                   >
                 </view>
               </view>

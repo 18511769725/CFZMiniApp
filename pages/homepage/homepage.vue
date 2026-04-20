@@ -53,9 +53,7 @@
                     </view>
                   </view>
                   <text class="ci-val text-style-1">{{
-                    state.ccompanyinfo.approvername ||
-                    state.userinfo.name ||
-                    "-"
+                    state.ccompanyinfo.approvername || "-"
                   }}</text>
                 </view>
                 <view class="ci-item">
@@ -70,7 +68,7 @@
                     </view>
                   </view>
                   <text class="ci-val text-style-1">{{
-                    state.userinfo.phone || "-"
+                    state.ccompanyinfo.approverphone || "-"
                   }}</text>
                 </view>
               </view>
@@ -85,7 +83,7 @@
                     <view class="ci-label"><text>职位信息</text></view>
                   </view>
                   <text class="ci-val ci-val--style1">{{
-                    state.userinfo.title || "-"
+                    state.ccompanyinfo.approvertitle || "-"
                   }}</text>
                 </view>
               </view>

@@ -189,6 +189,21 @@ const getUserInfoByPhone = (phoneNumber) => {
     success: (res) => {
       if (res && res.data && res.data.retcode === "200") {
         const userData = res.data.data[0];
+        const accountList = res.data.data;
+        console.info("getUserInfoByPhone accountList", accountList);
+
+        if (res.data.data.length === 0) {
+          uni.showToast({ title: "未查询到用户信息", icon: "none" });
+          return;
+        }
+        if (res.data.data.length > 1) {
+          uni.navigateTo({
+            url: `/pages/login/pickaccount?phone=${phoneNumber}`,
+          });
+          return;
+        }
+
+        console.info("userData", userData);
         // 状态2：正常登录进入主页
         if (userData.status === 2) {
           uni.setStorage({ key: "userSessionChaoqitong", data: res.data });

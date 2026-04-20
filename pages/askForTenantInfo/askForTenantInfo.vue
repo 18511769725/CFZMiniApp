@@ -20,9 +20,7 @@
         >
           <view class="quota-item-header">
             <view class="quota-type" :class="`quota-type-${item.type}`">
-              <text class="quota-type-text">{{
-                getQuotaTypeLabel(item)
-              }}</text>
+              <text class="quota-type-text">{{ getQuotaTypeLabel(item) }}</text>
             </view>
             <view class="quota-right-header">
               <text class="quota-main-highlight">{{
@@ -405,7 +403,7 @@ const handleSubmit = async () => {
     ? JSON.stringify(selectedPackage)
     : "";
 
-  await removeStorageAsync("selectedPackageInfo");
+  //await removeStorageAsync("selectedPackageInfo");
 
   submitting.value = true;
   const payload = {
@@ -483,9 +481,7 @@ onLoad((options) => {
           success: (res) => {
             if (res && res.data && res.data.retcode === "200") {
               // 处理查询结果，更新页面状态
-              console.log("查询配额成功：", res.data.data);
               state.anjucredits = res.data.data[0] || {};
-              console.log("配额内容列表：", state.anjucredits.anjuContentArray);
               state.selectedQuotaIndex = -1;
             } else {
               console.error("查询配额失败：", res.data);
@@ -500,14 +496,6 @@ onLoad((options) => {
             uni.showToast({ title: "查询配额失败，请稍后重试", icon: "none" });
           },
         });
-        // 获取到用户信息和公司ID后，可以在这里调用查询配额的接口，传入ccompanyid参数
-        // 查询接口示例：
-        // getAnjuQuota(state.userinfo.ccompanyid).then(quotaData => {
-        //   // 处理查询结果，更新页面状态
-        // }).catch(err => {
-        //   console.error("查询配额失败：", err);
-        //   uni.showToast({ title: "查询配额失败，请稍后重试", icon: "none" });
-        // });
       }
     },
     fail: () => {
@@ -873,12 +861,7 @@ onLoad((options) => {
   padding: 1rpx;
   box-sizing: border-box;
   border-radius: 13rpx;
-  background: linear-gradient(
-    0deg,
-    #256ac3 0%,
-    #193b74 52%,
-    #2663b9 100%
-  );
+  background: linear-gradient(0deg, #256ac3 0%, #193b74 52%, #2663b9 100%);
 }
 
 .input {

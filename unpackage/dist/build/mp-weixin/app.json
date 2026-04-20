@@ -15,7 +15,8 @@
     "pages/addUser/addUser",
     "pages/askForTenantInfo/askForTenantInfo",
     "pages/mall/productlist",
-    "pages/personal/personal"
+    "pages/personal/personal",
+    "pages/login/pickaccount"
   ],
   "window": {
     "navigationBarTextStyle": "black",

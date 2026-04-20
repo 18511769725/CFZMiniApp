@@ -120,6 +120,12 @@
 				"navigationBarTextStyle": "white",
 				"backgroundColor": "#020713"
 			}
+		},
+		{
+			"path": "pages/login/pickaccount",
+			"style": {
+				"navigationBarTitleText": "选择账户"
+			}
 		}
 	],
 	"globalStyle": {

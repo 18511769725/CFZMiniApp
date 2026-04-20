@@ -50,7 +50,7 @@
             <view class="quota-overview">
               <text class="quota-title">配额配置情况与当前使用进度</text>
               <view class="overview-grid">
-                <view class="overview-item">
+                <view class="overview-item" v-if="state.showAnju === 1">
                   <image
                     class="overview-item-bg"
                     src="https://mvpme82.cloud/data/556123f6-ea66-4cb5-9614-bdb1a0c8a975_1774525986214.png"
@@ -72,7 +72,7 @@
                     }}</text>
                   </view>
                 </view>
-                <view class="overview-item">
+                <view class="overview-item" v-if="state.showYuexiang === 1">
                   <image
                     class="overview-item-bg"
                     src="https://mvpme82.cloud/data/556123f6-ea66-4cb5-9614-bdb1a0c8a975_1774525986214.png"
@@ -85,7 +85,7 @@
                     }}</text>
                   </view>
                 </view>
-                <view class="overview-item">
+                <view class="overview-item" v-if="state.showKanghu === 1">
                   <image
                     class="overview-item-bg"
                     src="https://mvpme82.cloud/data/556123f6-ea66-4cb5-9614-bdb1a0c8a975_1774525986214.png"
@@ -106,7 +106,7 @@
           </view>
 
           <!-- 益企·安居模块 -->
-          <view class="module module-anju">
+          <view class="module module-anju" v-if="state.showAnju === 1">
             <image
               class="module-anju-bg"
               src="https://mvpme82.cloud/data/22bd4d89-bed2-4013-97db-da31a8eae3b6_1774526009494.png"
@@ -178,7 +178,7 @@
           </view>
 
           <!-- 益企·悦享模块 -->
-          <view class="module module-yuexiang">
+          <view class="module module-yuexiang" v-if="state.showYuexiang === 1">
             <image
               class="module-yuexiang-bg"
               src="https://mvpme82.cloud/data/36bf8077-3706-4aaf-b92c-9c921a6e5fae_1774526084326.png"
@@ -260,7 +260,7 @@
           </view>
 
           <!-- 益企·康护模块 -->
-          <view class="module module-kanghu">
+          <view class="module module-kanghu" v-if="state.showKanghu === 1">
             <image
               class="module-kanghu-bg"
               src="https://mvpme82.cloud/data/68682655-24db-4559-a737-e10597a4573e_1774526152885.png"
@@ -377,6 +377,9 @@ const state = reactive({
   },
   feedproductlist: [],
   fagainewslist: [],
+  showAnju: 1,
+  showYuexiang: 1,
+  showKanghu: 1,
 });
 const iconList = [
   { icon: "/static/images/bg2_0.png", text: "益企安居" },
@@ -797,6 +800,47 @@ const handleDescClick = (url) => {
   }
 };
 
+const getShowHideMoudles = (ccompanyid) => {
+  let payload = {
+    ccompanyid: ccompanyid,
+  };
+  uni.request({
+    url: "https://mvpme82.cloud/api/getShowHideMoudles",
+    method: "POST",
+    header: { "Content-Type": "application/json" },
+    data: { ccompanyid },
+    success: (res) => {
+      if (res && res.data && res.data.retcode === "200") {
+        // 根据返回的数据控制模块显示隐藏，假设返回的数据格式为 { showAnju: true, showYuexiang: false, showKanghu: true }
+        console.log("getShowHideMoudlesbyccompanyid res", res);
+        if (!res.data.data || res.data.data.length === 0) {
+          // 如果没有配置数据，默认显示全部模块
+          state.showAnju = 1;
+          state.showYuexiang = 1;
+          state.showKanghu = 1;
+          return;
+        }
+        const data = res.data.data?.[0] || {};
+        state.showAnju = data.anjustatus;
+        state.showYuexiang = data.yuexiangstatus;
+        state.showKanghu = data.kanghustatus;
+        console.log("getShowHideMoudlesbyccompanyid data", data);
+      } else {
+        // 默认显示全部模块
+        state.showAnju = 1;
+        state.showYuexiang = 1;
+        state.showKanghu = 1;
+      }
+    },
+    fail: () => {
+      // 请求失败时默认显示全部模块
+      state.showAnju = 1;
+      state.showYuexiang = 1;
+      state.showKanghu = 1;
+    },
+  });
+};
+
 // 页面加载时初始化
 onLoad(() => {
   uni.getStorage({
@@ -808,6 +852,7 @@ onLoad(() => {
         if (state.userinfo.ccompanyid) {
           getAnjuCreditStatus(state.userinfo.ccompanyid);
           getKanghuCreditStatus(state.userinfo.ccompanyid);
+          getShowHideMoudles(state.userinfo.ccompanyid);
         }
         //getNewsList();
       } else {
@@ -827,6 +872,7 @@ onShow(() => {
     getccompanyinfo(state.userinfo.id);
     getAnjuCreditStatus(state.userinfo.ccompanyid);
     getKanghuCreditStatus(state.userinfo.ccompanyid);
+    getShowHideMoudles(state.userinfo.ccompanyid);
   }
 });
 </script>
@@ -1002,8 +1048,11 @@ page {
 .overview-grid {
   position: relative;
   z-index: 2;
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: center;
+  align-items: stretch;
   gap: 14rpx;
   margin-bottom: 20rpx;
   margin-top: 15rpx;
@@ -1014,6 +1063,7 @@ page {
   position: relative;
   display: flex;
   flex-direction: column;
+  flex: 0 0 200rpx;
   min-height: 0;
   box-sizing: border-box;
 }
