@@ -269,12 +269,48 @@
         </view>
       </view>
 
-      <view class="action-btn-area module-enter enter-delay-3">
+      <view class="pdf-entry-list module-enter enter-delay-3">
         <view
-          v-if="String(state.userinfo?.isadmin) === '1'"
-          class="action-btn"
-          @tap="handleAddUser"
+          class="pdf-entry"
+          @tap="openPdfDocument('https://mvpme82.cloud/data/yqyxcxjs.pdf')"
         >
+          <view class="pdf-entry-icon-wrap">
+            <text class="pdf-entry-icon">PDF</text>
+          </view>
+          <view class="pdf-entry-content">
+            <text class="pdf-entry-title">查看操作说明</text>
+            <text class="pdf-entry-subtitle">了解平台服务流程</text>
+          </view>
+          <text class="pdf-entry-arrow">›</text>
+        </view>
+        <view
+          class="pdf-entry"
+          @tap="openZYLBPdf('https://mvpme82.cloud/data/fwzylb.pdf')"
+        >
+          <view class="pdf-entry-icon-wrap">
+            <text class="pdf-entry-icon">PDF</text>
+          </view>
+          <view class="pdf-entry-content">
+            <text class="pdf-entry-title">查看资源列表</text>
+            <text class="pdf-entry-subtitle">了解平台服务内容</text>
+          </view>
+          <text class="pdf-entry-arrow">›</text>
+        </view>
+      </view>
+
+      <view
+        class="action-btn-area module-enter enter-delay-4"
+        :class="isAdmin ? 'action-btn-area--admin' : 'action-btn-area--staff'"
+      >
+        <view class="action-btn" @tap="showServiceHotlineSheet">
+          <image
+            class="action-btn-icon"
+            src="/static/personal/hotline.png"
+            mode="aspectFit"
+          />
+          <text class="action-btn-label">咨询热线</text>
+        </view>
+        <view v-if="isAdmin" class="action-btn" @tap="handleAddUser">
           <image
             class="action-btn-icon"
             src="/static/personal/adduser.png"
@@ -282,19 +318,43 @@
           />
           <text class="action-btn-label">添加用户</text>
         </view>
-        <view
-          class="action-btn"
-          :class="{
-            'action-btn--full': String(state.userinfo?.isadmin) !== '1',
-          }"
-          @tap="handleLogout"
-        >
+        <view class="action-btn" @tap="handleLogout">
           <image
             class="action-btn-icon"
             src="/static/personal/quit.png"
             mode="aspectFit"
           />
           <text class="action-btn-label">退出登录</text>
+        </view>
+      </view>
+
+      <view
+        v-if="showHotlinePopup"
+        class="hotline-popup-mask"
+        @tap="closeServiceHotlinePopup"
+      >
+        <view class="hotline-popup" @tap.stop>
+          <view class="hotline-popup__header">
+            <text class="hotline-popup__title">咨询热线</text>
+            <text class="hotline-popup__subtitle">工作日9:00-17:30</text>
+          </view>
+          <scroll-view class="hotline-list" scroll-y>
+            <view
+              v-for="item in hotlineDisplayList"
+              :key="item.phone"
+              class="hotline-item"
+              @tap="callServiceHotline(item.phone)"
+            >
+              <view class="hotline-item__main">
+                <text class="hotline-item__label">{{ item.label }}</text>
+                <text class="hotline-item__phone">{{ item.phone }}</text>
+              </view>
+              <text class="hotline-item__action">拨打</text>
+            </view>
+          </scroll-view>
+          <view class="hotline-popup__footer" @tap="closeServiceHotlinePopup"
+            >取消</view
+          >
         </view>
       </view>
     </view>
@@ -325,7 +385,7 @@ const filteredOrderList = computed(() => {
   switch (activeTab.value) {
     case "serving":
       return state.orderList.filter((item) =>
-        [0, 1, 2, 4].includes(item.status),
+        [0, 1, 2, 4, -5].includes(item.status),
       );
     case "finished":
       return state.orderList.filter((item) => item.status === 3);
@@ -341,7 +401,7 @@ const filteredOrderList = computed(() => {
 const orderStats = computed(() => {
   return {
     serving: state.orderList.filter((item) =>
-      [0, 1, 2, 4].includes(item.status),
+      [0, 1, 2, 4, -5].includes(item.status),
     ).length,
     finished: state.orderList.filter((item) => item.status === 3).length,
     terminated: state.orderList.filter((item) =>
@@ -379,6 +439,7 @@ const getStatusText = (status) => {
     "-2": "审核驳回",
     "-3": "后台终止",
     "-4": "主管驳回",
+    "-5": "申请取消",
   };
   return statusMap[status] || "未知状态";
 };
@@ -418,6 +479,16 @@ const state = reactive({
   ccompanyinfo: {},
   creditinfo: {},
 });
+const showHotlinePopup = ref(false);
+const serviceHotlines = ref([]);
+
+const hotlineDisplayList = computed(() =>
+  serviceHotlines.value.filter(
+    (item) => item.phone && String(item.phone).trim(),
+  ),
+);
+
+const isAdmin = computed(() => String(state.userinfo?.isadmin) === "1");
 
 const toNumber = (value) => {
   const n = Number(value);
@@ -448,6 +519,105 @@ const handleLogout = () => {
 const handleAddUser = () => {
   uni.navigateTo({ url: "/pages/addUser/addUser" });
 };
+
+const openPdfDocument = (url) => {
+  uni.showLoading({ title: "文件加载中" });
+  uni.downloadFile({
+    url,
+    success: (res) => {
+      if (res.statusCode !== 200 || !res.tempFilePath) {
+        uni.showToast({ title: "文件加载失败", icon: "none" });
+        return;
+      }
+      uni.openDocument({
+        filePath: res.tempFilePath,
+        fileType: "pdf",
+        showMenu: true,
+        fail: () => {
+          uni.showToast({ title: "暂不支持打开 PDF 文件", icon: "none" });
+        },
+      });
+    },
+    fail: () => {
+      uni.showToast({ title: "文件下载失败，请检查网络", icon: "none" });
+    },
+    complete: () => {
+      uni.hideLoading();
+    },
+  });
+};
+
+const openZYLBPdf = () => {
+  // 调用getzylbwjbyuserid接口，传入参数userid，然后获取返回的PDF文件地址，最后调用openPdfDocument方法打开该PDF文件
+  console.info("userinfo", state.userinfo);
+  uni.request({
+    url: "https://mvpme82.cloud/api/getzylbwjbyuserid",
+    method: "POST",
+    header: { "Content-Type": "application/json" },
+    data: { userid: state.userinfo.id },
+    success: (res) => {
+      const responseData = res?.data;
+      if (responseData?.code === "200") {
+        const pdfUrl = responseData?.data;
+        console.info("pdfUrl", pdfUrl);
+        if (pdfUrl) {
+          openPdfDocument(pdfUrl);
+        } else {
+          uni.showToast({ title: "未找到资源列表 PDF 文件", icon: "none" });
+        }
+      } else {
+        uni.showToast({ title: "获取资源列表失败", icon: "none" });
+      }
+    },
+    fail: () => {
+      uni.showToast({ title: "请求资源列表失败，请检查网络", icon: "none" });
+    },
+  });
+};
+
+const closeServiceHotlinePopup = () => {
+  showHotlinePopup.value = false;
+};
+
+const callServiceHotline = (phone) => {
+  if (!phone) return;
+  uni.makePhoneCall({ phoneNumber: String(phone) });
+};
+
+const showServiceHotlineSheet = () => {
+  if (!hotlineDisplayList.value.length) {
+    uni.showToast({ title: "请先配置咨询热线", icon: "none" });
+    return;
+  }
+  showHotlinePopup.value = true;
+};
+
+const getHotlineConfigs = () => {
+  uni.request({
+    url: "https://mvpme82.cloud/api/gethotlineconfigs",
+    method: "POST",
+    header: { "Content-Type": "application/json" },
+    data: {},
+    success: (res) => {
+      if (
+        res?.statusCode === 200 &&
+        res?.data?.retcode === "200" &&
+        Array.isArray(res.data.data)
+      ) {
+        serviceHotlines.value = res.data.data.map((item) => ({
+          label: item.title,
+          phone: item.telnumber,
+        }));
+      } else {
+        uni.showToast({ title: "获取咨询热线失败", icon: "none" });
+      }
+    },
+    fail: () => {
+      uni.showToast({ title: "获取咨询热线请求失败", icon: "none" });
+    },
+  });
+};
+
 const getOrderList = () => {
   uni.request({
     url: "https://mvpme82.cloud/api/getordersforminiapp", // 目标接口地址
@@ -533,6 +703,7 @@ const getCreditInfo = (ccompanyid) => {
 
 // 页面加载时初始化
 onLoad(() => {
+  getHotlineConfigs();
   uni.getStorage({
     key: "userSessionChaoqitong",
     success: (res) => {
@@ -1352,13 +1523,94 @@ page {
   color: rgba(255, 255, 255, 0.4);
 }
 
-.action-btn-area {
-  margin-top: 36rpx;
+.pdf-entry {
   display: flex;
-  flex-direction: row;
+  align-items: center;
+  min-height: 112rpx;
+  min-width: 0;
+  padding: 20rpx 24rpx;
+  box-sizing: border-box;
+  border: 1rpx solid rgba(127, 190, 242, 0.42);
+  border-radius: 18rpx;
+  background: linear-gradient(
+    104deg,
+    rgba(36, 86, 148, 0.9) 0%,
+    rgba(14, 42, 82, 0.92) 58%,
+    rgba(11, 29, 57, 0.96) 100%
+  );
+  box-shadow: 0 12rpx 30rpx rgba(0, 0, 0, 0.16);
+}
+
+.pdf-entry-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16rpx;
+  margin-top: 28rpx;
+}
+
+.pdf-entry-icon-wrap {
+  width: 68rpx;
+  height: 68rpx;
+  display: flex;
+  align-items: center;
   justify-content: center;
-  gap: 32rpx;
+  flex-shrink: 0;
+  border-radius: 14rpx;
+  background: rgba(180, 220, 255, 0.16);
+  border: 1rpx solid rgba(214, 237, 255, 0.5);
+}
+
+.pdf-entry-icon {
+  color: #e5f4ff;
+  font-size: 20rpx;
+  font-weight: 700;
+}
+
+.pdf-entry-content {
+  min-width: 0;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 8rpx;
+  margin-left: 20rpx;
+}
+
+.pdf-entry-title {
+  color: #ffffff;
+  font-size: 28rpx;
+  font-weight: 600;
+}
+
+.pdf-entry-subtitle {
+  overflow: hidden;
+  color: rgba(224, 240, 255, 0.68);
+  font-size: 21rpx;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pdf-entry-arrow {
+  flex-shrink: 0;
+  margin-left: 18rpx;
+  color: rgba(226, 242, 255, 0.86);
+  font-size: 42rpx;
+  font-weight: 300;
+  line-height: 1;
+}
+
+.action-btn-area {
+  margin-top: 24rpx;
+  display: grid;
+  gap: 20rpx;
   padding-bottom: 24rpx;
+}
+
+.action-btn-area--admin {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.action-btn-area--staff {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 .action-btn {
@@ -1369,17 +1621,8 @@ page {
   background: rgba(255, 255, 255, 0.08);
   border: 1rpx solid rgba(255, 255, 255, 0.18);
   border-radius: 20rpx;
-  padding: 28rpx 48rpx;
-  min-width: 200rpx;
+  padding: 24rpx 18rpx;
   gap: 14rpx;
-}
-
-.action-btn--full {
-  width: 480rpx;
-  flex-direction: row;
-  gap: 20rpx;
-  padding: 28rpx 0;
-  justify-content: center;
 }
 
 .action-btn-icon {
@@ -1391,6 +1634,112 @@ page {
   font-size: 26rpx;
   color: rgba(255, 255, 255, 0.85);
   letter-spacing: 2rpx;
+}
+
+.hotline-popup-mask {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 24rpx;
+  background: rgba(2, 7, 19, 0.62);
+}
+
+.hotline-popup {
+  width: 100%;
+  max-width: 690rpx;
+  max-height: calc(100vh - 48rpx);
+  display: flex;
+  flex-direction: column;
+  border-radius: 30rpx;
+  overflow: hidden;
+  background: linear-gradient(
+    180deg,
+    rgba(16, 39, 74, 0.98) 0%,
+    rgba(7, 19, 38, 0.98) 100%
+  );
+  border: 2rpx solid rgba(128, 195, 246, 0.28);
+  box-shadow: 0 24rpx 64rpx rgba(0, 0, 0, 0.28);
+}
+
+.hotline-popup__header {
+  flex-shrink: 0;
+  padding: 32rpx 32rpx 20rpx;
+}
+
+.hotline-popup__title {
+  display: block;
+  font-size: 34rpx;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.hotline-popup__subtitle {
+  display: block;
+  margin-top: 10rpx;
+  font-size: 22rpx;
+  color: rgba(255, 255, 255, 0.58);
+}
+
+.hotline-list {
+  flex: 1;
+  min-height: 0;
+  max-height: 55vh;
+  padding: 0 24rpx 20rpx;
+  box-sizing: border-box;
+}
+
+.hotline-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20rpx;
+  padding: 24rpx;
+  border-radius: 22rpx;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.hotline-item + .hotline-item {
+  margin-top: 16rpx;
+}
+
+.hotline-item__main {
+  min-width: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+}
+
+.hotline-item__label {
+  font-size: 24rpx;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.hotline-item__phone {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.hotline-item__action {
+  flex-shrink: 0;
+  padding: 12rpx 22rpx;
+  border-radius: 999rpx;
+  font-size: 22rpx;
+  color: #0e2341;
+  background: linear-gradient(180deg, #fcefd4 0%, #dab26b 100%);
+}
+
+.hotline-popup__footer {
+  flex-shrink: 0;
+  padding: 24rpx 32rpx 34rpx;
+  text-align: center;
+  font-size: 28rpx;
+  color: rgba(255, 255, 255, 0.82);
+  border-top: 1rpx solid rgba(255, 255, 255, 0.08);
 }
 
 .module-enter {

@@ -105,6 +105,56 @@
             </view>
           </view>
 
+          <view v-if="state.fagainewslist.length" class="news-ticker">
+            <text class="news-ticker-label">资讯</text>
+            <view class="news-ticker-viewport">
+              <view class="news-ticker-track">
+                <view v-for="copy in 2" :key="copy" class="news-ticker-list">
+                  <view
+                    v-for="item in state.fagainewslist"
+                    :key="`${copy}-${item.id}`"
+                    class="news-ticker-item"
+                    @tap="openNewsArticle(item)"
+                  >
+                    <text class="news-ticker-dot"></text>
+                    <text class="news-ticker-title">{{ item.title }}</text>
+                  </view>
+                </view>
+              </view>
+            </view>
+          </view>
+
+          <!-- 大Banner（小程序内置指示点无法改样式，改为自定义指示点） -->
+          <!-- <view class="lunbo-wrap">
+            <swiper
+              class="lunbo-section"
+              :indicator-dots="false"
+              :current="lunboCurrent"
+              :autoplay="true"
+              :interval="300000"
+              :duration="500"
+              @change="onLunboChange"
+            >
+              <swiper-item v-for="(card, index) in lunboCards" :key="index">
+                <LunboCardComponent
+                  :title="card.title"
+                  :subtitle="card.subtitle"
+                  :backgroundImage="card.backgroundImage"
+                  :categorya="card.categorya"
+                  :categoryb="card.categoryb"
+                />
+              </swiper-item>
+            </swiper>
+            <view class="lunbo-dots-custom">
+              <view
+                v-for="(_, i) in lunboCards"
+                :key="i"
+                class="lunbo-dot"
+                :class="{ 'lunbo-dot--active': lunboCurrent === i }"
+              />
+            </view>
+          </view> -->
+
           <!-- 益企·安居模块 -->
           <view class="module module-anju" v-if="state.showAnju === 1">
             <image
@@ -124,7 +174,7 @@
               </view>
               <view
                 class="module-detail-btn module-detail-anju"
-                @tap="goProductList(0)"
+                @tap="goServiceHallTab(1)"
               >
                 <text class="module-detail-btn-text">查看详情</text>
               </view>
@@ -196,7 +246,7 @@
               </view>
               <view
                 class="module-detail-btn module-detail-yuexiang"
-                @tap="goProductList(1)"
+                @tap="goServiceHallTab(2)"
               >
                 <text class="module-detail-btn-text">查看详情</text>
               </view>
@@ -363,8 +413,9 @@
 </template>
 
 <script setup>
-import { reactive, computed } from "vue";
+import { reactive, computed, ref } from "vue";
 import { onLoad, onShow } from "@dcloudio/uni-app";
+import LunboCardComponent from "../mall/components/LunboCardComponent.vue";
 const state = reactive({
   userinfo: {},
   ccompanyinfo: {},
@@ -457,7 +508,7 @@ const normalizeUsageFlag = (value) => {
 };
 
 const formatPoints = (value) => {
-  return `${toNumber(value)}积分`;
+  return `${toNumber(value)}积分 * 12个月`;
 };
 const formatPointsWrape = (value) => {
   return `${toNumber(value)}\n积分`;
@@ -751,6 +802,16 @@ const getNewsList = () => {
   });
 };
 
+const openNewsArticle = (item) => {
+  if (item?.id === undefined || item?.id === null || item.id === "") {
+    uni.showToast({ title: "文章信息异常", icon: "none" });
+    return;
+  }
+  uni.navigateTo({
+    url: `/pages/article/article?id=${encodeURIComponent(String(item.id))}`,
+  });
+};
+
 const getfeedproductlist = (ccompanyid) => {
   uni.request({
     url: "https://mvpme82.cloud/api/getfeedproductlistforminiapp",
@@ -841,6 +902,27 @@ const getShowHideMoudles = (ccompanyid) => {
   });
 };
 
+// 增加资讯轮播内容区域
+// 轮播图（切图已含标题文案，title/subtitle 留空不叠字；点击跳转参数不变）
+const lunboCards = ref([
+  {
+    title: "",
+    subtitle: "",
+    backgroundImage:
+      "https://mvpme82.cloud/data/124f4947-491b-4dbd-bf9c-8a1145a8c858_1774526431848.jpg",
+    categorya: 1,
+    categoryb: 1,
+  },
+  // {
+  //   title: "",
+  //   subtitle: "",
+  //   backgroundImage:
+  //     "https://mvpme82.cloud/data/15d51da8-c168-4d2d-9967-94c6aabc815d_1774526454645.jpg",
+  //   categorya: 1,
+  //   categoryb: 5,
+  // },
+]);
+
 // 页面加载时初始化
 onLoad(() => {
   uni.getStorage({
@@ -854,7 +936,7 @@ onLoad(() => {
           getKanghuCreditStatus(state.userinfo.ccompanyid);
           getShowHideMoudles(state.userinfo.ccompanyid);
         }
-        //getNewsList();
+        getNewsList();
       } else {
         uni.showToast({ title: "用户信息异常", icon: "none" });
         uni.reLaunch({ url: "/pages/login/login" });
@@ -932,6 +1014,80 @@ page {
   z-index: 1;
   max-width: 100%;
   box-sizing: border-box;
+}
+
+.news-ticker {
+  display: flex;
+  align-items: center;
+  height: 66rpx;
+  margin: 0 30rpx 20rpx;
+  padding: 0 18rpx;
+  box-sizing: border-box;
+  border: 1rpx solid rgba(155, 188, 225, 0.28);
+  border-radius: 10rpx;
+  background: rgba(14, 32, 57, 0.72);
+}
+.news-ticker-label {
+  flex: 0 0 auto;
+  margin-right: 16rpx;
+  padding-right: 16rpx;
+  border-right: 1rpx solid rgba(155, 188, 225, 0.36);
+  color: #9fc7f5;
+  font-size: 23rpx;
+  line-height: 1;
+}
+.news-ticker-viewport {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  overflow: hidden;
+}
+.news-ticker-track {
+  display: flex;
+  width: max-content;
+  height: 100%;
+  animation: news-ticker-marquee 24s linear infinite;
+  will-change: transform;
+}
+.news-ticker-list {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  height: 100%;
+}
+.news-ticker-item {
+  display: inline-flex;
+  align-items: center;
+  flex: 0 0 auto;
+  max-width: 560rpx;
+  height: 100%;
+  margin-right: 34rpx;
+}
+.news-ticker-dot {
+  flex: 0 0 auto;
+  width: 7rpx;
+  height: 7rpx;
+  margin-right: 10rpx;
+  border-radius: 50%;
+  background: #79b8f4;
+}
+.news-ticker-title {
+  display: block;
+  max-width: 540rpx;
+  overflow: hidden;
+  color: #e5eefb;
+  font-size: 23rpx;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+@keyframes news-ticker-marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
 }
 
 /* 横向分割线：统一使用切图 8.png（小程序用 image） */
@@ -1658,5 +1814,73 @@ page {
 
 .quota-metric-value.success {
   color: #b8ffd9;
+}
+
+/* 轮播区：687×269；与下方双列卡片同宽（.cards-grid 亦 687） */
+.lunbo-wrap {
+  position: relative;
+  width: 687rpx;
+  max-width: 100%;
+  margin: 0 auto 30rpx;
+  box-sizing: border-box;
+}
+
+.lunbo-section {
+  width: 687rpx;
+  max-width: 100%;
+  height: 269rpx;
+  border-radius: 24rpx;
+  overflow: hidden;
+  box-sizing: border-box;
+
+  :deep(swiper-item) {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  :deep(.service-card-wrapper) {
+    width: 100%;
+    height: 100%;
+  }
+
+  ::v-deep .uni-swiper-item {
+    display: flex;
+    align-items: stretch;
+    justify-content: flex-start;
+    width: 100%;
+  }
+}
+
+.lunbo-dots-custom {
+  position: absolute;
+  left: 50%;
+  bottom: 12rpx;
+  transform: translateX(-50%);
+  z-index: 20;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+/* 未选中 .3 */
+.lunbo-dot {
+  width: 7rpx;
+  height: 7rpx;
+  margin: 0 4rpx;
+  background-color: #f8f3ea;
+  opacity: 0.67;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* 选中 .28 */
+.lunbo-dot--active {
+  width: 17rpx;
+  height: 8rpx;
+  background-color: #ebd1a2;
+  border-radius: 4rpx;
+  opacity: 1;
 }
 </style>

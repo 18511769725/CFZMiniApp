@@ -1,53 +1,21 @@
 <template>
   <view class="anju-container">
-    <!-- 优惠房源 / 补贴房源：整图 15.png，跳转与原先卡片同一商品列表接口参数 -->
-    <view class="anju-housing-banner" @tap="goHousingProductList">
-      <image
-        class="anju-housing-banner-img"
-        src="https://mvpme82.cloud/data/a385d669-b84d-4f61-ae1b-3e5b8fa6b040_1774526386651.png"
-        mode="scaleToFill"
-      />
-    </view>
-
     <!-- 宣传横幅（一键申报 / 全域护航 / 安居无忧） -->
     <view class="anju-promo-banner">
       <image
         class="anju-promo-banner-img"
-        src="https://mvpme82.cloud/data/efc34df3-0c6d-4911-bdc7-0094e104b483_1774526259483.png"
-        mode="aspectFill"
+        src="https://mvpme82.cloud/data/2c6a0fb5-2665-4962-b513-ec991b97ae27_1784097333636.jpg"
+        mode="widthFix"
       />
     </view>
-
-    <!-- 申请流程：单张整图（底+金边一体），无代码叠金边 -->
-    <view class="application-process">
+    <!-- 优惠房源 / 补贴房源：整图 15.png，跳转与原先卡片同一商品列表接口参数 -->
+    <view class="anju-housing-banner" @tap="goHousingProductList">
       <image
-        class="application-process-bg"
-        src="https://mvpme82.cloud/data/fa7e0527-08c5-46e5-8696-4768a4382f72_1774540934254.png"
+        class="anju-housing-banner-img"
+        src="https://mvpme82.cloud/data/08707e4c-b587-4f4b-bab7-a1a21eeb2394_1784019323375.png"
         mode="scaleToFill"
       />
-      <view class="application-process-inner">
-        <view class="process-title">
-          <view class="title-line"></view>
-          <text class="process-title-text">申请流程</text>
-        </view>
-        <scroll-view scroll-x class="process-steps" show-scrollbar="false">
-          <view class="process-steps-inner">
-            <ProcessStepCard
-              v-for="(step, index) in steps"
-              :key="index"
-              :compact-flow="true"
-              :step-number="String(index + 1).padStart(2, '0')"
-              :icon="step.icon"
-              :icon-scale="step.iconScale ?? 1"
-              :title="step.title"
-              :subtitle="step.subtitle"
-              :background-image="step.backgroundImage"
-            />
-          </view>
-        </scroll-view>
-      </view>
     </view>
-
     <!-- 推荐服务 / 热门服务等 Tab + 列表（Tab：.19-3 / .20；列表外框：.19-2；图：.16-2） -->
     <view class="services-section">
       <!-- 外框 .19-3：渐变描边容器 -->
@@ -106,10 +74,7 @@
                     )
                   }}</view>
                   <view class="feed-service-loc">{{
-                    ellipsisFeedOneLine(
-                      product.bcompanyname,
-                      FEED_LOC_MAX_KEEP,
-                    )
+                    ellipsisFeedOneLine(product.bcompanyname, FEED_LOC_MAX_KEEP)
                   }}</view>
                 </view>
               </view>
@@ -118,11 +83,70 @@
         </view>
       </view>
     </view>
+
+    <view
+      v-if="showProcessConfirmPopup"
+      class="process-confirm-mask"
+      @tap="closeProcessConfirmPopup"
+    >
+      <view class="process-confirm-popup" @tap.stop>
+        <view class="process-confirm-popup__header">
+          <text class="process-confirm-popup__title">流程确认</text>
+          <text class="process-confirm-popup__subtitle"
+            >是否已经了解房源申请流程？</text
+          >
+        </view>
+        <view class="process-confirm-actions">
+          <view
+            class="process-confirm-btn process-confirm-btn--primary"
+            @tap="confirmGoHousingList"
+          >
+            已了解，前往房源列表
+          </view>
+          <view class="process-confirm-btn" @tap="closeAndScrollTop">
+            再看看
+          </view>
+          <view class="process-confirm-btn" @tap="openHotlinePopup">
+            联系客服
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view
+      v-if="showHotlinePopup"
+      class="hotline-popup-mask"
+      @tap="closeServiceHotlinePopup"
+    >
+      <view class="hotline-popup" @tap.stop>
+        <view class="hotline-popup__header">
+          <text class="hotline-popup__title">咨询热线</text>
+          <text class="hotline-popup__subtitle">请选择需要拨打的热线</text>
+        </view>
+        <view class="hotline-list">
+          <view
+            v-for="item in hotlineDisplayList"
+            :key="item.phone"
+            class="hotline-item"
+            @tap="callServiceHotline(item.phone)"
+          >
+            <view class="hotline-item__main">
+              <text class="hotline-item__label">{{ item.label }}</text>
+              <text class="hotline-item__phone">{{ item.phone }}</text>
+            </view>
+            <text class="hotline-item__action">拨打</text>
+          </view>
+        </view>
+        <view class="hotline-popup__footer" @tap="closeServiceHotlinePopup"
+          >取消</view
+        >
+      </view>
+    </view>
   </view>
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from "vue";
+import { ref, reactive, onMounted, computed } from "vue";
 import ProcessStepCard from "./ProcessStepCard.vue";
 import {
   ellipsisFeedOneLine,
@@ -130,16 +154,18 @@ import {
   FEED_LOC_MAX_KEEP,
 } from "../../../utils/feedEllipsis.js";
 
+const emit = defineEmits(["scrollToTop"]);
+
 const state = reactive({
   feedproductlist: [],
   feedTabId: 1,
 });
 
 const serviceFeedTabs = [
-  { tabid: 1, label: "推荐服务" },
-  { tabid: 2, label: "热门服务" },
-  { tabid: 3, label: "专属推荐" },
-  { tabid: 4, label: "当前可预约" },
+  { tabid: 1, label: "热门项目" },
+  // { tabid: 2, label: "推荐服务" },
+  // { tabid: 3, label: "专属推荐" },
+  // { tabid: 4, label: "当前可预约" },
 ];
 
 const onFeedTabChange = (tabid) => {
@@ -150,9 +176,60 @@ const onFeedTabChange = (tabid) => {
 
 /** 与原 ServiceCardComponent 一致：安居分类下商品列表（原两卡均为 categorya=0、categoryb=0） */
 const goHousingProductList = () => {
+  showProcessConfirmPopup.value = true;
+};
+
+const showProcessConfirmPopup = ref(false);
+const showHotlinePopup = ref(false);
+const serviceHotlines = ref([
+  { label: "平台热线 1", phone: "15001397029" },
+  { label: "平台热线 2", phone: "18599038273" },
+  { label: "安居咨询 1", phone: "15801024511" },
+  { label: "安居咨询 2", phone: "15635877770" },
+]);
+
+const hotlineDisplayList = computed(() =>
+  serviceHotlines.value.filter(
+    (item) => item.phone && String(item.phone).trim(),
+  ),
+);
+
+const closeProcessConfirmPopup = () => {
+  showProcessConfirmPopup.value = false;
+};
+
+const confirmGoHousingList = () => {
+  showProcessConfirmPopup.value = false;
   uni.navigateTo({
     url: "/pages/mall/productlist?categorya=0&categoryb=0",
   });
+};
+
+const closeAndScrollTop = () => {
+  showProcessConfirmPopup.value = false;
+  emit("scrollToTop");
+  uni.pageScrollTo({
+    scrollTop: 0,
+    duration: 300,
+  });
+};
+
+const closeServiceHotlinePopup = () => {
+  showHotlinePopup.value = false;
+};
+
+const callServiceHotline = (phone) => {
+  if (!phone) return;
+  uni.makePhoneCall({ phoneNumber: String(phone) });
+};
+
+const openHotlinePopup = () => {
+  if (!hotlineDisplayList.value.length) {
+    uni.showToast({ title: "请先配置咨询热线", icon: "none" });
+    return;
+  }
+  showProcessConfirmPopup.value = false;
+  showHotlinePopup.value = true;
 };
 // 流程步骤
 const steps = ref([
@@ -231,12 +308,171 @@ onMounted(() => {
 .anju-container {
   padding: 20rpx;
 
+  .process-confirm-mask {
+    position: fixed;
+    inset: 0;
+    z-index: 998;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24rpx;
+    box-sizing: border-box;
+    background: rgba(0, 0, 0, 0.46);
+  }
+
+  .process-confirm-popup {
+    width: 100%;
+    max-width: 620rpx;
+    border-radius: 26rpx;
+    background: #ffffff;
+    overflow: hidden;
+    box-shadow: 0 20rpx 60rpx rgba(0, 0, 0, 0.18);
+  }
+
+  .process-confirm-popup__header {
+    padding: 34rpx 34rpx 24rpx;
+  }
+
+  .process-confirm-popup__title {
+    display: block;
+    font-size: 34rpx;
+    font-weight: 600;
+    color: #1f2937;
+  }
+
+  .process-confirm-popup__subtitle {
+    display: block;
+    margin-top: 10rpx;
+    font-size: 26rpx;
+    color: #6b7280;
+    line-height: 1.5;
+  }
+
+  .process-confirm-actions {
+    padding: 0 24rpx 24rpx;
+  }
+
+  .process-confirm-btn {
+    margin-top: 14rpx;
+    height: 84rpx;
+    border-radius: 16rpx;
+    background: #f3f4f6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28rpx;
+    color: #374151;
+  }
+
+  .process-confirm-btn--primary {
+    background: #00a96b;
+    color: #ffffff;
+  }
+
+  .hotline-popup-mask {
+    position: fixed;
+    inset: 0;
+    z-index: 20;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding: 24rpx;
+    box-sizing: border-box;
+    background: rgba(2, 7, 19, 0.62);
+  }
+
+  .hotline-popup {
+    width: 100%;
+    max-width: 690rpx;
+    border-radius: 30rpx;
+    overflow: hidden;
+    background: linear-gradient(
+      180deg,
+      rgba(16, 39, 74, 0.98) 0%,
+      rgba(7, 19, 38, 0.98) 100%
+    );
+    border: 2rpx solid rgba(128, 195, 246, 0.28);
+    box-shadow: 0 24rpx 64rpx rgba(0, 0, 0, 0.28);
+  }
+
+  .hotline-popup__header {
+    padding: 32rpx 32rpx 20rpx;
+  }
+
+  .hotline-popup__title {
+    display: block;
+    font-size: 34rpx;
+    font-weight: 600;
+    color: #ffffff;
+  }
+
+  .hotline-popup__subtitle {
+    display: block;
+    margin-top: 10rpx;
+    font-size: 22rpx;
+    color: rgba(255, 255, 255, 0.58);
+  }
+
+  .hotline-list {
+    padding: 0 24rpx 20rpx;
+  }
+
+  .hotline-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20rpx;
+    padding: 24rpx;
+    border-radius: 22rpx;
+    background: rgba(255, 255, 255, 0.05);
+  }
+
+  .hotline-item + .hotline-item {
+    margin-top: 16rpx;
+  }
+
+  .hotline-item__main {
+    min-width: 0;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8rpx;
+  }
+
+  .hotline-item__label {
+    font-size: 24rpx;
+    color: rgba(255, 255, 255, 0.72);
+  }
+
+  .hotline-item__phone {
+    font-size: 32rpx;
+    font-weight: 600;
+    color: #ffffff;
+  }
+
+  .hotline-item__action {
+    flex-shrink: 0;
+    padding: 12rpx 22rpx;
+    border-radius: 999rpx;
+    font-size: 22rpx;
+    color: #0e2341;
+    background: linear-gradient(180deg, #fcefd4 0%, #dab26b 100%);
+  }
+
+  .hotline-popup__footer {
+    padding: 24rpx 32rpx 34rpx;
+    text-align: center;
+    font-size: 28rpx;
+    color: rgba(255, 255, 255, 0.82);
+    border-top: 1rpx solid rgba(255, 255, 255, 0.08);
+  }
+
   /* 朝阳安居服务：稿 684×273，宽度与其它块统一 690 */
   .anju-housing-banner {
     width: 690rpx;
     max-width: 100%;
     height: 273rpx;
-    margin: 0 auto 24rpx;
+    margin: 0 auto 0rpx;
     border-radius: 24rpx;
     overflow: hidden;
     line-height: 0;
@@ -254,8 +490,8 @@ onMounted(() => {
   .anju-promo-banner {
     width: 690rpx;
     max-width: 100%;
-    height: 448rpx;
-    margin: 0 auto 24rpx;
+    height: auto;
+    margin: 0 auto 0rpx;
     border-radius: 24rpx;
     overflow: hidden;
     line-height: 0;
@@ -263,7 +499,7 @@ onMounted(() => {
 
     .anju-promo-banner-img {
       width: 100%;
-      height: 100%;
+      height: auto;
       display: block;
       vertical-align: top;
     }
@@ -326,7 +562,11 @@ onMounted(() => {
         flex-shrink: 0;
         width: auto;
         height: 34rpx;
-        font-family: PingFangSC-Medium, PingFang SC, -apple-system, sans-serif;
+        font-family:
+          PingFangSC-Medium,
+          PingFang SC,
+          -apple-system,
+          sans-serif;
         font-size: 36rpx;
         font-weight: normal;
         font-stretch: normal;
@@ -366,7 +606,7 @@ onMounted(() => {
   }
 
   .services-section {
-    margin-top: 0;
+    margin-top: 48rpx;
   }
 
   /* .19-3 外框：690×86，与上方块同宽 */
@@ -449,7 +689,10 @@ onMounted(() => {
   .feed-tab-inactive {
     max-width: 150rpx;
     min-height: 32rpx;
-    font-family: PingFang SC, PingFangSC-Regular, sans-serif;
+    font-family:
+      PingFang SC,
+      PingFangSC-Regular,
+      sans-serif;
     font-size: 31rpx;
     font-weight: normal;
     line-height: 1.2;
@@ -569,7 +812,10 @@ onMounted(() => {
   .feed-service-name {
     width: 100%;
     min-height: 20rpx;
-    font-family: PingFang SC, PingFangSC-Regular, sans-serif;
+    font-family:
+      PingFang SC,
+      PingFangSC-Regular,
+      sans-serif;
     font-size: 22rpx;
     font-weight: normal;
     font-stretch: normal;
@@ -586,7 +832,10 @@ onMounted(() => {
   .feed-service-loc {
     width: 100%;
     min-height: 15rpx;
-    font-family: PingFang SC, PingFangSC-Regular, sans-serif;
+    font-family:
+      PingFang SC,
+      PingFangSC-Regular,
+      sans-serif;
     font-size: 16rpx;
     font-weight: normal;
     font-stretch: normal;

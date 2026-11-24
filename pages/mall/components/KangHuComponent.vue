@@ -102,7 +102,8 @@ const normalizeKanghuProductRow = (row) => {
 
 const sortKanghuProductsForBanner = (rows) => {
   const list = rows.map(normalizeKanghuProductRow).filter(Boolean);
-  const isFesco = (name) => String(name || "").includes(BEIJING_FESCO_NAME_PART);
+  const isFesco = (name) =>
+    String(name || "").includes(BEIJING_FESCO_NAME_PART);
   const first = list.filter((x) => isFesco(x.bcompanyname));
   const rest = list.filter((x) => !isFesco(x.bcompanyname));
   return [...first, ...rest];
@@ -263,12 +264,7 @@ onMounted(() => {
     box-sizing: border-box;
     padding: 2rpx;
     border-radius: 26rpx;
-    background: linear-gradient(
-      159deg,
-      #f6f1e7 0%,
-      #dbb062 58%,
-      #ca9c4a 100%
-    );
+    background: linear-gradient(159deg, #f6f1e7 0%, #dbb062 58%, #ca9c4a 100%);
 
     &:last-child {
       margin-bottom: 0;
@@ -360,7 +356,11 @@ onMounted(() => {
         flex-shrink: 0;
         width: auto;
         height: 34rpx;
-        font-family: PingFangSC-Medium, PingFang SC, -apple-system, sans-serif;
+        font-family:
+          PingFangSC-Medium,
+          PingFang SC,
+          -apple-system,
+          sans-serif;
         font-size: 36rpx;
         font-weight: normal;
         font-stretch: normal;

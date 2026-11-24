@@ -66,7 +66,7 @@ const isImgPath = (value) => {
 const handleCardClick = () => {
   // 跳转页面，并传递props.categorya和props.categoryb作为参数
   uni.navigateTo({
-    url: `/pages/mall/productlist?categorya=${props.categorya || 0}&categoryb=${props.categoryb || 0}`,
+    url: `/pages/mall/bcompanylist?categorya=${props.categorya || 0}&categoryb=${props.categoryb || 0}&bcompanyid=${props.bcompanyid || 0}`,
   });
 };
 </script>

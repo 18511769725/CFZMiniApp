@@ -1,0 +1,1 @@
+<view class="video-player-page data-v-5668cc64"><video wx:if="{{a}}" class="video-player data-v-5668cc64" src="{{b}}" controls autoplay object-fit="contain"/></view>

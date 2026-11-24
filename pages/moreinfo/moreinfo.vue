@@ -10,10 +10,10 @@
       <!-- 姓名（必填） -->
       <view class="form-item">
         <label class="form-label required">姓名</label>
-        <input 
-          class="form-input" 
-          type="text" 
-          v-model="userForm.name" 
+        <input
+          class="form-input"
+          type="text"
+          v-model="userForm.name"
           placeholder="请输入您的姓名"
           :disabled="isInfoReadOnly"
         />
@@ -22,10 +22,10 @@
       <!-- 电子邮箱（必填） -->
       <view class="form-item">
         <label class="form-label required">电子邮箱</label>
-        <input 
-          class="form-input" 
-          type="email" 
-          v-model="userForm.email" 
+        <input
+          class="form-input"
+          type="email"
+          v-model="userForm.email"
           placeholder="请输入您的电子邮箱"
           :disabled="isInfoReadOnly"
         />
@@ -34,10 +34,10 @@
       <!-- 职位信息（必填） -->
       <view class="form-item">
         <label class="form-label required">职位信息</label>
-        <input 
-          class="form-input" 
-          type="text" 
-          v-model="userForm.title" 
+        <input
+          class="form-input"
+          type="text"
+          v-model="userForm.title"
           placeholder="请输入您的职位"
           :disabled="isInfoReadOnly"
         />
@@ -46,25 +46,34 @@
       <!-- 企业信用编码（必填） -->
       <view class="form-item">
         <label class="form-label required">企业信用编码</label>
-        <input 
-          class="form-input" 
-          type="text" 
-          v-model="userForm.creditcode" 
+        <input
+          class="form-input"
+          type="text"
+          v-model="userForm.creditcode"
           placeholder="请输入企业信用编码"
           :disabled="isInfoReadOnly"
         />
-        <view v-if="creditcodeError" class="error-tip">企业信用编码异常，请重新填写</view>
+        <view v-if="creditcodeError" class="error-tip"
+          >企业信用编码异常，请重新填写</view
+        >
       </view>
 
       <!-- 提交按钮 -->
-      <button class="submit-btn" form-type="submit" :disabled="state.isSubmitting" @click="handleFormSubmit">提交信息</button>
+      <button
+        class="submit-btn"
+        form-type="submit"
+        :disabled="state.isSubmitting"
+        @click="handleFormSubmit"
+      >
+        提交信息
+      </button>
     </form>
   </view>
 </template>
 
 <script setup>
-import { reactive, ref, onMounted } from 'vue';
-import { onLoad } from '@dcloudio/uni-app';
+import { reactive, ref, onMounted } from "vue";
+import { onLoad } from "@dcloudio/uni-app";
 // 页面状态数据
 const isSubmitting = ref(false); // 提交按钮加载状态
 const creditcodeError = ref(false); // 企业信用编码异常提示
@@ -72,17 +81,17 @@ const isInfoReadOnly = ref(false); // 表单是否只读（备用，可根据需
 
 // 用户表单数据（与接口字段对应）
 const state = reactive({
-	errorMsg: '',
-	loading: false,
-	isSubmitting: false,
+  errorMsg: "",
+  loading: false,
+  isSubmitting: false,
 });
 // 用户表单数据（与接口字段对应）
 const userForm = reactive({
-	phone: '', // 上一页传递的手机号
-	name: '',
-	email: '',
-	title: '',
-	creditcode: ''
+  phone: "", // 上一页传递的手机号
+  name: "",
+  email: "",
+  title: "",
+  creditcode: "",
 });
 
 // 页面加载时获取上一页传递的phone参数
@@ -94,8 +103,8 @@ onLoad((option) => {
     getUserInfoByPhone();
   } else {
     uni.showToast({
-      title: '未获取到手机号',
-      icon: 'none'
+      title: "未获取到手机号",
+      icon: "none",
     });
   }
 });
@@ -135,52 +144,61 @@ const getUserInfoByPhone = () => {
 // 表单提交处理
 const handleFormSubmit = async (e) => {
   e.preventDefault(); // 阻止默认表单提交行为
-  
+
   state.isSubmitting = true;
-  
+
   // 1. 表单校验（必填项验证）
   const { phone, name, email, title, creditcode } = userForm;
   // 1. 姓名校验：必填 + 最长50字符
   if (!name.trim()) {
-    return uni.showToast({ title: '请填写姓名', icon: 'none' });
+    return uni.showToast({ title: "请填写姓名", icon: "none" });
   }
   if (name.trim().length > 10) {
-    return uni.showToast({ title: '姓名长度不能超过10个字符', icon: 'none' });
+    return uni.showToast({ title: "姓名长度不能超过10个字符", icon: "none" });
   }
-  
+
   // 2. 电子邮箱校验：必填 + 格式正确 + 最长50字符
   if (!email.trim()) {
-    return uni.showToast({ title: '请填写电子邮箱', icon: 'none' });
+    return uni.showToast({ title: "请填写电子邮箱", icon: "none" });
   }
   if (email.trim().length > 30) {
-    return uni.showToast({ title: '电子邮箱长度不能超过30个字符', icon: 'none' });
+    return uni.showToast({
+      title: "电子邮箱长度不能超过30个字符",
+      icon: "none",
+    });
   }
   const emailReg = /^[a-zA-Z0-9._%-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
   if (!emailReg.test(email.trim())) {
-    return uni.showToast({ title: '请填写正确的电子邮箱格式', icon: 'none' });
+    return uni.showToast({ title: "请填写正确的电子邮箱格式", icon: "none" });
   }
-  
+
   // 3. 职位信息校验：必填 + 最长50字符
   if (!title.trim()) {
-    return uni.showToast({ title: '请填写职位信息', icon: 'none' });
+    return uni.showToast({ title: "请填写职位信息", icon: "none" });
   }
   if (title.trim().length > 20) {
-    return uni.showToast({ title: '职位信息长度不能超过20个字符', icon: 'none' });
+    return uni.showToast({
+      title: "职位信息长度不能超过20个字符",
+      icon: "none",
+    });
   }
-  
+
   // 4. 企业信用编码校验：必填 + 最长50字符
   if (!creditcode.trim()) {
-    return uni.showToast({ title: '请填写企业信用编码', icon: 'none' });
+    return uni.showToast({ title: "请填写企业信用编码", icon: "none" });
   }
   if (creditcode.trim().length > 20) {
-    return uni.showToast({ title: '企业信用编码长度不能超过20个字符', icon: 'none' });
+    return uni.showToast({
+      title: "企业信用编码长度不能超过20个字符",
+      icon: "none",
+    });
   }
   let payload = {
-	  phone: userForm.phone, // 携带手机号
-	  name: userForm.name.trim(),
-	  email: userForm.email.trim(),
-	  title: userForm.title.trim(),
-	  creditcode: userForm.creditcode.trim()
+    phone: userForm.phone, // 携带手机号
+    name: userForm.name.trim(),
+    email: userForm.email.trim(),
+    title: userForm.title.trim(),
+    creditcode: userForm.creditcode.trim(),
   };
   uni.request({
     url: "https://mvpme82.cloud/api/submituserinfobyphone", // 目标接口地址
@@ -190,18 +208,22 @@ const handleFormSubmit = async (e) => {
     success: (res) => {
       // 接口返回格式：retcode=200 为成功
       if (res && res.data && res.data.retcode === "200") {
-        uni.showToast({ title: '信息更新成功', icon: 'success' });
+        uni.showToast({ title: "信息更新成功", icon: "success" });
         setTimeout(() => {
-			uni.navigateTo({ url: '/pages/login/login' });
-		}, 200);
+          uni.navigateTo({ url: "/pages/login/login" });
+        }, 200);
       } else {
-        uni.showToast({title: '信息更新失败！',icon: 'none',duration: 1000});
+        uni.showToast({
+          title: "信息更新失败！",
+          icon: "none",
+          duration: 1000,
+        });
       }
-	  state.isSubmitting = false;
+      state.isSubmitting = false;
     },
     fail: (err) => {
-      uni.showToast({title: '信息更新失败！',icon: 'none',duration: 1000});
-	  state.isSubmitting = false;
+      uni.showToast({ title: "信息更新失败！", icon: "none", duration: 1000 });
+      state.isSubmitting = false;
     },
   });
 };
@@ -230,7 +252,7 @@ const handleFormSubmit = async (e) => {
 .required {
   position: relative;
   &::before {
-    content: '*';
+    content: "*";
     color: #ff4d4f;
     position: absolute;
     left: -15rpx;

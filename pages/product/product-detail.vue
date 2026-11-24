@@ -35,8 +35,27 @@
             <swiper-item
               v-for="(imgItem, index) in swiperImageList"
               :key="index"
+              @click="handleSwiperItemClick(imgItem)"
             >
-              <image class="anju-swiper-img" :src="imgItem" mode="aspectFill" />
+              <view
+                v-if="imgItem.type === 'video'"
+                class="anju-video-swiper-item"
+              >
+                <image
+                  class="anju-swiper-img"
+                  :src="imgItem.imgurl || defaultImg"
+                  mode="aspectFill"
+                />
+                <view class="anju-video-play-button" aria-label="播放视频">
+                  <view class="anju-video-play-icon" />
+                </view>
+              </view>
+              <image
+                v-else
+                class="anju-swiper-img"
+                :src="getSwiperImageUrl(imgItem)"
+                mode="aspectFill"
+              />
             </swiper-item>
           </swiper>
         </view>
@@ -205,8 +224,27 @@
         autoplay
         interval="3000"
       >
-        <swiper-item v-for="(imgItem, index) in swiperImageList" :key="index">
-          <image class="swiper-img" :src="imgItem" mode="aspectFill"></image>
+        <swiper-item
+          v-for="(imgItem, index) in swiperImageList"
+          :key="index"
+          @click="handleSwiperItemClick(imgItem)"
+        >
+          <view v-if="imgItem.type === 'video'" class="video-swiper-item">
+            <image
+              class="swiper-img"
+              :src="imgItem.imgurl || defaultImg"
+              mode="aspectFill"
+            />
+            <view class="video-play-button" aria-label="播放视频">
+              <view class="video-play-icon" />
+            </view>
+          </view>
+          <image
+            v-else
+            class="swiper-img"
+            :src="getSwiperImageUrl(imgItem)"
+            mode="aspectFill"
+          ></image>
         </swiper-item>
       </swiper>
 
@@ -312,6 +350,19 @@
         </view>
       </view>
     </view>
+    <view
+      v-if="state.contactInfo.phone"
+      class="product-consultation-float"
+      @tap="callProductConsultation"
+    >
+      <text class="product-consultation-title">产品咨询</text>
+      <text class="product-consultation-company">{{
+        state.contactInfo.shortname || ""
+      }}</text>
+      <text class="product-consultation-phone">{{
+        state.contactInfo.phone
+      }}</text>
+    </view>
   </view>
 </template>
 
@@ -327,7 +378,31 @@ const KANGHU_LONG_IMAGE_PRODUCT_IDS = new Set([19, 75]);
 const state = reactive({
   userinfo: {},
   productDetailData: {},
+  contactInfo: {},
 });
+
+const getContactInfo = (productid) => {
+  let payload = {
+    productid: productid,
+  };
+  uni.request({
+    url: "https://mvpme82.cloud/api/getbcompanyshortnameandphone", // 目标接口地址
+    method: "POST",
+    data: payload,
+    success: (res) => {
+      console.log("获取公司联系方式结果：", res);
+      if (res && res.data && res.data.code === "200") {
+        console.log("公司联系方式：", res.data.data[0]);
+        state.contactInfo = res.data.data[0] || {};
+      } else {
+        console.error("获取公司联系方式失败：", res);
+      }
+    },
+    fail: (err) => {
+      console.error("获取公司联系方式失败：", err);
+    },
+  });
+};
 
 const defaultImg = "/static/images/default-product.png";
 
@@ -409,6 +484,11 @@ const showDarkProductDetailBottomBar = computed(() => {
   const ca = detailCategorya.value;
   return ca === 0 || ca === 1;
 });
+
+const callProductConsultation = () => {
+  if (!state.contactInfo.phone) return;
+  uni.makePhoneCall({ phoneNumber: state.contactInfo.phone });
+};
 
 const darkProductDetailBottomBtnText = computed(() =>
   detailCategorya.value === 0 ? "发起订单" : "加入购物车",
@@ -630,8 +710,16 @@ const parseSwiperImageList = (imageListJson) => {
   try {
     const imageList = JSON.parse(imageListJson);
     if (Array.isArray(imageList) && imageList.length > 0) {
-      // 提取所有图片地址，容错处理单个图片对象
-      swiperImageList.value = imageList.map((item) => item?.url || defaultImg);
+      swiperImageList.value = imageList.map((item) => {
+        if (item && typeof item === "object") {
+          return {
+            ...item,
+            type: item.type === "video" ? "video" : "image",
+            imgurl: item.imgurl || item.url || defaultImg,
+          };
+        }
+        return { type: "image", url: item || defaultImg };
+      });
     } else {
       // 空数组时返回默认占位图
       swiperImageList.value = [defaultImg];
@@ -640,6 +728,18 @@ const parseSwiperImageList = (imageListJson) => {
     console.error("商品走马灯图片解析失败：", error);
     swiperImageList.value = [defaultImg];
   }
+};
+
+const getSwiperImageUrl = (item) => {
+  if (typeof item === "string") return item || defaultImg;
+  return item?.imgurl || item?.url || defaultImg;
+};
+
+const handleSwiperItemClick = (item) => {
+  if (item?.type !== "video" || !item.url) return;
+  uni.navigateTo({
+    url: `/pages/video/video-player?url=${encodeURIComponent(item.url)}`,
+  });
 };
 
 // 解析detailimagelist，
@@ -708,6 +808,8 @@ const loadProductDetail = (productId) => {
             parsePackageList(state.productDetailData.packageprice);
             // 触发价格逻辑，控制套餐区域显示
             getProductPrice();
+            // 获取供应商联系方式
+            getContactInfo(state.productDetailData.id);
             const ca = Number(state.productDetailData.categorya);
             if ((ca === 0 || ca === 1) && packageList.value.length > 0) {
               selectedPackageIndex.value = 0;
@@ -925,6 +1027,56 @@ onLoad((options) => {
   box-sizing: border-box;
 }
 
+.product-consultation-float {
+  position: fixed;
+  right: 24rpx;
+  bottom: 190rpx;
+  z-index: 100;
+  width: 190rpx;
+  padding: 18rpx 16rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-sizing: border-box;
+  border: 1rpx solid rgba(255, 255, 255, 0.45);
+  border-radius: 18rpx;
+  background: linear-gradient(
+    180deg,
+    rgba(20, 58, 103, 0.96) 0%,
+    rgba(6, 23, 48, 0.96) 100%
+  );
+  box-shadow: 0 10rpx 24rpx rgba(0, 0, 0, 0.25);
+}
+
+.product-consultation-title {
+  color: #fcefd4;
+  font-size: 26rpx;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.product-consultation-company,
+.product-consultation-phone {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.product-consultation-company {
+  margin-top: 10rpx;
+  color: rgba(255, 255, 255, 0.88);
+  font-size: 21rpx;
+  line-height: 1.3;
+}
+
+.product-consultation-phone {
+  margin-top: 6rpx;
+  color: #ffffff;
+  font-size: 20rpx;
+  line-height: 1.3;
+}
+
 /* 康护长图详情：与底栏同色，避免 scroll 底部留白、padding 区呈白缝 */
 .product-detail-page.is-kanghu-long-detail {
   background-color: #061730;
@@ -940,6 +1092,41 @@ onLoad((options) => {
 .swiper-img {
   width: 100%;
   height: 100%;
+}
+
+.video-swiper-item,
+.anju-video-swiper-item {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.video-play-button,
+.anju-video-play-button {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 84rpx;
+  height: 84rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  border: 2rpx solid rgba(255, 255, 255, 0.9);
+  border-radius: 50%;
+  background-color: rgba(0, 0, 0, 0.48);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.video-play-icon,
+.anju-video-play-icon {
+  width: 0;
+  height: 0;
+  margin-left: 6rpx;
+  border-top: 14rpx solid transparent;
+  border-bottom: 14rpx solid transparent;
+  border-left: 22rpx solid #ffffff;
 }
 
 /* 康护长图详情：单张 imageurl，宽度撑满、高度随比例 */

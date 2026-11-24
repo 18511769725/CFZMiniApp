@@ -160,6 +160,40 @@
             </view>
           </view>
         </view>
+        <!-- 项目专员信息区 -->
+        <view class="info-card-wrap" v-if="state.orderInfo.agentweixinpic">
+          <view class="info-card-inner project-agent-card">
+            <view class="card-title">项目专员信息</view>
+            <view class="project-agent-content">
+              <image
+                class="project-agent-qrcode"
+                :src="state.orderInfo.agentweixinpic"
+                mode="aspectFit"
+              ></image>
+              <view class="project-agent-details">
+                <view class="project-agent-item">
+                  <text class="project-agent-label">项目专员姓名</text>
+                  <text class="project-agent-value">{{
+                    state.orderInfo.agentname || "-"
+                  }}</text>
+                </view>
+                <view
+                  class="project-agent-item project-agent-phone"
+                  :class="{
+                    'project-agent-phone--clickable':
+                      state.orderInfo.agentphone,
+                  }"
+                  @click="callProjectAgent"
+                >
+                  <text class="project-agent-label">项目专员电话</text>
+                  <text class="project-agent-value">{{
+                    state.orderInfo.agentphone || "-"
+                  }}</text>
+                </view>
+              </view>
+            </view>
+          </view>
+        </view>
 
         <!-- 订单商品内容：外框与其它信息卡一致，内框（图+标题+明细）单独背景 -->
         <view class="info-card-wrap">
@@ -222,7 +256,7 @@
       </view>
     </scroll-view>
 
-    <!-- 底部操作按钮（设计稿 .33 / 底部条 .34） -->
+    <!-- 底部操作按钮 -->
     <view
       class="bottom-actions"
       v-if="state.orderInfo && state.orderInfo.status !== undefined"
@@ -313,6 +347,12 @@ const showsubsidytype = (type) => {
     discount: "折扣补贴",
   };
   return map[type] || "未知";
+};
+
+const callProjectAgent = () => {
+  const phone = state.orderInfo.agentphone;
+  if (!phone) return;
+  uni.makePhoneCall({ phoneNumber: String(phone) });
 };
 
 // 模拟获取订单详情接口
@@ -483,6 +523,7 @@ const getStatusText = (status) => {
     "-2": "审批拒绝",
     "-3": "后台终止",
     "-4": "主管驳回",
+    "-5": "申请取消",
   };
   return statusMap[status] || "未知状态";
 };
@@ -499,6 +540,7 @@ const getStatusClass = (status) => {
     "-2": "status-terminated",
     "-3": "status-terminated",
     "-4": "status-terminated",
+    "-5": "status-requestedcancel",
   };
   return classMap[status] || "";
 };
@@ -524,7 +566,7 @@ const getFirstProductImage = (imagelist) => {
   }
 };
 
-// 取消订单（示例实现）
+// 取消订单
 const cancelOrder = () => {
   const status = state.orderInfo.status;
   if (!(status === 0 || status === 1 || status === 4)) return;
@@ -541,13 +583,13 @@ const cancelOrder = () => {
     success: (res) => {
       if (res.confirm) {
         uni.request({
-          url: "https://mvpme82.cloud/api/cancelorderfromminiapp",
+          url: "https://mvpme82.cloud/api/submitcancelorderrequestfromminiapp",
           method: "POST",
           header: { "Content-Type": "application/json" },
           data: payload,
           success: (resp) => {
             if (resp && resp.data && resp.data.retcode === "200") {
-              uni.showToast({ title: "订单已取消", icon: "none" });
+              uni.showToast({ title: "订单取消申请已提交", icon: "none" });
               // 刷新详情
               getOrderDetail(state.orderInfo.id);
             } else {
@@ -850,12 +892,69 @@ $order-product-row-bg: "https://mvpme82.cloud/data/a480b220-ffb8-4240-b1e9-ade6f
   min-width: 0;
 }
 
+.project-agent-content {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 32rpx;
+}
+
+.project-agent-qrcode {
+  width: 180rpx;
+  height: 180rpx;
+  flex-shrink: 0;
+  border-radius: 12rpx;
+  background-color: #ffffff;
+}
+
+.project-agent-details {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 24rpx;
+}
+
+.project-agent-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+  min-width: 0;
+}
+
+.project-agent-label,
+.project-agent-value {
+  font-family:
+    "PingFang SC",
+    PingFangSC-Regular,
+    -apple-system,
+    sans-serif;
+  line-height: 40rpx;
+  letter-spacing: 0;
+  word-break: break-all;
+}
+
+.project-agent-label {
+  font-size: 24rpx;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.project-agent-value {
+  font-size: 28rpx;
+  color: #ffffff;
+}
+
+.project-agent-phone--clickable .project-agent-value {
+  color: #f6d69f;
+}
+
 /* 内容区状态与正文同色（白） */
 .status-pending,
 .status-negotiate,
 .status-signed,
 .status-finished,
-.status-terminated {
+.status-terminated,
+.status-requestedcancel {
   color: #ffffff !important;
 }
 

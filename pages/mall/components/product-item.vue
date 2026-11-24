@@ -6,6 +6,9 @@
     :class="{ 'anju-card-outer--yuexiang': variant === 'yuexiang' }"
     @click="toProductDetail"
   >
+    <view v-if="watermarkText" class="card-watermark card-watermark--anju">{{
+      watermarkText
+    }}</view>
     <image class="anju-card-bg" :src="listDarkCardBgSrc" mode="scaleToFill" />
     <view class="anju-card-inner">
       <view class="anju-thumb-wrap">
@@ -116,6 +119,9 @@
 
   <!-- 默认：左图右文（悦享等分类） -->
   <view v-else class="product-item-container" @click="toProductDetail">
+    <view v-if="watermarkText" class="card-watermark card-watermark--default">{{
+      watermarkText
+    }}</view>
     <view class="product-img-wrapper">
       <image
         class="product-img"
@@ -153,9 +159,18 @@ const props = defineProps({
     type: String,
     default: "default",
   },
+  userid: {
+    type: [String, Number],
+    default: "",
+  },
 });
 
 const emit = defineEmits(["toDetail", "addCart"]);
+
+const watermarkText = computed(() => {
+  if (props.userid === undefined || props.userid === null) return "";
+  return String(props.userid);
+});
 
 /** 益企·安居列表卡片整图底（688×252，描边圆角在切图内） */
 const anjuCardBgSrc =
@@ -685,6 +700,37 @@ const toProductDetail = () => {
   box-shadow: inset 0 -3rpx 3rpx 0 rgba(255, 255, 255, 0.53);
   border: 1rpx solid rgba(130, 168, 214, 0.8);
   opacity: 0.95;
+}
+
+.card-watermark {
+  position: absolute;
+  top: 10rpx;
+  right: 12rpx;
+  z-index: 3;
+  pointer-events: none;
+  max-width: 48%;
+  padding: 4rpx 8rpx;
+  border-radius: 999rpx;
+  font-size: 16rpx;
+  font-weight: 400;
+  line-height: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  box-sizing: border-box;
+  opacity: 0.32;
+}
+
+.card-watermark--anju {
+  color: rgba(255, 255, 255, 0.35);
+  border: 1rpx solid rgba(255, 255, 255, 0.1);
+  background: rgba(0, 0, 0, 0.08);
+}
+
+.card-watermark--default {
+  color: rgba(102, 102, 102, 0.35);
+  border: 1rpx solid rgba(238, 238, 238, 0.45);
+  background: rgba(255, 255, 255, 0.45);
 }
 
 /* ========== 默认列表项 ========== */

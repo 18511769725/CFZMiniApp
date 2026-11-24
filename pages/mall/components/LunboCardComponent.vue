@@ -49,7 +49,7 @@ const isImgPath = (value) => {
 };
 
 const handleCardClick = () => {
-  // 跳转页面，并传递props.categorya和props.categoryb作为参数
+  // 跳转到企业列表页，并传递分类参数，便于页面按分类筛选内容
   uni.navigateTo({
     url: `/pages/mall/productlist?categorya=${props.categorya || 0}&categoryb=${props.categoryb || 0}`,
   });

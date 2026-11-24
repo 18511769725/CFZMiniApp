@@ -1,6 +1,4 @@
 {
   "component": true,
-  "usingComponents": {
-    "process-step-card": "./ProcessStepCard"
-  }
+  "usingComponents": {}
 }

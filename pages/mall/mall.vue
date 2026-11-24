@@ -29,9 +29,17 @@
     </scroll-view>
 
     <!-- 动态组件内容区域 -->
-    <scroll-view scroll-y class="content-scroll">
+    <scroll-view
+      scroll-y
+      class="content-scroll"
+      :scroll-top="contentScrollTop"
+      :scroll-with-animation="true"
+    >
       <!-- 益企·安居 -->
-      <AnJuComponent v-if="activeTabId === 1" />
+      <AnJuComponent
+        v-if="activeTabId === 1"
+        @scrollToTop="scrollMallContentTop"
+      />
 
       <!-- 益企·悦享 -->
       <YueXiangComponent v-if="activeTabId === 2" />
@@ -43,7 +51,7 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { nextTick, ref } from "vue";
 import { onShow } from "@dcloudio/uni-app";
 import AnJuComponent from "./components/AnJuComponent.vue";
 import YueXiangComponent from "./components/YueXiangComponent.vue";
@@ -60,10 +68,18 @@ const tabs = ref([
 
 // 当前活跃的tab ID
 const activeTabId = ref(1);
+const contentScrollTop = ref(0);
 
 // 切换tab
 const switchTab = (tabId) => {
   activeTabId.value = tabId;
+};
+
+const scrollMallContentTop = () => {
+  contentScrollTop.value = 1;
+  nextTick(() => {
+    contentScrollTop.value = 0;
+  });
 };
 
 onShow(() => {

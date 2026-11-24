@@ -7,6 +7,8 @@
     "pages/mainpage/mainpage",
     "pages/moreinfo/moreinfo",
     "pages/product/product-detail",
+    "pages/article/article",
+    "pages/video/video-player",
     "pages/cargo/cargo-list",
     "pages/orderDetail/orderDetail",
     "pages/login/agreement",
@@ -15,8 +17,10 @@
     "pages/addUser/addUser",
     "pages/askForTenantInfo/askForTenantInfo",
     "pages/mall/productlist",
+    "pages/mall/bcompanylist",
     "pages/personal/personal",
-    "pages/login/pickaccount"
+    "pages/login/pickaccount",
+    "pages/askForTenantInfo/anjuprocess/anjuprocess"
   ],
   "window": {
     "navigationBarTextStyle": "black",

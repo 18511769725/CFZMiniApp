@@ -75,6 +75,13 @@
         </view>
       </view>
     </view>
+    <view
+      class="tenant-info-tip"
+      @click="navigateToAnjuProcess"
+      style="display: none"
+    >
+      请确保承租人已在“朝安居”平台完成备案审核，点击查看完整流程
+    </view>
 
     <!-- 表单区：669×590 稿，同套渐变描边 -->
     <view class="tenant-card-shell tenant-card-shell--form">
@@ -295,6 +302,10 @@ const getQuotaStats = (item) => {
     used: 0,
     available: count,
   };
+};
+
+const navigateToAnjuProcess = () => {
+  uni.navigateTo({ url: "/pages/askForTenantInfo/anjuprocess/anjuprocess" });
 };
 
 const isQuotaAvailable = (item) => {
@@ -931,6 +942,39 @@ onLoad((options) => {
 .bottom-order-btn[disabled] {
   opacity: 0.45;
   color: rgba(6, 23, 48, 0.55);
+}
+
+.tenant-info-tip {
+  width: 669rpx;
+  max-width: 100%;
+  margin: 22rpx auto 30rpx;
+  padding: 18rpx 28rpx;
+  box-sizing: border-box;
+  border-radius: 20rpx;
+  border: 1rpx solid rgba(116, 176, 255, 0.38);
+  background: linear-gradient(
+    135deg,
+    rgba(22, 58, 109, 0.78) 0%,
+    rgba(15, 39, 76, 0.82) 100%
+  );
+  font-family: PingFangSC-Regular, "PingFang SC", sans-serif;
+  font-size: 24rpx;
+  line-height: 38rpx;
+  color: rgba(214, 233, 255, 0.96);
+  letter-spacing: 0.4rpx;
+  text-align: left;
+  box-shadow: 0 10rpx 24rpx rgba(7, 20, 43, 0.22);
+  transition: all 0.2s ease;
+}
+
+.tenant-info-tip:active {
+  transform: scale(0.985);
+  border-color: rgba(139, 197, 255, 0.55);
+  background: linear-gradient(
+    135deg,
+    rgba(27, 68, 126, 0.85) 0%,
+    rgba(18, 48, 91, 0.9) 100%
+  );
 }
 </style>
 

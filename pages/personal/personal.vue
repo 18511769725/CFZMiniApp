@@ -209,6 +209,22 @@
         <view class="section-title-bar" />
         <text>我的功能</text>
       </view>
+      <view class="function-hotline-entry" @tap="showServiceHotlineSheet">
+        <view class="function-hotline-entry__main">
+          <image
+            class="function-hotline-entry__icon"
+            src="/static/personal/hotline.png"
+            mode="aspectFit"
+          />
+          <view class="function-hotline-entry__text">
+            <text class="function-hotline-entry__title">咨询热线</text>
+            <text class="function-hotline-entry__desc"
+              >4 组热线电话，点击后可直接拨打</text
+            >
+          </view>
+        </view>
+        <text class="function-hotline-entry__arrow">立即查看</text>
+      </view>
       <view class="function-panel">
         <view
           v-for="item in functionMenuItems"
@@ -222,6 +238,36 @@
             mode="aspectFit"
           />
           <text class="function-text">{{ item.text }}</text>
+        </view>
+      </view>
+
+      <view
+        v-if="showHotlinePopup"
+        class="hotline-popup-mask"
+        @tap="closeServiceHotlinePopup"
+      >
+        <view class="hotline-popup" @tap.stop>
+          <view class="hotline-popup__header">
+            <text class="hotline-popup__title">咨询热线</text>
+            <text class="hotline-popup__subtitle">请选择需要拨打的热线</text>
+          </view>
+          <view class="hotline-list">
+            <view
+              v-for="item in hotlineDisplayList"
+              :key="item.phone"
+              class="hotline-item"
+              @tap="callServiceHotline(item.phone)"
+            >
+              <view class="hotline-item__main">
+                <text class="hotline-item__label">{{ item.label }}</text>
+                <text class="hotline-item__phone">{{ item.phone }}</text>
+              </view>
+              <text class="hotline-item__action">拨打</text>
+            </view>
+          </view>
+          <view class="hotline-popup__footer" @tap="closeServiceHotlinePopup"
+            >取消</view
+          >
         </view>
       </view>
 
@@ -322,6 +368,7 @@ const displayOrder = computed(() => {
 const menuIconSrc = (item) => {
   if (item.icon === "messages.png") return "/static/personal/messages.png";
   if (item.icon === "pjfk.png") return "/static/personal/feedback.png";
+  if (item.icon === "hotline.png") return "/static/personal/hotline.png";
   if (item.icon === "quit.png") return "/static/personal/quit.png";
   return `/static/images/${item.icon}`;
 };
@@ -418,6 +465,26 @@ const state = reactive({
   ccompanyinfo: {},
   creditinfo: {},
 });
+const showHotlinePopup = ref(false);
+const serviceHotlines = ref([
+  { label: "咨询热线", phone: "010-65006211" },
+  { label: "咨询热线", phone: "010-65006984" },
+  { label: "咨询热线", phone: "010-65000440" },
+  { label: "咨询热线", phone: "010-65000442" },
+]);
+
+const hotlineDisplayList = computed(() =>
+  serviceHotlines.value
+    .filter((item) => item.phone && String(item.phone).trim())
+    .map((item, index) => ({
+      label:
+        item.label && item.label !== "咨询热线"
+          ? item.label
+          : `咨询热线 ${index + 1}`,
+      phone: String(item.phone).trim(),
+    })),
+);
+
 const menuList = ref([
   {
     text: "消息通知",
@@ -428,6 +495,11 @@ const menuList = ref([
     text: "评价反馈",
     icon: "pjfk.png",
     action: "myCoupon",
+  },
+  {
+    text: "咨询热线",
+    icon: "hotline.png",
+    action: "serviceHotline",
   },
   {
     text: "添加用户",
@@ -452,7 +524,9 @@ const visibleMenuList = computed(() => {
 });
 
 const functionMenuItems = computed(() =>
-  visibleMenuList.value.filter((item) => item.action !== "quitlogin"),
+  visibleMenuList.value.filter(
+    (item) => item.action !== "quitlogin" && item.action !== "serviceHotline",
+  ),
 );
 
 const handleLogout = () => {
@@ -460,9 +534,33 @@ const handleLogout = () => {
   uni.reLaunch({ url: "/pages/login/login" });
 };
 
+const closeServiceHotlinePopup = () => {
+  showHotlinePopup.value = false;
+};
+
+const callServiceHotline = (phone) => {
+  if (!phone) return;
+  uni.makePhoneCall({ phoneNumber: String(phone) });
+};
+
+const showServiceHotlineSheet = () => {
+  if (!hotlineDisplayList.value.length) {
+    uni.showToast({
+      title: "请先配置咨询热线",
+      icon: "none",
+    });
+    return;
+  }
+
+  showHotlinePopup.value = true;
+};
+
 const handleMenuClick = (item) => {
   switch (item.action) {
     case "mergeAsset":
+      break;
+    case "serviceHotline":
+      showServiceHotlineSheet();
       break;
     case "addUser":
       uni.navigateTo({ url: "/pages/addUser/addUser" });
@@ -615,7 +713,6 @@ page {
 .personal-top-bg {
   width: 100%;
   display: block;
-  vertical-align: top;
 }
 
 .personal-main {
@@ -638,12 +735,7 @@ page {
   margin-right: auto;
   padding: 2rpx;
   border-radius: 41rpx;
-  background: linear-gradient(
-    171deg,
-    #80c3f6 0%,
-    #244368 48%,
-    #9ccdf0 100%
-  );
+  background: linear-gradient(171deg, #80c3f6 0%, #244368 48%, #9ccdf0 100%);
 }
 
 .company-card-inner {
@@ -767,7 +859,10 @@ page {
   margin-left: 12rpx;
   flex: 1;
   min-width: 0;
-  font-family: PingFang SC, PingFangSC-Light, sans-serif;
+  font-family:
+    PingFang SC,
+    PingFangSC-Light,
+    sans-serif;
   font-size: 21rpx;
   font-weight: normal;
   letter-spacing: 0;
@@ -775,7 +870,10 @@ page {
 }
 
 .info-item .val.val--style1 {
-  font-family: PingFang SC, PingFangSC-Medium, sans-serif;
+  font-family:
+    PingFang SC,
+    PingFangSC-Medium,
+    sans-serif;
   font-size: 24rpx;
   font-weight: normal;
   letter-spacing: 0;
@@ -783,7 +881,10 @@ page {
 }
 
 .info-item .val.val--style2 {
-  font-family: PingFang SC, PingFangSC-Light, sans-serif;
+  font-family:
+    PingFang SC,
+    PingFangSC-Light,
+    sans-serif;
   font-size: 21rpx;
   font-weight: normal;
   letter-spacing: 1rpx;
@@ -869,7 +970,10 @@ page {
 }
 
 .name-row .name {
-  font-family: PingFang SC, PingFangSC-Medium, sans-serif;
+  font-family:
+    PingFang SC,
+    PingFangSC-Medium,
+    sans-serif;
   font-size: 34rpx;
   font-weight: normal;
   line-height: 51rpx;
@@ -878,7 +982,10 @@ page {
 }
 
 .name-row .role {
-  font-family: PingFang SC, PingFangSC-Regular, sans-serif;
+  font-family:
+    PingFang SC,
+    PingFangSC-Regular,
+    sans-serif;
   font-size: 22rpx;
   font-weight: normal;
   line-height: 32rpx;
@@ -1059,12 +1166,7 @@ page {
   margin-top: 20rpx;
   padding: 2rpx;
   border-radius: 20rpx;
-  background: linear-gradient(
-    171deg,
-    #80c3f6 0%,
-    #244368 48%,
-    #9ccdf0 100%
-  );
+  background: linear-gradient(171deg, #80c3f6 0%, #244368 48%, #9ccdf0 100%);
 }
 
 .order-item-inner {
@@ -1086,12 +1188,7 @@ page {
   border-radius: 18rpx;
   overflow: hidden;
   flex-shrink: 0;
-  background: linear-gradient(
-    178deg,
-    #5e97d2 0%,
-    #2c5f8f 49%,
-    #6a9ccf 100%
-  );
+  background: linear-gradient(178deg, #5e97d2 0%, #2c5f8f 49%, #6a9ccf 100%);
 }
 
 .order-thumb-inner {
@@ -1179,8 +1276,10 @@ page {
 .function-panel {
   display: flex;
   flex-direction: row;
+  flex-wrap: wrap;
   align-items: stretch;
-  justify-content: space-around;
+  justify-content: flex-start;
+  gap: 24rpx 0;
   padding: 32rpx 8rpx;
   border-radius: 24rpx;
   background: rgba(255, 255, 255, 0.06);
@@ -1188,8 +1287,63 @@ page {
   margin-bottom: 8rpx;
 }
 
-.function-item {
+.function-hotline-entry {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24rpx;
+  padding: 28rpx 26rpx;
+  margin-bottom: 20rpx;
+  border-radius: 24rpx;
+  background: linear-gradient(
+    135deg,
+    rgba(18, 48, 88, 0.96) 0%,
+    rgba(10, 25, 49, 0.98) 100%
+  );
+  border: 2rpx solid rgba(128, 195, 246, 0.26);
+  box-shadow: 0 12rpx 28rpx rgba(0, 0, 0, 0.16);
+}
+
+.function-hotline-entry__main {
+  display: flex;
+  align-items: center;
+  gap: 18rpx;
+  min-width: 0;
   flex: 1;
+}
+
+.function-hotline-entry__icon {
+  width: 56rpx;
+  height: 56rpx;
+  flex-shrink: 0;
+}
+
+.function-hotline-entry__text {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6rpx;
+}
+
+.function-hotline-entry__title {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.function-hotline-entry__desc {
+  font-size: 22rpx;
+  color: rgba(255, 255, 255, 0.62);
+}
+
+.function-hotline-entry__arrow {
+  flex-shrink: 0;
+  font-size: 22rpx;
+  color: #f3deb1;
+}
+
+.function-item {
+  width: 25%;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1208,6 +1362,10 @@ page {
   background: rgba(255, 255, 255, 0.12);
 }
 
+.function-item:nth-child(4n + 1)::before {
+  display: none;
+}
+
 .function-icon {
   width: 48rpx;
   height: 48rpx;
@@ -1219,17 +1377,109 @@ page {
   color: rgba(255, 255, 255, 0.88);
 }
 
+.hotline-popup-mask {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 24rpx;
+  background: rgba(2, 7, 19, 0.62);
+}
+
+.hotline-popup {
+  width: 100%;
+  max-width: 690rpx;
+  border-radius: 30rpx;
+  overflow: hidden;
+  background: linear-gradient(
+    180deg,
+    rgba(16, 39, 74, 0.98) 0%,
+    rgba(7, 19, 38, 0.98) 100%
+  );
+  border: 2rpx solid rgba(128, 195, 246, 0.28);
+  box-shadow: 0 24rpx 64rpx rgba(0, 0, 0, 0.28);
+}
+
+.hotline-popup__header {
+  padding: 32rpx 32rpx 20rpx;
+}
+
+.hotline-popup__title {
+  display: block;
+  font-size: 34rpx;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.hotline-popup__subtitle {
+  display: block;
+  margin-top: 10rpx;
+  font-size: 22rpx;
+  color: rgba(255, 255, 255, 0.58);
+}
+
+.hotline-list {
+  padding: 0 24rpx 20rpx;
+}
+
+.hotline-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20rpx;
+  padding: 24rpx;
+  border-radius: 22rpx;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.hotline-item + .hotline-item {
+  margin-top: 16rpx;
+}
+
+.hotline-item__main {
+  min-width: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+}
+
+.hotline-item__label {
+  font-size: 24rpx;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.hotline-item__phone {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.hotline-item__action {
+  flex-shrink: 0;
+  padding: 12rpx 22rpx;
+  border-radius: 999rpx;
+  font-size: 22rpx;
+  color: #0e2341;
+  background: linear-gradient(180deg, #fcefd4 0%, #dab26b 100%);
+}
+
+.hotline-popup__footer {
+  padding: 24rpx 32rpx 34rpx;
+  text-align: center;
+  font-size: 28rpx;
+  color: rgba(255, 255, 255, 0.82);
+  border-top: 1rpx solid rgba(255, 255, 255, 0.08);
+}
+
 .g-border--logout {
   margin-top: 28rpx;
   margin-bottom: 8rpx;
   padding: 1rpx;
   border-radius: 27rpx;
-  background: linear-gradient(
-    178deg,
-    #5e97d2 0%,
-    #2c5f8f 49%,
-    #6a9ccf 100%
-  );
+  background: linear-gradient(178deg, #5e97d2 0%, #2c5f8f 49%, #6a9ccf 100%);
 }
 
 .logout-inner {

@@ -7,7 +7,7 @@
         :indicator-dots="false"
         :current="lunboCurrent"
         :autoplay="true"
-        :interval="3000"
+        :interval="300000"
         :duration="500"
         @change="onLunboChange"
       >
@@ -198,25 +198,25 @@ const lunboCards = ref([
     categorya: 1,
     categoryb: 1,
   },
-  {
-    title: "",
-    subtitle: "",
-    backgroundImage:
-      "https://mvpme82.cloud/data/15d51da8-c168-4d2d-9967-94c6aabc815d_1774526454645.jpg",
-    categorya: 1,
-    categoryb: 5,
-  },
+  // {
+  //   title: "",
+  //   subtitle: "",
+  //   backgroundImage:
+  //     "https://mvpme82.cloud/data/15d51da8-c168-4d2d-9967-94c6aabc815d_1774526454645.jpg",
+  //   categorya: 1,
+  //   categoryb: 5,
+  // },
 ]);
 
 const serviceCardsA = ref([
   {
     icon: "/static/pages/mall/yuexiang/bus.png",
-    title: "朝阳美食巴士游",
+    title: "畅游朝阳美景",
     subtitle: "移动盛宴穿梭朝阳",
     backgroundImage:
       "https://mvpme82.cloud/data/6f0231a2-8045-4ce6-b762-1fcbbe9777b1_1774320029683.jpg",
     categorya: 1,
-    categoryb: 4,
+    categoryb: 1,
   },
   {
     icon: "/static/pages/mall/yuexiang/meeting.png",

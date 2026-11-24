@@ -14,6 +14,7 @@
           :variant="listVariant"
           @toDetail="handleToDetail"
           @addCart="handleAddCart"
+          :userid="state.userinfo?.id || ''"
         ></product-item>
       </view>
 
@@ -41,6 +42,7 @@ const state = reactive({
   errorMsg: "", // 错误提示
   categorya: 0, // 一级分类ID
   categoryb: 0, // 二级分类ID
+  bcompanyid: 0, // 供应商企业id
 });
 
 /** 益企·安居(0) 与 益企·悦享(1) 共用同一套深色列表卡片；康护等其它分类仍用默认行 */
@@ -82,6 +84,7 @@ const loadProductList = async () => {
   let payload = {
     categorya: state.categorya || 0, // 一级分类ID，默认为0
     categoryb: state.categoryb || 0, // 二级分类ID，默认为
+    bcompanyid: state.bcompanyid || 0, // 供应商企业id，默认为0
     pageSize: 20,
     currentPage: 1,
     ccompanyid: state.userinfo?.ccompanyid || "", // 从用户信息中获取companyid，若无则传空字符串
@@ -179,6 +182,7 @@ const getStorageAsync = (key) => {
 onLoad((options) => {
   state.categorya = options.categorya || 0; // 从页面参数获取一级分类ID，默认为0
   state.categoryb = options.categoryb || 0; // 从页面参数获取二级分类ID，默认为0
+  state.bcompanyid = options.bcompanyid || 0; //供应商id
   applyNavigationStyle();
   loadProductList();
 });
@@ -186,12 +190,6 @@ onLoad((options) => {
 onShow(() => {
   applyNavigationStyle();
 });
-
-// onShow((options) => {
-//   state.categorya = options.categorya || 0; // 从页面参数获取一级分类ID，默认为0
-//   state.categoryb = options.categoryb || 0; // 从页面参数获取二级分类ID，默认为0
-//   loadProductList();
-// });
 </script>
 
 <style scoped lang="scss">
